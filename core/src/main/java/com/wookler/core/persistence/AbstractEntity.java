@@ -33,7 +33,9 @@ public abstract class AbstractEntity {
 	 * 
 	 * @throws Exception
 	 */
-	public abstract void save() throws Exception;
+	public void save() throws Exception {
+		(DataManager.get().getPersister(getClass())).save(this);
+	}
 
 	/**
 	 * Delete this instance of the Entity. This will delete the entity from the
@@ -41,5 +43,7 @@ public abstract class AbstractEntity {
 	 * 
 	 * @throws Exception
 	 */
-	public abstract void delete() throws Exception;
+	public void delete() throws Exception {
+		(DataManager.get().getPersister(getClass())).save(this);
+	}
 }

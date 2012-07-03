@@ -18,7 +18,7 @@ import com.wookler.utils.ListParam;
  * @param <T>
  *            - Entity Type(s).
  */
-public abstract class AbstractPersister<T extends AbstractEntity> implements
+public abstract class AbstractPersister implements
 		InitializedHandle {
 	protected EnumPersisterState state = EnumPersisterState.Unknown;
 
@@ -52,7 +52,7 @@ public abstract class AbstractPersister<T extends AbstractEntity> implements
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract List<T> read(List<KeyValuePair<String>> columnkeys)
+	public abstract List<AbstractEntity> read(List<KeyValuePair<String>> columnkeys)
 			throws Exception;
 
 	/**
@@ -62,7 +62,7 @@ public abstract class AbstractPersister<T extends AbstractEntity> implements
 	 *            - Entity record instance.
 	 * @throws Exception
 	 */
-	public abstract void save(T record) throws Exception;
+	public abstract void save(AbstractEntity record) throws Exception;
 
 	/**
 	 * Bulk save a list of entity records.
@@ -71,7 +71,7 @@ public abstract class AbstractPersister<T extends AbstractEntity> implements
 	 *            - List of entity records.
 	 * @throws Exception
 	 */
-	public abstract void save(List<T> records) throws Exception;
+	public abstract void save(List<AbstractEntity> records) throws Exception;
 
 	/**
 	 * Delete the specified entity record.
@@ -80,5 +80,5 @@ public abstract class AbstractPersister<T extends AbstractEntity> implements
 	 *            - Entity record.
 	 * @throws Exception
 	 */
-	public abstract void delete(T record) throws Exception;
+	public abstract void delete(AbstractEntity record) throws Exception;
 }
