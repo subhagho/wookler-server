@@ -16,7 +16,7 @@ public @interface Attribute {
 	 * 
 	 * @return
 	 */
-	String name();
+	String name() default "";
 
 	/**
 	 * Is this attribute a key/key part.
@@ -25,10 +25,4 @@ public @interface Attribute {
 	 */
 	boolean keyattribute() default false;
 
-	/**
-	 * Is this attribute a reference key.
-	 * 
-	 * @return
-	 */
-	boolean reference() default false;
 }

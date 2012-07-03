@@ -4,6 +4,8 @@
 package com.wookler.core.persistence;
 
 /**
+ * Annotation marks referenced entities and association attribute.
+ * 
  * @author subhagho
  * 
  */
@@ -21,4 +23,18 @@ public @interface Reference {
 	 * @return
 	 */
 	String attribute();
+
+	/**
+	 * Specify the association with the target entity.
+	 * 
+	 * @return
+	 */
+	EnumRefereceType association() default EnumRefereceType.One2One;
+
+	/**
+	 * Lazy Load referenced entity.
+	 * 
+	 * @return
+	 */
+	boolean lazyload() default false;
 }

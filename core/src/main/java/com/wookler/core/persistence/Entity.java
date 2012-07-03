@@ -19,13 +19,13 @@ public @interface Entity {
 	 * 
 	 * @return
 	 */
-	String recordset();
+	String recordset() default "";
 
 	/**
-	 * Custom data persister to use for this entity. If no explicit persister is
+	 * Custom data persister class(name) to use for this entity. If no explicit persister is
 	 * specified the DataManager will search for the persister.
 	 * 
 	 * @return
 	 */
-	Class<AbstractPersister> persister();
+	String persister() default "";
 }
