@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test>
+	<data>
+		<params>
+			<instance type="Instance" name="test.instance.1" class="com.wookler.core.utils.Test_Param">
+				<params>
+					<param type="List">
+						<values>
+							<value type="Value" name="v.i" value="9999" />
+							<value type="Value" name="v.d" value="9999.99887" />
+							<value type="Value" name="v.s" value="This is a String" />
+							<value type="List" name="v.l">
+								<values>
+									<value type="Value" name="vv.i" value="12837912" />
+									<value type="Value" name="pi" value="3.142" />
+									<value type="Instance" name="vv.ins" class="com.wookler.core.utils.Test_Param">
+									</value>
+								</values>
+							</value>
+							<value type="Instance" name="vl.ins" class="com.wookler.core.utils.Test_Param" >
+								<params>
+									<param type="Value" value="String 1" />
+									<param type="Value" value="String 2" />
+									<param type="Value" value="String 3" />
+									<param type="List">
+										<values>
+											<value type="Value" value="1000" />
+											<value type="Value" value="1001" />
+											<value type="Value" value="1002" />
+											<value type="Value" value="1003" />
+										</values>
+									</param>
+								</params>
+							</value>
+						</values>
+					</param>
+				</params>
+			</instance>
+		</params>
+	</data>
+</test>
