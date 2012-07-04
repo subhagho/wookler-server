@@ -1,0 +1,119 @@
+/**
+ * 
+ */
+package com.wookler.entities;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.wookler.core.persistence.AbstractEntity;
+import com.wookler.core.persistence.Attribute;
+import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.Reference;
+
+/**
+ * @author subhagho
+ * 
+ */
+@Entity(recordset = "SEQUENCE")
+@XmlRootElement(name = "sequence")
+@XmlAccessorType(XmlAccessType.NONE)
+public class Sequence extends AbstractEntity {
+	@Attribute(name = "MEDIAID")
+	@XmlElement(name = "mediaid")
+	private String mediaid;
+
+	@Attribute(name = "SEQID", keyattribute=true)
+	@XmlElement(name = "sequenceid")
+	private long seqid;
+
+	@Attribute(name = "STARTTIME")
+	@XmlElement(name = "start")
+	private long starttime;
+
+	@Attribute(name = "ENDTIME")
+	@XmlElement(name = "end")
+	private long endtime;
+
+	@Attribute(name = "CREATIVE")
+	@XmlElement(name = "creative")
+	@Reference(target="com.wookler.entities.Creative", attribute="id")
+	private Creative creative;
+	
+	/**
+	 * @return the mediaid
+	 */
+	public String getMediaid() {
+		return mediaid;
+	}
+
+	/**
+	 * @param mediaid
+	 *            the mediaid to set
+	 */
+	public void setMediaid(String mediaid) {
+		this.mediaid = mediaid;
+	}
+
+	/**
+	 * @return the seqid
+	 */
+	public long getSeqid() {
+		return seqid;
+	}
+
+	/**
+	 * @param seqid
+	 *            the seqid to set
+	 */
+	public void setSeqid(long seqid) {
+		this.seqid = seqid;
+	}
+
+	/**
+	 * @return the starttime
+	 */
+	public long getStarttime() {
+		return starttime;
+	}
+
+	/**
+	 * @param starttime
+	 *            the starttime to set
+	 */
+	public void setStarttime(long starttime) {
+		this.starttime = starttime;
+	}
+
+	/**
+	 * @return the endtime
+	 */
+	public long getEndtime() {
+		return endtime;
+	}
+
+	/**
+	 * @param endtime
+	 *            the endtime to set
+	 */
+	public void setEndtime(long endtime) {
+		this.endtime = endtime;
+	}
+
+	/**
+	 * @return the creative
+	 */
+	public Creative getCreative() {
+		return creative;
+	}
+
+	/**
+	 * @param creative the creative to set
+	 */
+	public void setCreative(Creative creative) {
+		this.creative = creative;
+	}
+
+}

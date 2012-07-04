@@ -5,6 +5,8 @@ package com.wookler.entities;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
@@ -18,13 +20,20 @@ import com.wookler.core.persistence.Entity;
 @Entity
 public abstract class Media extends AbstractEntity {
 	@Attribute(name = "TYPE")
+	@XmlElement(name = "type")
 	protected EnumMediaType type;
 
 	@Attribute(name = "ID", keyattribute = true)
+	@XmlElement(name = "id")
 	private String id;
 
 	@Attribute(name = "TIMESTAMP")
+	@XmlElement(name = "timestamp")
 	private Date timestamp;
+
+	@Attribute(name = "TAGS")
+	@XmlElement(name = "tags")
+	private String[] tags;
 
 	/**
 	 * @return
@@ -61,5 +70,20 @@ public abstract class Media extends AbstractEntity {
 	 */
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	/**
+	 * @return the tags
+	 */
+	public String[] getTags() {
+		return tags;
+	}
+
+	/**
+	 * @param tags
+	 *            the tags to set
+	 */
+	public void setTags(String[] tags) {
+		this.tags = tags;
 	}
 }

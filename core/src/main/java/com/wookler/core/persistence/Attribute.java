@@ -3,6 +3,11 @@
  */
 package com.wookler.core.persistence;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Annotation marks fields to be persisted for an Entity. Fields should be
  * exposed via getters/setters (method name format getXxxxx()/setXxxxx().
@@ -10,6 +15,8 @@ package com.wookler.core.persistence;
  * @author subhagho
  * 
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface Attribute {
 	/**
 	 * Column name this entity attribute maps to.

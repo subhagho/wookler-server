@@ -3,19 +3,26 @@
  */
 package com.wookler.core.persistence;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Annotation marks referenced entities and association attribute.
  * 
  * @author subhagho
  * 
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface Reference {
 	/**
 	 * Target entity the attribute points to.
 	 * 
 	 * @return
 	 */
-	Class<AbstractEntity> target();
+	String target();
 
 	/**
 	 * Target entity attribute this field refers to.

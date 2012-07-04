@@ -3,8 +3,10 @@
  */
 package com.wookler.core.persistence;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation marking a POJO as a persisted entity.
@@ -13,6 +15,7 @@ import java.lang.annotation.RetentionPolicy;
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 public @interface Entity {
 	/**
 	 * Table/ColumnGroup/RecordSet name this entity is mapped to.

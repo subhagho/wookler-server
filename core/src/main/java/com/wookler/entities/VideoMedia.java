@@ -3,25 +3,37 @@
  */
 package com.wookler.entities;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
 
 /**
+ * Class represents a media type Video.
+ * 
  * @author subhagho
  * 
  */
-@Entity(recordset = "VIDEOS")
+@Entity(recordset = "VIDEO")
+@XmlRootElement(name = "video")
+@XmlAccessorType(XmlAccessType.NONE)
 public class VideoMedia extends Media {
-	@Attribute(name="NAME")
+	@Attribute(name = "NAME")
+	@XmlElement(name = "name")
 	private String name;
 
-	@Attribute(name="DESC")
+	@Attribute(name = "DESC")
+	@XmlElement(name = "description")
 	private String description;
 
-	@Attribute(name="LENGTH")
+	@Attribute(name = "LENGTH")
+	@XmlElement(name = "length")
 	private long length;
 
-	@Attribute(name="URI")
+	@Attribute(name = "URI")
+	@XmlElement(name = "uri")
 	private String location;
 
 	public VideoMedia() {
