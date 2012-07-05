@@ -18,8 +18,7 @@ import com.wookler.utils.ListParam;
  * @param <T>
  *            - Entity Type(s).
  */
-public abstract class AbstractPersister implements
-		InitializedHandle {
+public abstract class AbstractPersister implements InitializedHandle {
 	protected EnumPersisterState state = EnumPersisterState.Unknown;
 
 	protected String classtype;
@@ -32,6 +31,19 @@ public abstract class AbstractPersister implements
 	 */
 	public String key() {
 		return classtype;
+	}
+
+	/**
+	 * Get the Getter/Setter method name for the field.
+	 * 
+	 * @param prefix
+	 *            - "get"/"set"
+	 * @param field
+	 *            - Field name
+	 * @return
+	 */
+	protected String getMethodName(String prefix, String field) {
+		return prefix + field.toUpperCase().charAt(0) + field.substring(1);
 	}
 
 	/**
@@ -49,10 +61,13 @@ public abstract class AbstractPersister implements
 	 * @note Search keys are ANDED, no grouping operations are supported.
 	 * @param columnkeys
 	 *            - List of Column->Value to be used for searching.
+	 * @param type
+	 *            - Class type of the entity to search.
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract List<AbstractEntity> read(List<KeyValuePair<String>> columnkeys)
+	public abstract List<AbstractEntity> read(
+			List<KeyValuePair<String>> columnkeys, Class<AbstractEntity> type)
 			throws Exception;
 
 	/**

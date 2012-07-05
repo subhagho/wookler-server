@@ -3,10 +3,16 @@
  */
 package com.wookler.core.persistence;
 
+import java.io.File;
+import java.io.FileReader;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 import com.wookler.core.EnumInstanceState;
 import com.wookler.utils.AbstractParam;
@@ -96,10 +102,81 @@ public class CSVPersister extends AbstractPersister {
 	 * @see com.wookler.core.persistence.AbstractPersister#read(java.util.List)
 	 */
 	@Override
-	public List<AbstractEntity> read(List<KeyValuePair<String>> columnkeys)
-			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<AbstractEntity> read(List<KeyValuePair<String>> columnkeys,
+			Class<AbstractEntity> type) throws Exception {
+		List<AbstractEntity> result = null;
+		String cname = type.getCanonicalName();
+		if (!cache.containsKey(cname)) {
+			load(type);
+		}
+		List<AbstractEntity> records = cache.get(cname);
+		for (AbstractEntity rec : records) {
+
+		}
+		return result;
+	}
+
+	private HashMap<String, AttributeReflection> getEntityMetadata(
+			Class<AbstractEntity> type) throws Exception {
+		HashMap<String, AttributeReflection> map = new HashMap<String, AttributeReflection>();
+
+		Field[] fields = type.getFields();
+		if (fields != null && fields.length > 0) {
+			for (Field fd : fields) {
+				if (!fd.isAnnotationPresent(Attribute.class))
+					continue;
+				Attribute attr = (Attribute) fd.getAnnotation(Attribute.class);
+				AttributeReflection ar = new AttributeReflection();
+				ar.Field = fd;
+				ar.Column = attr.name();
+
+				String mname = getMethodName("get", fd.getName());
+				ar.Getter = type.getMethod(mname, (Class<?>) null);
+				mname = getMethodName("set", fd.getName());
+				ar.Setter = type.getMethod(mname, fd.getType());
+
+				map.put(ar.Column, ar);
+			}
+		}
+
+		return map;
+	}
+
+	private void load(Class<AbstractEntity> type) throws Exception {
+		if (!type.isAnnotationPresent(Entity.class))
+			throw new Exception("Class [" + type.getCanonicalName()
+					+ "] has not been annotated as an Entity.");
+		Entity eann = (Entity) type.getAnnotation(Entity.class);
+		String fname = eann.recordset() + ".CSV";
+		String path = datadir + "/" + fname;
+
+		File fi = new File(path);
+		if (!fi.exists())
+			throw new Exception("Cannot find CSV file [" + path
+					+ "] for entity [" + type.getCanonicalName() + "]");
+		List<AbstractEntity> entities = new ArrayList<AbstractEntity>();
+
+		CSVReader reader = new CSVReader(new FileReader(path), ',', '"');
+		String[] header = null;
+		while (true) {
+			String[] data = reader.readNext();
+			if (data == null)
+				break;
+			if (header == null) {
+				header = data;
+				continue;
+			}
+			AbstractEntity record = parseRecord(type, header, data);
+			entities.add(record);
+		}
+		cache.put(type.getCanonicalName(), entities);
+	}
+
+	private AbstractEntity parseRecord(Class<AbstractEntity> type,
+			String[] header, String[] data) throws Exception {
+		AbstractEntity entity = (AbstractEntity) type.newInstance();
+
+		return entity;
 	}
 
 	/*
@@ -111,8 +188,8 @@ public class CSVPersister extends AbstractPersister {
 	 */
 	@Override
 	public void save(AbstractEntity record) throws Exception {
-		// TODO Auto-generated method stub
-
+		throw new NotImplementedException(
+				"This is a dummy persister. Write operations are not supported.");
 	}
 
 	/*
@@ -122,7 +199,8 @@ public class CSVPersister extends AbstractPersister {
 	 */
 	@Override
 	public void save(List<AbstractEntity> records) throws Exception {
-		throw new NotImplementedException("This is a dummy persister. Write operations are not supported.");
+		throw new NotImplementedException(
+				"This is a dummy persister. Write operations are not supported.");
 	}
 
 	/*
@@ -134,7 +212,8 @@ public class CSVPersister extends AbstractPersister {
 	 */
 	@Override
 	public void delete(AbstractEntity record) throws Exception {
-		throw new NotImplementedException("This is a dummy persister. Write operations are not supported.");
+		throw new NotImplementedException(
+				"This is a dummy persister. Write operations are not supported.");
 	}
 
 }
