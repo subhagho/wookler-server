@@ -6,6 +6,7 @@ package com.wookler.core.persistence.csv;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AbstractPersister;
+import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
 import com.wookler.utils.AbstractParam;
 import com.wookler.utils.KeyValuePair;
@@ -156,10 +158,19 @@ public class CSVPersister extends AbstractPersister {
 		return entity;
 	}
 
-	protected void setFieldValue(Field fd, String value) throws Exception {
+	protected void setFieldValue(AttributeReflection attr,
+			AbstractEntity entity, Field fd, String value) throws Exception {
 		Class<?> type = fd.getType();
 		if (type.equals(Short.class) || type.equals(short.class)) {
-
+			attr.Setter.invoke(entity, Short.parseShort(value));
+		} else if (type.equals(Integer.class) || type.equals(int.class)) {
+			attr.Setter.invoke(entity, Integer.parseInt(value));
+		} else if (type.equals(Long.class) || type.equals(long.class)) {
+			attr.Setter.invoke(entity, Long.parseLong(value));
+		} else if (type.equals(Float.class) || type.equals(float.class)) {
+			attr.Setter.invoke(entity, Float.parseFloat(value));
+		} else if (type.equals(Double.class) || type.equals(double.class)) {
+			attr.Setter.invoke(entity, Double.parseDouble(value));
 		}
 	}
 
