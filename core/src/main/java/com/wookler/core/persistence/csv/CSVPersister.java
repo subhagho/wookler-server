@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.NotImplementedException;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -158,22 +159,7 @@ public class CSVPersister extends AbstractPersister {
 		return entity;
 	}
 
-	protected void setFieldValue(AttributeReflection attr,
-			AbstractEntity entity, Field fd, String value) throws Exception {
-		Class<?> type = fd.getType();
-		if (type.equals(Short.class) || type.equals(short.class)) {
-			attr.Setter.invoke(entity, Short.parseShort(value));
-		} else if (type.equals(Integer.class) || type.equals(int.class)) {
-			attr.Setter.invoke(entity, Integer.parseInt(value));
-		} else if (type.equals(Long.class) || type.equals(long.class)) {
-			attr.Setter.invoke(entity, Long.parseLong(value));
-		} else if (type.equals(Float.class) || type.equals(float.class)) {
-			attr.Setter.invoke(entity, Float.parseFloat(value));
-		} else if (type.equals(Double.class) || type.equals(double.class)) {
-			attr.Setter.invoke(entity, Double.parseDouble(value));
-		}
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 

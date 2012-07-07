@@ -6,6 +6,8 @@ package com.wookler.core.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.apache.commons.beanutils.PropertyUtils;
+
 import com.wookler.core.persistence.AbstractPersister;
 
 /**
@@ -13,8 +15,8 @@ import com.wookler.core.persistence.AbstractPersister;
  * 
  */
 public class AdHocTest {
-	private static class Natives {
-		private String string;
+	public static class Natives {
+		private String varstring;
 		private short varshort;
 		private int varint;
 		private long varlong;
@@ -24,39 +26,19 @@ public class AdHocTest {
 		private byte varbyte;
 		private char varchar;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
+		/**
+		 * @return the varstring
 		 */
-		@Override
-		public String toString() {
-			StringBuffer buff = new StringBuffer();
-			buff.append("[STRING : ").append(string).append("]\n");
-			buff.append("[SHORT : ").append(varshort).append("]\n");
-			buff.append("[INT : ").append(varint).append("]\n");
-			buff.append("[LONG : ").append(varlong).append("]\n");
-			buff.append("[FLOAT : ").append(varfloat).append("]\n");
-			buff.append("[DOUBLE : ").append(vardouble).append("]\n");
-			buff.append("[BOOL : ").append(varbool).append("]\n");
-			buff.append("[BYTE : ").append(varbyte).append("]\n");
-			buff.append("[CHAR : ").append(varchar).append("]\n");
-			return buff.toString();
+		public String getVarstring() {
+			return varstring;
 		}
 
 		/**
-		 * @return the string
+		 * @param varstring
+		 *            the varstring to set
 		 */
-		public String getString() {
-			return string;
-		}
-
-		/**
-		 * @param string
-		 *            the string to set
-		 */
-		public void setString(String string) {
-			this.string = string;
+		public void setVarstring(String varstring) {
+			this.varstring = varstring;
 		}
 
 		/**
@@ -179,6 +161,26 @@ public class AdHocTest {
 			this.varchar = varchar;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			StringBuffer buff = new StringBuffer();
+			buff.append("[STRING : ").append(varstring).append("]\n");
+			buff.append("[SHORT : ").append(varshort).append("]\n");
+			buff.append("[INT : ").append(varint).append("]\n");
+			buff.append("[LONG : ").append(varlong).append("]\n");
+			buff.append("[FLOAT : ").append(varfloat).append("]\n");
+			buff.append("[DOUBLE : ").append(vardouble).append("]\n");
+			buff.append("[BOOL : ").append(varbool).append("]\n");
+			buff.append("[BYTE : ").append(varbyte).append("]\n");
+			buff.append("[CHAR : ").append(varchar).append("]\n");
+			return buff.toString();
+		}
+
 	}
 
 	/**
@@ -190,22 +192,25 @@ public class AdHocTest {
 
 			Field[] fields = nt.getClass().getDeclaredFields();
 			for (Field fd : fields) {
-				Method mt = nt.getClass().getMethod(
-						AbstractPersister.getMethodName("set", fd.getName()),
-						new Class[] { fd.getType() });
 				Class<?> type = fd.getType();
 				if (type.equals(String.class)) {
-					mt.invoke(nt, "This is a string...");
+					PropertyUtils.setProperty(nt, fd.getName(),
+							"This is a new String...");
 				} else if (type.equals(Short.class) || type.equals(short.class)) {
-					mt.invoke(nt, Short.MAX_VALUE);
+					PropertyUtils
+							.setProperty(nt, fd.getName(), Short.MAX_VALUE);
 				} else if (type.equals(Integer.class) || type.equals(int.class)) {
-					mt.invoke(nt, Integer.MAX_VALUE);
+					PropertyUtils.setProperty(nt, fd.getName(),
+							Integer.MAX_VALUE);
 				} else if (type.equals(Long.class) || type.equals(long.class)) {
-					mt.invoke(nt, Long.MAX_VALUE);
+					PropertyUtils.setProperty(nt, fd.getName(), Long.MAX_VALUE);
 				} else if (type.equals(Float.class) || type.equals(float.class)) {
-					mt.invoke(nt, Float.MAX_VALUE);
-				} else if (type.equals(Double.class) || type.equals(double.class)) {
-					mt.invoke(nt, Double.MAX_VALUE);
+					PropertyUtils
+							.setProperty(nt, fd.getName(), Float.MAX_VALUE);
+				} else if (type.equals(Double.class)
+						|| type.equals(double.class)) {
+					PropertyUtils.setProperty(nt, fd.getName(),
+							Double.MAX_VALUE);
 				}
 			}
 

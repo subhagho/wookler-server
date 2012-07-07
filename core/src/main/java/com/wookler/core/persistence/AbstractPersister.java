@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtils;
+
 import com.wookler.core.InitializedHandle;
 import com.wookler.utils.KeyValuePair;
 import com.wookler.utils.ListParam;
@@ -80,6 +82,27 @@ public abstract class AbstractPersister implements InitializedHandle {
 			metacache.put(type.getCanonicalName(), map);
 		}
 		return metacache.get(type.getCanonicalName());
+	}
+
+	/**
+	 * Set the Field value to the passed object. The base method only supports
+	 * primitive types.
+	 * 
+	 * @param entity
+	 *            - Target Object
+	 * @param fd
+	 *            - Field to set
+	 * @param value
+	 *            - Value Object
+	 * @throws Exception
+	 */
+	protected void setFieldValue(AbstractEntity entity, Field fd, Object value)
+			throws Exception {
+		if (fd.getType().isPrimitive()) {
+			PropertyUtils.setProperty(entity, fd.getName(), value);
+		} else
+			throw new Exception(
+					"Non-primitive type support not implemented in the base method.");
 	}
 
 	/**
