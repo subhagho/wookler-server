@@ -70,7 +70,7 @@ public class FilterConditionParser {
 						values[1] = vmatch.group(2).trim();
 						if (quoted.containsKey(values[1]))
 							values[1] = quoted.get(values[1]);
-						
+
 						FilterCondition bcond = new FilterCondition(column,
 								eoper, values);
 						return bcond;
@@ -92,6 +92,7 @@ public class FilterConditionParser {
 			String key = "QUOTED_STRING_" + index;
 			matcher.appendReplacement(out, key);
 			quoted.put(key, part.trim());
+			index++;
 		}
 		return matcher.appendTail(out).toString();
 	}

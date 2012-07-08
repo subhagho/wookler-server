@@ -4,7 +4,6 @@
 package com.wookler.core.persistence;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -23,8 +22,6 @@ import com.wookler.utils.ListParam;
  *            - Entity Type(s).
  */
 public abstract class AbstractPersister implements InitializedHandle {
-	private HashMap<String, HashMap<String, AttributeReflection>> metacache = new HashMap<String, HashMap<String, AttributeReflection>>();
-
 	protected EnumPersisterState state = EnumPersisterState.Unknown;
 
 	protected String classtype;
@@ -39,51 +36,7 @@ public abstract class AbstractPersister implements InitializedHandle {
 		return classtype;
 	}
 
-	/**
-	 * Get/Load the type metadata.
-	 * 
-	 * @param type
-	 *            - Class type
-	 * @return
-	 * @throws Exception
-	 */
-	protected HashMap<String, AttributeReflection> getEntityMetadata(
-			Class<AbstractEntity> type) throws Exception {
-		if (!metacache.containsKey(type.getCanonicalName())) {
-			HashMap<String, AttributeReflection> map = new HashMap<String, AttributeReflection>();
-
-			Field[] fields = type.getDeclaredFields();
-			if (fields != null && fields.length > 0) {
-				for (Field fd : fields) {
-					if (!fd.isAnnotationPresent(Attribute.class))
-						continue;
-					Attribute attr = (Attribute) fd
-							.getAnnotation(Attribute.class);
-					AttributeReflection ar = new AttributeReflection();
-					ar.Field = fd;
-					ar.Column = attr.name();
-
-					String mname = getMethodName("get", fd.getName());
-					ar.Getter = type.getMethod(mname, (Class<?>) null);
-					mname = getMethodName("set", fd.getName());
-					ar.Setter = type.getMethod(mname, fd.getType());
-
-					if (fd.isAnnotationPresent(Reference.class)) {
-						Reference ref = (Reference) fd
-								.getAnnotation(Reference.class);
-						ar.Reference = new ReferenceReflection();
-						ar.Reference.Class = ref.target();
-						ar.Reference.Field = ref.attribute();
-						ar.Reference.Type = ref.association();
-					}
-					map.put(ar.Column, ar);
-				}
-			}
-			metacache.put(type.getCanonicalName(), map);
-		}
-		return metacache.get(type.getCanonicalName());
-	}
-
+	
 	/**
 	 * Set the Field value to the passed object. The base method only supports
 	 * primitive types.
@@ -103,19 +56,6 @@ public abstract class AbstractPersister implements InitializedHandle {
 		} else
 			throw new Exception(
 					"Non-primitive type support not implemented in the base method.");
-	}
-
-	/**
-	 * Get the Getter/Setter method name for the field.
-	 * 
-	 * @param prefix
-	 *            - "get"/"set"
-	 * @param field
-	 *            - Field name
-	 * @return
-	 */
-	public static String getMethodName(String prefix, String field) {
-		return prefix + field.toUpperCase().charAt(0) + field.substring(1);
 	}
 
 	/**
