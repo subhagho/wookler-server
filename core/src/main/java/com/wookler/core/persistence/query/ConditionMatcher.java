@@ -23,10 +23,10 @@ public class ConditionMatcher {
 		if (column.indexOf('.') < 0) {
 			AttributeReflection attr = ReflectionUtils.get().getAttribute(
 					entity.getClass(), column);
-			Object evalue = PropertyUtils.getProperty(entity,
-					attr.Field.getName());
-			if (evalue != null) {
-				return compare(value, evalue, operator, attr.Field.getType());
+			Object src = PropertyUtils
+					.getProperty(entity, attr.Field.getName());
+			if (src != null) {
+				return compare(src, value, operator, attr.Field.getType());
 			}
 		} else {
 
@@ -63,11 +63,27 @@ public class ConditionMatcher {
 			if (operator != EnumOperator.Contains)
 				return false;
 			Class<?> atype = type.getComponentType();
-			if (EnumPrimitives.isPrimitiveType(atype)) {
+			if (atype.isPrimitive()) {
 				EnumPrimitives etype = EnumPrimitives.type(atype);
-			} else if (atype.equals(String.class)) {
-
+				switch (etype) {
+				case EShort:
+					return containsShortArray(src, tgt);
+				case EInteger:
+					return containsIntArray(src, tgt);
+				case ELong:
+					return containsLongArray(src, tgt);
+				case EFloat:
+					return containsFloatArray(src, tgt);
+				case EDouble:
+					return containsDoubleArray(src, tgt);
+				case ECharacter:
+					return containsCharArray(src, tgt);
+				}
+			} else {
+				containsObjectArray(src, tgt);
 			}
+		} else if (src instanceof Enum) {
+			// TODO: Figure out how to handle Enums
 		} else {
 			throw new Exception("Unsupported value comparison. [CLASS:"
 					+ type.getCanonicalName() + "]");
@@ -75,7 +91,69 @@ public class ConditionMatcher {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
+	private <T> boolean containsObjectArray(Object src, Object tgt)
+			throws Exception {
+		T[] array = (T[]) src;
+		for (T val : array) {
+			if (val.equals((T) tgt))
+				return true;
+		}
+		return false;
+	}
+
 	private boolean containsShortArray(Object src, Object tgt) throws Exception {
+		short[] array = (short[]) src;
+		for (short val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsIntArray(Object src, Object tgt) throws Exception {
+		int[] array = (int[]) src;
+		for (int val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsLongArray(Object src, Object tgt) throws Exception {
+		long[] array = (long[]) src;
+		for (long val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsFloatArray(Object src, Object tgt) throws Exception {
+		float[] array = (float[]) src;
+		for (float val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsDoubleArray(Object src, Object tgt)
+			throws Exception {
+		double[] array = (double[]) src;
+		for (double val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsCharArray(Object src, Object tgt) throws Exception {
+		char[] array = (char[]) src;
+		for (char val : array) {
+			if (val == (Short) tgt)
+				return true;
+		}
 		return false;
 	}
 

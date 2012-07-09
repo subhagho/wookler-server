@@ -18,20 +18,23 @@ public class AdHocTests {
 	public static void main(String[] args) {
 		Integer[] array = { 1, 2, 3, 4 };
 		List<Integer> list = new ArrayList<Integer>();
-		check(array);
-		check(list);
+		try {
+			boolean retval = containsObjectArray(array, new Integer(3));
+			System.out.println("Found : " + retval);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public static void check(Object obj) {
-		if (obj.getClass().isArray()) {
-			int[] array = (int[]) obj;
-			for (Object aobj : array) {
-				int value = (Integer) aobj;
-				System.out.println("Value : " + value);
-			}
-			System.out.println("Is an array.");
-		} else if (obj instanceof Iterable<?>) {
-			System.out.println("Is an Iterable.");
+	@SuppressWarnings("unchecked")
+	private static <T> boolean containsObjectArray(Object src, Object tgt)
+			throws Exception {
+		T[] array = (T[]) src;
+		for (T val : array) {
+			if (val.equals((T) tgt))
+				return true;
 		}
+		return false;
 	}
 }

@@ -36,6 +36,10 @@ public class VideoMedia extends Media {
 	@XmlElement(name = "uri")
 	private String location;
 
+	@Attribute(name = "SOURCE")
+	@XmlElement(name = "source")
+	private EnumVideoSource source;
+
 	public VideoMedia() {
 		type = EnumMediaType.Video;
 	}
@@ -98,6 +102,21 @@ public class VideoMedia extends Media {
 	 */
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public EnumVideoSource getSource() {
+		return source;
+	}
+
+	/**
+	 * @param source
+	 *            the source to set
+	 */
+	public void setSource(EnumVideoSource source) {
+		this.source = source;
 	}
 
 }
