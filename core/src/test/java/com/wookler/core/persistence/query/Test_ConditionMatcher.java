@@ -6,6 +6,7 @@ package com.wookler.core.persistence.query;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class Test_ConditionMatcher {
 	@Entity(recordset = "EMBED")
 	public static class EntityMatchEmbed extends AbstractEntity {
 		@Attribute(name = "FORshort")
-		private short forshort = Short.MIN_VALUE;
+		private short forshort = 128;
 		@Attribute(name = "FORReference")
 		private EntityMatchEmbed2 forReference = new EntityMatchEmbed2();
 
@@ -108,6 +109,8 @@ public class Test_ConditionMatcher {
 		private Character forChar = 'B';
 		@Attribute(name = "FORString")
 		private String forString = "77380-10632";
+		@Attribute(name = "FORDate")
+		private Date forDate = new Date(System.currentTimeMillis());
 		@Attribute(name = "FORStringContains")
 		private List<String> forStringContains = new ArrayList<String>();
 		@Attribute(name = "FORIntContains")
@@ -378,6 +381,126 @@ public class Test_ConditionMatcher {
 			this.forReference = forReference;
 		}
 
+		/**
+		 * @return the forDate
+		 */
+		public Date getForDate() {
+			return forDate;
+		}
+
+		/**
+		 * @param forDate
+		 *            the forDate to set
+		 */
+		public void setForDate(Date forDate) {
+			this.forDate = forDate;
+		}
+
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchReference() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORReference.FORshort",
+					EnumOperator.Equal, ""
+							+ entity.getForReference().getForshort());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORReference.FORReference.FORint",
+					EnumOperator.Equal, ""
+							+ entity.getForReference().getForReference()
+									.getForint());
+			assertEquals(true, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchDate() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORDate", EnumOperator.Equal,
+					entity.getForDate());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate", EnumOperator.NotEqual,
+					new Date(0));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate", EnumOperator.GreaterThan,
+					new Date(0));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate",
+					EnumOperator.GreaterThanEqual, entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate", EnumOperator.LessThan,
+					"Z" + entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate",
+					EnumOperator.LessThanEqual, entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate", EnumOperator.Like,
+					"(.*)-(.*)");
+			assertEquals(true, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchString() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORString", EnumOperator.Equal,
+					entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString",
+					EnumOperator.GreaterThan, "*" + entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString",
+					EnumOperator.GreaterThanEqual, entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString", EnumOperator.LessThan,
+					"Z" + entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString",
+					EnumOperator.LessThanEqual, entity.getForString());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORString", EnumOperator.Like,
+					"(.*)-(.*)");
+			assertEquals(true, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	/**
@@ -618,6 +741,223 @@ public class Test_ConditionMatcher {
 					EnumOperator.Between,
 					new String[] { "" + (entity.getForLong() + 1),
 							"" + (entity.getForLong() + 2) });
+			assertEquals(false, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchFloat() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORfloat", EnumOperator.Equal, ""
+					+ entity.getForfloat());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat",
+					EnumOperator.GreaterThan, "" + (entity.getForfloat() - 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat",
+					EnumOperator.GreaterThanEqual, ""
+							+ (entity.getForfloat() - 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat", EnumOperator.LessThan,
+					"" + (entity.getForfloat() + 1));
+			assertEquals(true, retval);
+			retval = matcher
+					.match(entity, "FORfloat", EnumOperator.LessThanEqual, ""
+							+ (entity.getForfloat() + 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat", EnumOperator.Between,
+					new String[] { "" + (entity.getForfloat() - 1),
+							"" + (entity.getForfloat() + 1) });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORfloat", EnumOperator.Between,
+					new String[] { "" + (entity.getForfloat() + 1),
+							"" + (entity.getForlong() + 2) });
+			assertEquals(false, retval);
+
+			retval = matcher.match(entity, "FORFloat", EnumOperator.Equal, ""
+					+ entity.getForFloat());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat",
+					EnumOperator.GreaterThan, "" + (entity.getForFloat() - 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat",
+					EnumOperator.GreaterThanEqual, ""
+							+ (entity.getForFloat() - 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat", EnumOperator.LessThan,
+					"" + (entity.getForFloat() + 1));
+			assertEquals(true, retval);
+			retval = matcher
+					.match(entity, "FORFloat", EnumOperator.LessThanEqual, ""
+							+ (entity.getForFloat() + 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat", EnumOperator.Between,
+					new String[] { "" + (entity.getForFloat() - 1),
+							"" + (entity.getForFloat() + 1) });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORFloat", EnumOperator.Between,
+					new String[] { "" + (entity.getForFloat() + 1),
+							"" + (entity.getForFloat() + 2) });
+			assertEquals(false, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchDouble() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORdouble", EnumOperator.Equal, ""
+					+ entity.getFordouble());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble",
+					EnumOperator.GreaterThan, "" + (entity.getFordouble() - 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble",
+					EnumOperator.GreaterThanEqual, ""
+							+ (entity.getFordouble() - 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble", EnumOperator.LessThan,
+					"" + (entity.getFordouble() + 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble",
+					EnumOperator.LessThanEqual, ""
+							+ (entity.getFordouble() + 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble", EnumOperator.Between,
+					new String[] { "" + (entity.getFordouble() - 1),
+							"" + (entity.getFordouble() + 1) });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORdouble", EnumOperator.Between,
+					new String[] { "" + (entity.getFordouble() + 1),
+							"" + (entity.getFordouble() + 2) });
+			assertEquals(false, retval);
+
+			retval = matcher.match(entity, "FORDouble", EnumOperator.Equal, ""
+					+ entity.getForDouble());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble",
+					EnumOperator.GreaterThan, "" + (entity.getForDouble() - 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble",
+					EnumOperator.GreaterThanEqual, ""
+							+ (entity.getForDouble() - 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble", EnumOperator.LessThan,
+					"" + (entity.getForDouble() + 1));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble",
+					EnumOperator.LessThanEqual, ""
+							+ (entity.getForDouble() + 2));
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble", EnumOperator.Between,
+					new String[] { "" + (entity.getForDouble() - 1),
+							"" + (entity.getForDouble() + 1) });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDouble", EnumOperator.Between,
+					new String[] { "" + (entity.getForDouble() + 1),
+							"" + (entity.getForDouble() + 2) });
+			assertEquals(false, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchChar() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORchar", EnumOperator.Equal, ""
+					+ entity.getForchar());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar", EnumOperator.NotEqual,
+					"X");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar", EnumOperator.GreaterThan,
+					"*");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar",
+					EnumOperator.GreaterThanEqual, " ");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar", EnumOperator.LessThan,
+					"Z");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar",
+					EnumOperator.LessThanEqual, "B");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar", EnumOperator.Between,
+					new String[] { " ", "B" });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORchar", EnumOperator.Between,
+					new String[] { "a", "b" });
+			assertEquals(false, retval);
+
+			retval = matcher.match(entity, "FORChar", EnumOperator.Equal, ""
+					+ entity.getForChar());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar", EnumOperator.NotEqual,
+					"" + 0);
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar", EnumOperator.GreaterThan,
+					"A");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar",
+					EnumOperator.GreaterThanEqual, " ");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar", EnumOperator.LessThan,
+					"Z");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar",
+					EnumOperator.LessThanEqual, "B");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar", EnumOperator.Between,
+					new String[] { "A", "Z" });
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORChar", EnumOperator.Between,
+					new String[] { "a", "n" });
 			assertEquals(false, retval);
 		} catch (Exception e) {
 			e.printStackTrace();

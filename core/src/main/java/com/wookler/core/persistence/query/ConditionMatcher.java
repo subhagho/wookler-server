@@ -47,7 +47,7 @@ public class ConditionMatcher {
 				return compare(src, value, operator, attr.Field.getType());
 			}
 		} else {
-			String[] vars = column.split(".");
+			String[] vars = column.split("\\.");
 			Object src = null;
 			Class<?> type = null;
 
@@ -61,7 +61,7 @@ public class ConditionMatcher {
 				} else {
 					AttributeReflection attr = ReflectionUtils.get()
 							.getAttribute(src.getClass(), var);
-					src = PropertyUtils.getProperty(entity,
+					src = PropertyUtils.getProperty(src,
 							attr.Field.getName());
 					type = attr.Field.getType();
 				}
