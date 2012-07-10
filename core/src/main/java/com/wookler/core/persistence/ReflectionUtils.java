@@ -74,7 +74,7 @@ public class ReflectionUtils {
 						ar.Column = attr.name();
 
 						String mname = getMethodName("get", fd.getName());
-						ar.Getter = type.getMethod(mname, (Class<?>) null);
+						ar.Getter = type.getMethod(mname);
 						mname = getMethodName("set", fd.getName());
 						ar.Setter = type.getMethod(mname, fd.getType());
 

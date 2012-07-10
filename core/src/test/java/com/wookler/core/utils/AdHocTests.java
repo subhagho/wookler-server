@@ -3,8 +3,8 @@
  */
 package com.wookler.core.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+
+import com.wookler.core.persistence.EnumEntityState;
 
 /**
  * @author subhagho
@@ -17,14 +17,24 @@ public class AdHocTests {
 	 */
 	public static void main(String[] args) {
 		Integer[] array = { 1, 2, 3, 4 };
-		List<Integer> list = new ArrayList<Integer>();
 		try {
 			boolean retval = containsObjectArray(array, new Integer(3));
 			System.out.println("Found : " + retval);
+			retval = compare(EnumEntityState.New, "newx");
+			System.out.println("Enum Compare : " + retval);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T extends Enum<T>> boolean compare(Object src, String value)
+			throws Exception {
+		String name = ((T) src).name();
+		if (name.compareToIgnoreCase(value) == 0)
+			return true;
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")

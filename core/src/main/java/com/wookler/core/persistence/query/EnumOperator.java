@@ -48,12 +48,16 @@ public enum EnumOperator {
 	/**
 	 * Value between (between)
 	 */
-	Between;
+	Between,
+	/**
+	 * Value in List (in)
+	 */
+	In;
 
 	public static final String[] _OPERATOR_TOKENS_ = { "<=", ">=", "!=", "=",
 			"<", ">" };
 	public static final String[] _OPERATOR_KEYWORDS_ = { "like", "between",
-			"contains" };
+			"contains", "in" };
 
 	public static final int _INDEX_LEQ_ = 0;
 	public static final int _INDEX_GEQ_ = 1;
@@ -64,6 +68,7 @@ public enum EnumOperator {
 	public static final int _INDEX_LK_ = 0;
 	public static final int _INDEX_BT_ = 1;
 	public static final int _INDEX_CON_ = 2;
+	public static final int _INDEX_IN_ = 3;
 
 	/**
 	 * Convert the specified query operator to the Operator Enum.
@@ -101,6 +106,8 @@ public enum EnumOperator {
 					return Between;
 				case _INDEX_CON_:
 					return Contains;
+				case _INDEX_IN_:
+					return In;
 				}
 			}
 		}

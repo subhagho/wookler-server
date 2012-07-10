@@ -5,6 +5,7 @@ package com.wookler.core.persistence.query;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -14,10 +15,27 @@ import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.ReflectionUtils;
 
 /**
+ * Utility Class to match Entity attributes against the filter condition.
+ * 
  * @author subhagho
  * 
  */
 public class ConditionMatcher {
+	/**
+	 * Match the filter value with the Entity attribute of the specified entity
+	 * record.
+	 * 
+	 * @param entity
+	 *            - Entity record to check.
+	 * @param column
+	 *            - Attribute Column name
+	 * @param operator
+	 *            - Condition Operator
+	 * @param value
+	 *            - Value to match.
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean match(AbstractEntity entity, String column,
 			EnumOperator operator, Object value) throws Exception {
 		if (column.indexOf('.') < 0) {
@@ -29,7 +47,28 @@ public class ConditionMatcher {
 				return compare(src, value, operator, attr.Field.getType());
 			}
 		} else {
+			String[] vars = column.split(".");
+			Object src = null;
+			Class<?> type = null;
 
+			for (String var : vars) {
+				if (src == null) {
+					AttributeReflection attr = ReflectionUtils.get()
+							.getAttribute(entity.getClass(), var);
+					src = PropertyUtils.getProperty(entity,
+							attr.Field.getName());
+					type = attr.Field.getType();
+				} else {
+					AttributeReflection attr = ReflectionUtils.get()
+							.getAttribute(src.getClass(), var);
+					src = PropertyUtils.getProperty(entity,
+							attr.Field.getName());
+					type = attr.Field.getType();
+				}
+			}
+			if (src != null) {
+				return compare(src, value, operator, type);
+			}
 		}
 		return false;
 	}
@@ -82,11 +121,58 @@ public class ConditionMatcher {
 			} else {
 				containsObjectArray(src, tgt);
 			}
+		} else if (src instanceof Iterable<?>) {
+			if (operator != EnumOperator.Contains)
+				return false;
+			containsObjectList(src, tgt);
+
 		} else if (src instanceof Enum) {
-			// TODO: Figure out how to handle Enums
+			return compareEnum(src, tgt);
 		} else {
 			throw new Exception("Unsupported value comparison. [CLASS:"
 					+ type.getCanonicalName() + "]");
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T extends Enum<T>> boolean compareEnum(Object src,
+			Object tgt) throws Exception {
+		String name = ((T) src).name();
+		if (name.compareToIgnoreCase((String) tgt) == 0)
+			return true;
+		return false;
+	}
+
+	private boolean containsObjectList(Object src, Object tgt) throws Exception {
+		Iterable<?> iterable = (Iterable<?>) src;
+		Iterator<?> iter = iterable.iterator();
+		while (iter.hasNext()) {
+			Object obj = iter.next();
+			Class<?> type = obj.getClass();
+			boolean retval = false;
+			if (EnumPrimitives.isPrimitiveType(type)) {
+				EnumPrimitives etype = EnumPrimitives.type(type);
+				switch (etype) {
+				case EShort:
+					retval = compareShort(src, tgt, EnumOperator.Equal);
+				case EInteger:
+					retval = compareInt(src, tgt, EnumOperator.Equal);
+				case ELong:
+					retval = compareLong(src, tgt, EnumOperator.Equal);
+				case EFloat:
+					retval = compareFloat(src, tgt, EnumOperator.Equal);
+				case EDouble:
+					retval = compareDouble(src, tgt, EnumOperator.Equal);
+				case ECharacter:
+					retval = compareChar(src, tgt, EnumOperator.Equal);
+				}
+				retval = src.equals(tgt);
+			} else {
+				retval = src.equals(tgt);
+			}
+			if (retval)
+				return true;
 		}
 		return false;
 	}
@@ -171,6 +257,17 @@ public class ConditionMatcher {
 			return (((String) src).compareTo((String) tgt) <= 0);
 		case NotEqual:
 			return (((String) src).compareTo((String) tgt) != 0);
+		case In:
+			String[] values = (String[]) tgt;
+			for (String value : values) {
+				if (value.compareTo((String) src) == 0)
+					return true;
+			}
+			return false;
+		case Like:
+			if (Pattern.matches((String) tgt, (String) src))
+				return true;
+			return false;
 		default:
 			return false;
 		}
@@ -195,6 +292,14 @@ public class ConditionMatcher {
 			short minv = Short.parseShort(values[0]);
 			short maxv = Short.parseShort(values[1]);
 			return ((Short) src >= minv && (Short) src <= maxv);
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				short shval = Short.parseShort(value);
+				if (shval == (Short) src)
+					return true;
+			}
+			return false;
 		default:
 			return false;
 		}
@@ -219,19 +324,14 @@ public class ConditionMatcher {
 			int minv = Integer.parseInt(values[0]);
 			int maxv = Integer.parseInt(values[1]);
 			return ((Integer) src >= minv && (Integer) src <= maxv);
-		case Contains:
-			int itgt = Integer.parseInt((String) tgt);
-			if (src.getClass().isArray()) {
-
-			} else if (src instanceof Iterable<?>) {
-				Iterable<?> iobj = (Iterable<?>) src;
-				Iterator<?> iter = iobj.iterator();
-				while (iter.hasNext()) {
-					int val = (Integer) iter.next();
-					if (val == itgt)
-						return true;
-				}
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				int shval = Integer.parseInt(value);
+				if (shval == (Integer) src)
+					return true;
 			}
+			return false;
 		default:
 			return false;
 		}
@@ -256,6 +356,14 @@ public class ConditionMatcher {
 			long minv = Long.parseLong(values[0]);
 			long maxv = Long.parseLong(values[1]);
 			return ((Long) src >= minv && (Long) src <= maxv);
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				long shval = Long.parseLong(value);
+				if (shval == (Long) src)
+					return true;
+			}
+			return false;
 		default:
 			return false;
 		}
@@ -280,6 +388,14 @@ public class ConditionMatcher {
 			float minv = Float.parseFloat(values[0]);
 			float maxv = Float.parseFloat(values[1]);
 			return ((Float) src >= minv && (Float) src <= maxv);
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				float shval = Float.parseFloat(value);
+				if (shval == (Float) src)
+					return true;
+			}
+			return false;
 		default:
 			return false;
 		}
@@ -304,6 +420,14 @@ public class ConditionMatcher {
 			double minv = Double.parseDouble(values[0]);
 			double maxv = Double.parseDouble(values[1]);
 			return ((Double) src >= minv && (Double) src <= maxv);
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				double shval = Double.parseDouble(value);
+				if (shval == (Double) src)
+					return true;
+			}
+			return false;
 		default:
 			return false;
 		}
@@ -328,6 +452,13 @@ public class ConditionMatcher {
 			char minv = values[0].charAt(0);
 			char maxv = values[1].charAt(0);
 			return ((Character) src >= minv && (Character) src <= maxv);
+		case In:
+			String[] svalues = (String[]) tgt;
+			for (String value : svalues) {
+				if (value.charAt(0) == (Character) src)
+					return true;
+			}
+			return false;
 		default:
 			return false;
 		}
