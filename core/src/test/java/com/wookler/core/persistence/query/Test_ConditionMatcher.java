@@ -5,6 +5,7 @@ package com.wookler.core.persistence.query;
 
 import static org.junit.Assert.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
+import com.wookler.utils.DateUtils;
 
 /**
  * @author subhagho
@@ -438,25 +440,37 @@ public class Test_ConditionMatcher {
 			boolean retval = false;
 
 			retval = matcher.match(entity, "FORDate", EnumOperator.Equal,
-					entity.getForDate());
+					DateUtils.format(entity.getForDate()));
 			assertEquals(true, retval);
-			retval = matcher.match(entity, "FORDate", EnumOperator.NotEqual,
-					new Date(0));
+			retval = matcher.match(entity, "FORDate", EnumOperator.NotEqual, ""
+					+ new Date(0).getTime());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate",
+					EnumOperator.GreaterThanEqual,
+					DateUtils.format(entity.getForDate(), "MM/dd/yyyy")
+							+ ";MM/dd/yyyy");
 			assertEquals(true, retval);
 			retval = matcher.match(entity, "FORDate", EnumOperator.GreaterThan,
-					new Date(0));
+					"" + new Date(0).getTime());
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FORDate", EnumOperator.LessThan, ""
+					+ DateUtils.parse("12-12-2222", "MM-dd-yyyy").getTime());
 			assertEquals(true, retval);
 			retval = matcher.match(entity, "FORDate",
-					EnumOperator.GreaterThanEqual, entity.getForString());
+					EnumOperator.LessThanEqual,
+					"" + DateUtils.parse("12-12-2222", "MM-dd-yyyy").getTime());
 			assertEquals(true, retval);
-			retval = matcher.match(entity, "FORDate", EnumOperator.LessThan,
-					"Z" + entity.getForString());
-			assertEquals(true, retval);
-			retval = matcher.match(entity, "FORDate",
-					EnumOperator.LessThanEqual, entity.getForString());
-			assertEquals(true, retval);
-			retval = matcher.match(entity, "FORDate", EnumOperator.Like,
-					"(.*)-(.*)");
+			retval = matcher.match(
+					entity,
+					"FORDate",
+					EnumOperator.Between,
+					new String[] {
+							""
+									+ DateUtils.parse("12-12-2000",
+											"MM-dd-yyyy").getTime(),
+							""
+									+ DateUtils.parse("12-12-2222",
+											"MM-dd-yyyy").getTime() });
 			assertEquals(true, retval);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -13,6 +13,7 @@ import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.ReflectionUtils;
+import com.wookler.utils.DateUtils;
 
 /**
  * Utility Class to match Entity attributes against the filter condition.
@@ -61,8 +62,7 @@ public class ConditionMatcher {
 				} else {
 					AttributeReflection attr = ReflectionUtils.get()
 							.getAttribute(src.getClass(), var);
-					src = PropertyUtils.getProperty(src,
-							attr.Field.getName());
+					src = PropertyUtils.getProperty(src, attr.Field.getName());
 					type = attr.Field.getType();
 				}
 			}
@@ -95,9 +95,7 @@ public class ConditionMatcher {
 		} else if (type == String.class) {
 			return compareString(src, tgt, operator);
 		} else if (type == Date.class) {
-			Date ds = (Date) src;
-			Date dt = (Date) tgt;
-			return compareLong(ds.getTime(), dt.getTime(), operator);
+			return compareDate(src, tgt, operator);
 		} else if (type.isArray()) {
 			if (operator != EnumOperator.Contains)
 				return false;
@@ -241,6 +239,62 @@ public class ConditionMatcher {
 				return true;
 		}
 		return false;
+	}
+
+	private boolean compareDate(Object src, Object tgt, EnumOperator oper)
+			throws Exception {
+		Date ds = (Date) src;
+		long dsvalue = ds.getTime();
+		Object dtgt = null;
+		if (oper != EnumOperator.Between && oper != EnumOperator.In) {
+			long dtvalue = -1;
+			try {
+				dtvalue = Long.parseLong((String) tgt);
+			} catch (Exception e) {
+				String sdt = (String) tgt;
+				if (sdt.indexOf(';') > 0) {
+					String[] parts = sdt.split(";");
+					Date dt = DateUtils.parse(parts[0], parts[1]);
+					dtvalue = dt.getTime();
+					ds = DateUtils.parse(DateUtils.format(ds, parts[1]),
+							parts[1]);
+					dsvalue = ds.getTime();
+				} else {
+					Date dt = DateUtils.parse(sdt);
+					dtvalue = dt.getTime();
+					ds = DateUtils.parse(DateUtils.format(ds));
+					dsvalue = ds.getTime();
+				}
+			}
+			dtgt = String.valueOf(dtvalue);
+		} else {
+			String[] values = (String[]) tgt;
+			String[] pvalue = new String[values.length];
+			for (int ii = 0; ii < values.length; ii++) {
+				String dts = values[ii];
+				long dtvalue = -1;
+				try {
+					dtvalue = Long.parseLong(dts);
+				} catch (Exception e) {
+					if (dts.indexOf(';') > 0) {
+						String[] parts = dts.split(";");
+						Date dt = DateUtils.parse(parts[0], parts[1]);
+						dtvalue = dt.getTime();
+						ds = DateUtils.parse(DateUtils.format(ds, parts[1]),
+								parts[1]);
+						dsvalue = ds.getTime();
+					} else {
+						Date dt = DateUtils.parse(dts);
+						dtvalue = dt.getTime();
+						ds = DateUtils.parse(DateUtils.format(ds));
+						dsvalue = ds.getTime();
+					}
+				}
+				pvalue[ii] = String.valueOf(dtvalue);
+			}
+			dtgt = pvalue;
+		}
+		return compareLong(dsvalue, dtgt, oper);
 	}
 
 	private boolean compareString(Object src, Object tgt, EnumOperator oper) {
