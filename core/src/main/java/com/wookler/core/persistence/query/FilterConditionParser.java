@@ -3,7 +3,9 @@
  */
 package com.wookler.core.persistence.query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,21 +18,35 @@ public class FilterConditionParser {
 
 	private HashMap<String, String> quoted = new HashMap<String, String>();
 
-	public FilterCondition parse(String condition) throws Exception {
+	public List<FilterCondition> parse(String condition)
+			throws Exception {
 		quoted.clear();
-		String filter = parseQuoted(condition);
+		List<FilterCondition> conditions = new ArrayList<FilterCondition>();
+		String filterstr = parseQuoted(condition);
+		String[] filters = filterstr.split(";");
+		if (filters != null) {
+			for (String filter : filters) {
+				FilterCondition cond = parseCondition(filter);
+				if (cond != null)
+					conditions.add(cond);
+			}
+		}
+		return conditions;
+	}
+
+	private FilterCondition parseCondition(String filter) throws Exception {
 		for (String oper : EnumOperator._OPERATOR_TOKENS_) {
 			if (filter.indexOf(oper) >= 0) {
 				String[] parts = filter.split(oper);
 				if (parts.length < 2)
 					throw new Exception("Error parsing filter condition ["
-							+ condition + "]");
+							+ filter + "]");
 				if (parts[0] == null || parts[0].isEmpty())
 					throw new Exception("Error parsing filter condition ["
-							+ condition + "] : Missing condition field.");
+							+ filter + "] : Missing condition field.");
 				if (parts[1] == null || parts[1].isEmpty())
 					throw new Exception("Error parsing filter condition ["
-							+ condition + "] : Missing condition value.");
+							+ filter + "] : Missing condition value.");
 				parts[1] = parts[1].trim();
 				if (quoted.containsKey(parts[1])) {
 					parts[1] = quoted.get(parts[1]);
@@ -78,14 +94,13 @@ public class FilterConditionParser {
 				}
 			}
 		}
-		throw new Exception("Error parsing filter condition [" + condition
-				+ "]");
+		throw new Exception("Error parsing filter condition [" + filter + "]");
 	}
 
 	private String parseQuoted(String condition) {
 		Pattern pattern = Pattern.compile(_QUOTES_REGEX_);
 		Matcher matcher = pattern.matcher(condition);
-		int index = 0;
+		int index = quoted.size();
 		StringBuffer out = new StringBuffer();
 		while (matcher.find()) {
 			String part = matcher.group(1);

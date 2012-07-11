@@ -100,29 +100,29 @@ public class ConditionMatcher {
 			if (operator != EnumOperator.Contains)
 				return false;
 			Class<?> atype = type.getComponentType();
-			if (atype.isPrimitive()) {
+			if (EnumPrimitives.isPrimitiveType(atype)) {
 				EnumPrimitives etype = EnumPrimitives.type(atype);
 				switch (etype) {
 				case EShort:
-					return containsShortArray(src, tgt);
+					return containsShortArray(src, tgt, atype);
 				case EInteger:
-					return containsIntArray(src, tgt);
+					return containsIntArray(src, tgt, atype);
 				case ELong:
-					return containsLongArray(src, tgt);
+					return containsLongArray(src, tgt, atype);
 				case EFloat:
-					return containsFloatArray(src, tgt);
+					return containsFloatArray(src, tgt, atype);
 				case EDouble:
-					return containsDoubleArray(src, tgt);
+					return containsDoubleArray(src, tgt, atype);
 				case ECharacter:
-					return containsCharArray(src, tgt);
+					return containsCharArray(src, tgt, atype);
 				}
 			} else {
-				containsObjectArray(src, tgt);
+				return containsObjectArray(src, tgt);
 			}
 		} else if (src instanceof Iterable<?>) {
 			if (operator != EnumOperator.Contains)
 				return false;
-			containsObjectList(src, tgt);
+			return containsObjectList(src, tgt);
 
 		} else if (src instanceof Enum) {
 			return compareEnum(src, tgt);
@@ -145,29 +145,38 @@ public class ConditionMatcher {
 	private boolean containsObjectList(Object src, Object tgt) throws Exception {
 		Iterable<?> iterable = (Iterable<?>) src;
 		Iterator<?> iter = iterable.iterator();
+
+		Class<?> type = null;
+		boolean primitive = false;
+		EnumPrimitives etype = null;
+
 		while (iter.hasNext()) {
 			Object obj = iter.next();
-			Class<?> type = obj.getClass();
+			if (type == null) {
+				type = obj.getClass();
+				primitive = EnumPrimitives.isPrimitiveType(type);
+				if (primitive)
+					etype = EnumPrimitives.type(type);
+			}
 			boolean retval = false;
-			if (EnumPrimitives.isPrimitiveType(type)) {
-				EnumPrimitives etype = EnumPrimitives.type(type);
+			if (primitive) {
 				switch (etype) {
 				case EShort:
-					retval = compareShort(src, tgt, EnumOperator.Equal);
+					retval = compareShort(obj, tgt, EnumOperator.Equal);
 				case EInteger:
-					retval = compareInt(src, tgt, EnumOperator.Equal);
+					retval = compareInt(obj, tgt, EnumOperator.Equal);
 				case ELong:
-					retval = compareLong(src, tgt, EnumOperator.Equal);
+					retval = compareLong(obj, tgt, EnumOperator.Equal);
 				case EFloat:
-					retval = compareFloat(src, tgt, EnumOperator.Equal);
+					retval = compareFloat(obj, tgt, EnumOperator.Equal);
 				case EDouble:
-					retval = compareDouble(src, tgt, EnumOperator.Equal);
+					retval = compareDouble(obj, tgt, EnumOperator.Equal);
 				case ECharacter:
-					retval = compareChar(src, tgt, EnumOperator.Equal);
+					retval = compareChar(obj, tgt, EnumOperator.Equal);
 				}
-				retval = src.equals(tgt);
+				retval = obj.equals(tgt);
 			} else {
-				retval = src.equals(tgt);
+				retval = obj.equals(tgt);
 			}
 			if (retval)
 				return true;
@@ -186,57 +195,116 @@ public class ConditionMatcher {
 		return false;
 	}
 
-	private boolean containsShortArray(Object src, Object tgt) throws Exception {
-		short[] array = (short[]) src;
-		for (short val : array) {
-			if (val == (Short) tgt)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean containsIntArray(Object src, Object tgt) throws Exception {
-		int[] array = (int[]) src;
-		for (int val : array) {
-			if (val == (Short) tgt)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean containsLongArray(Object src, Object tgt) throws Exception {
-		long[] array = (long[]) src;
-		for (long val : array) {
-			if (val == (Short) tgt)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean containsFloatArray(Object src, Object tgt) throws Exception {
-		float[] array = (float[]) src;
-		for (float val : array) {
-			if (val == (Short) tgt)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean containsDoubleArray(Object src, Object tgt)
+	private boolean containsShortArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		double[] array = (double[]) src;
-		for (double val : array) {
-			if (val == (Short) tgt)
-				return true;
+		short value = Short.parseShort((String)tgt);
+		if (type.isPrimitive()) {
+			short[] array = (short[]) src;
+			for (short val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Short[] array = (Short[]) src;
+			for (short val : array) {
+				if (val == value)
+					return true;
+			}
 		}
 		return false;
 	}
 
-	private boolean containsCharArray(Object src, Object tgt) throws Exception {
-		char[] array = (char[]) src;
-		for (char val : array) {
-			if (val == (Short) tgt)
-				return true;
+	private boolean containsIntArray(Object src, Object tgt, Class<?> type)
+			throws Exception {
+		int value = Integer.parseInt((String)tgt);
+		if (type.isPrimitive()) {
+			int[] array = (int[]) src;
+			for (int val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Integer[] array = (Integer[]) src;
+			for (int val : array) {
+				if (val == value)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsLongArray(Object src, Object tgt, Class<?> type)
+			throws Exception {
+		long value = Long.parseLong((String)tgt);
+		if (type.isPrimitive()) {
+			long[] array = (long[]) src;
+			for (long val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Long[] array = (Long[]) src;
+			for (long val : array) {
+				if (val == value)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsFloatArray(Object src, Object tgt, Class<?> type)
+			throws Exception {
+		float value = Float.parseFloat((String)tgt);
+		if (type.isPrimitive()) {
+			float[] array = (float[]) src;
+			for (float val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Float[] array = (Float[]) src;
+			for (float val : array) {
+				if (val == value)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsDoubleArray(Object src, Object tgt, Class<?> type)
+			throws Exception {
+		double value = Double.parseDouble((String)tgt);
+		if (type.isPrimitive()) {
+			double[] array = (double[]) src;
+			for (double val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Double[] array = (Double[]) src;
+			for (double val : array) {
+				if (val == value)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsCharArray(Object src, Object tgt, Class<?> type)
+			throws Exception {
+		char value = ((String)tgt).charAt(0);
+		if (type.isPrimitive()) {
+			char[] array = (char[]) src;
+			for (char val : array) {
+				if (val == value)
+					return true;
+			}
+		} else {
+			Character[] array = (Character[]) src;
+			for (char val : array) {
+				if (val == value)
+					return true;
+			}
 		}
 		return false;
 	}

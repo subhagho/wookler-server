@@ -5,7 +5,6 @@ package com.wookler.core.persistence.query;
 
 import static org.junit.Assert.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -398,6 +397,38 @@ public class Test_ConditionMatcher {
 			this.forDate = forDate;
 		}
 
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
+	public void testMatchArray() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FORDoubleContains",
+					EnumOperator.Contains, ""
+							+ entity.getForDoubleContains()[1]);
+			assertEquals(true, retval);
+
+			retval = matcher.match(entity, "FORIntContains",
+					EnumOperator.Contains, "" + entity.getForIntConaints()[2]);
+			assertEquals(true, retval);
+
+			retval = matcher
+					.match(entity, "FORStringContains", EnumOperator.Contains,
+							entity.getForStringContains().get(0));
+			assertEquals(true, retval);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	/**

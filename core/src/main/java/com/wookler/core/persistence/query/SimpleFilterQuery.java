@@ -39,15 +39,8 @@ public class SimpleFilterQuery extends Query {
 		if (query == null || query.isEmpty())
 			return;
 
-		String[] filters = query.split(";");
-		if (filters == null || filters.length <= 0)
-			return;
 		FilterConditionParser parser = new FilterConditionParser();
-		conditions = new ArrayList<FilterCondition>();
-		for (String filter : filters) {
-			FilterCondition cond = parser.parse(filter);
-			conditions.add(cond);
-		}
+		conditions = parser.parse(query);
 	}
 
 	/*
