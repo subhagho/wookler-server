@@ -74,9 +74,27 @@ public class FilterCondition {
 	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		buff.append(column).append(" ").append(comparator.name()).append(" ")
-				.append(value == null ? "NULL" : value.toString());
+		buff.append(column).append(" ").append(comparator.name()).append(" ");
+		if (value != null) {
+			if (!value.getClass().isArray()) {
+				buff.append(value.toString());
+			} else {
+				String[] data = (String[]) value;
+				buff.append("[");
+				boolean first = true;
+				for (String dd : data) {
+					if (first)
+						first = false;
+					else
+						buff.append(", ");
+					buff.append(dd);
+				}
+
+				buff.append("]");
+			}
+		} else {
+			buff.append("NULL");
+		}
 		return buff.toString();
 	}
-
 }

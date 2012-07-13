@@ -32,4 +32,10 @@ public @interface Attribute {
 	 */
 	boolean keyattribute() default false;
 
+	/**
+	 * Custom data handler for the field.
+	 * 
+	 * @return
+	 */
+	String handler() default "";
 }

@@ -51,8 +51,12 @@ public class ConditionMatcher {
 			String[] vars = column.split("\\.");
 			Object src = null;
 			Class<?> type = null;
-
+			StringBuffer coffset = new StringBuffer();
 			for (String var : vars) {
+				if (src != null)
+					coffset.append('.');
+				coffset.append(var);
+
 				if (src == null) {
 					AttributeReflection attr = ReflectionUtils.get()
 							.getAttribute(entity.getClass(), var);
@@ -65,10 +69,72 @@ public class ConditionMatcher {
 					src = PropertyUtils.getProperty(src, attr.Field.getName());
 					type = attr.Field.getType();
 				}
+				if (src.getClass().isArray()) {
+					if (isArrayEntityType(src)) {
+						String cpart = column.replaceFirst(
+								"^" + coffset.toString() + ".", "");
+						return matchArray(src, cpart, operator, value);
+					}
+				} else if (src instanceof Iterable) {
+					if (isListEntityType(src)) {
+						String cpart = column.replaceFirst(
+								"^" + coffset.toString() + ".", "");
+						return matchList(src, cpart, operator, value);
+					}
+				}
 			}
 			if (src != null) {
 				return compare(src, value, operator, type);
 			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends AbstractEntity> boolean matchArray(Object src,
+			String column, EnumOperator operator, Object value)
+			throws Exception {
+		T[] entities = (T[]) src;
+		for (T entity : entities) {
+			if (match(entity, column, operator, value))
+				return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> boolean isListEntityType(Object src) {
+		Iterable<T> entities = (Iterable<T>) src;
+		if (entities != null && entities.iterator().hasNext()) {
+			T value = entities.iterator().next();
+			if (value instanceof AbstractEntity) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> boolean isArrayEntityType(Object src) {
+		T[] entities = (T[]) src;
+		if (entities != null && entities.length > 0) {
+			T value = entities[0];
+			if (value instanceof AbstractEntity) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends AbstractEntity> boolean matchList(Object src,
+			String column, EnumOperator operator, Object value)
+			throws Exception {
+		Iterable<T> entities = (Iterable<T>) src;
+
+		for (T entity : entities) {
+			if (match(entity, column, operator, value))
+				return true;
 		}
 		return false;
 	}
@@ -197,7 +263,7 @@ public class ConditionMatcher {
 
 	private boolean containsShortArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		short value = Short.parseShort((String)tgt);
+		short value = Short.parseShort((String) tgt);
 		if (type.isPrimitive()) {
 			short[] array = (short[]) src;
 			for (short val : array) {
@@ -216,7 +282,7 @@ public class ConditionMatcher {
 
 	private boolean containsIntArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		int value = Integer.parseInt((String)tgt);
+		int value = Integer.parseInt((String) tgt);
 		if (type.isPrimitive()) {
 			int[] array = (int[]) src;
 			for (int val : array) {
@@ -235,7 +301,7 @@ public class ConditionMatcher {
 
 	private boolean containsLongArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		long value = Long.parseLong((String)tgt);
+		long value = Long.parseLong((String) tgt);
 		if (type.isPrimitive()) {
 			long[] array = (long[]) src;
 			for (long val : array) {
@@ -254,7 +320,7 @@ public class ConditionMatcher {
 
 	private boolean containsFloatArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		float value = Float.parseFloat((String)tgt);
+		float value = Float.parseFloat((String) tgt);
 		if (type.isPrimitive()) {
 			float[] array = (float[]) src;
 			for (float val : array) {
@@ -273,7 +339,7 @@ public class ConditionMatcher {
 
 	private boolean containsDoubleArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		double value = Double.parseDouble((String)tgt);
+		double value = Double.parseDouble((String) tgt);
 		if (type.isPrimitive()) {
 			double[] array = (double[]) src;
 			for (double val : array) {
@@ -292,7 +358,7 @@ public class ConditionMatcher {
 
 	private boolean containsCharArray(Object src, Object tgt, Class<?> type)
 			throws Exception {
-		char value = ((String)tgt).charAt(0);
+		char value = ((String) tgt).charAt(0);
 		if (type.isPrimitive()) {
 			char[] array = (char[]) src;
 			for (char val : array) {

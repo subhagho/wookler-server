@@ -15,7 +15,8 @@ public class Test_FilterConditionParser {
 					"VAR <= 8347398", "VAR >= -110002", "VAR < 0.887282",
 					"VAR > 098888", "VAR LIke '\\[(.*),(.*)\\]'",
 					"VAR between ['1STR', '8STR'];VAR > '098888;0000'",
-					"VAR CONTAINS 'STRINGKEY'" };
+					"VAR CONTAINS 'STRINGKEY'",
+					"VAR IN  ['8888','9999','99991','99992'];VAR IN  ['abcd']" };
 			FilterConditionParser parser = new FilterConditionParser();
 			for (String cond : conditions) {
 				List<FilterCondition> conds = parser.parse(cond);

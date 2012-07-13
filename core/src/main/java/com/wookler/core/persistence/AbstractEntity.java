@@ -3,6 +3,10 @@
  */
 package com.wookler.core.persistence;
 
+import java.util.Date;
+
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * Abstract class, to be inherited by all entities that are persisted.
  * 
@@ -11,6 +15,24 @@ package com.wookler.core.persistence;
  */
 public abstract class AbstractEntity {
 	protected EnumEntityState state = EnumEntityState.Unknown;
+
+	@Attribute(name = "TIMESTAMP", handler = "com.wookler.core.persistence.handlers.DateHandler")
+	@XmlElement(name = "timestamp")
+	protected Date timestamp;
+
+	/**
+	 * @return
+	 */
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * @param timestamp
+	 */
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
 	/**
 	 * Indicates that the value of an attribute of this entity has been updated.

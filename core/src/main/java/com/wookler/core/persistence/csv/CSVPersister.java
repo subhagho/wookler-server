@@ -5,13 +5,10 @@ package com.wookler.core.persistence.csv;
 
 import java.io.File;
 import java.io.FileReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.NotImplementedException;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -19,10 +16,9 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AbstractPersister;
-import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.query.SimpleFilterQuery;
 import com.wookler.utils.AbstractParam;
-import com.wookler.utils.KeyValuePair;
 import com.wookler.utils.ListParam;
 import com.wookler.utils.ValueParam;
 
@@ -108,17 +104,17 @@ public class CSVPersister extends AbstractPersister {
 	 * @see com.wookler.core.persistence.AbstractPersister#read(java.util.List)
 	 */
 	@Override
-	public List<AbstractEntity> read(List<KeyValuePair<String>> columnkeys,
-			Class<AbstractEntity> type) throws Exception {
+	public List<AbstractEntity> read(String query, Class<AbstractEntity> type)
+			throws Exception {
 		List<AbstractEntity> result = null;
 		String cname = type.getCanonicalName();
 		if (!cache.containsKey(cname)) {
 			load(type);
 		}
 		List<AbstractEntity> records = cache.get(cname);
-		for (AbstractEntity rec : records) {
-
-		}
+		SimpleFilterQuery filter = new SimpleFilterQuery();
+		filter.parse(query);
+		result = filter.select(records);
 		return result;
 	}
 
@@ -159,7 +155,6 @@ public class CSVPersister extends AbstractPersister {
 		return entity;
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 

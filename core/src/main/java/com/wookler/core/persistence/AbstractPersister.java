@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import com.wookler.core.InitializedHandle;
-import com.wookler.utils.KeyValuePair;
 import com.wookler.utils.ListParam;
 
 /**
@@ -36,7 +35,6 @@ public abstract class AbstractPersister implements InitializedHandle {
 		return classtype;
 	}
 
-	
 	/**
 	 * Set the Field value to the passed object. The base method only supports
 	 * primitive types.
@@ -78,9 +76,8 @@ public abstract class AbstractPersister implements InitializedHandle {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract List<AbstractEntity> read(
-			List<KeyValuePair<String>> columnkeys, Class<AbstractEntity> type)
-			throws Exception;
+	public abstract List<AbstractEntity> read(String query,
+			Class<AbstractEntity> type) throws Exception;
 
 	/**
 	 * Persist the specified entity record.

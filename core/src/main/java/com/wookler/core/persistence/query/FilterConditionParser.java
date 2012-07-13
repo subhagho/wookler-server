@@ -18,11 +18,17 @@ public class FilterConditionParser {
 
 	private HashMap<String, String> quoted = new HashMap<String, String>();
 
-	public List<FilterCondition> parse(String condition)
-			throws Exception {
+	/**
+	 * Parse the specified query string
+	 * 
+	 * @param query
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FilterCondition> parse(String query) throws Exception {
 		quoted.clear();
 		List<FilterCondition> conditions = new ArrayList<FilterCondition>();
-		String filterstr = parseQuoted(condition);
+		String filterstr = parseQuoted(query);
 		String[] filters = filterstr.split(";");
 		if (filters != null) {
 			for (String filter : filters) {
@@ -52,8 +58,8 @@ public class FilterConditionParser {
 					parts[1] = quoted.get(parts[1]);
 				}
 				EnumOperator eoper = EnumOperator.parse(oper);
-				FilterCondition cond = new FilterCondition(parts[0], eoper,
-						parts[1]);
+				FilterCondition cond = new FilterCondition(parts[0].trim(),
+						eoper, parts[1]);
 				return cond;
 			}
 		}
@@ -62,7 +68,7 @@ public class FilterConditionParser {
 			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(filter);
 			while (matcher.find()) {
-				String column = matcher.group(1);
+				String column = matcher.group(1).trim();
 				String value = matcher.group(2).trim();
 				if (quoted.containsKey(value)) {
 					value = quoted.get(value);
@@ -87,6 +93,24 @@ public class FilterConditionParser {
 						if (quoted.containsKey(values[1]))
 							values[1] = quoted.get(values[1]);
 
+						FilterCondition bcond = new FilterCondition(column,
+								eoper, values);
+						return bcond;
+					}
+				case In:
+					String iregx = "\\[(.*)(,.*)*?\\]";
+					Pattern ipattrn = Pattern.compile(iregx);
+					Matcher imatch = ipattrn.matcher(value);
+					while (imatch.find()) {
+						String vs = imatch.group(1);
+						String[] values = vs.split(",");
+						if (values != null && values.length > 0) {
+							for (int ii = 0; ii < values.length; ii++) {
+								if (quoted.containsKey(values[ii])) {
+									values[ii] = quoted.get(values[ii]);
+								}
+							}
+						}
 						FilterCondition bcond = new FilterCondition(column,
 								eoper, values);
 						return bcond;

@@ -17,15 +17,17 @@ public class RegexTest {
 	 */
 	public static void main(String[] args) {
 		try {
-			String condition = "VAR = ['8888','9999']";
+			String condition = "VAR IN ['8888','9999','99991','99992']";
 
-			String qr = "['|\"](.*?)['|\"]";
+			String qr = "\\[(.*)(,.*)*?\\]";
 			Pattern pattern = Pattern.compile(qr);
 			Matcher matcher = pattern.matcher(condition);
 			while (matcher.find()) {
-				System.out.println(matcher.group(1));
+				for (int i = 0; i <= matcher.groupCount(); i++) {
+					System.out.println(matcher.group(i));
+				}
 			}
-			//System.out.println(matcher.appendTail(out).toString());
+			// System.out.println(matcher.appendTail(out).toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
