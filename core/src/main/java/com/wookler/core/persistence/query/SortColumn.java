@@ -1,0 +1,44 @@
+/**
+ * 
+ */
+package com.wookler.core.persistence.query;
+
+/**
+ * @author subhagho
+ * 
+ */
+public class SortColumn {
+	private String column;
+	private EnumSortOrder order;
+
+	/**
+	 * @return the column
+	 */
+	public String getColumn() {
+		return column;
+	}
+
+	/**
+	 * @param column
+	 *            the column to set
+	 */
+	public void setColumn(String column) {
+		this.column = column;
+	}
+
+	/**
+	 * @return the order
+	 */
+	public EnumSortOrder getOrder() {
+		return order;
+	}
+
+	/**
+	 * @param order
+	 *            the order to set
+	 */
+	public void setOrder(EnumSortOrder order) {
+		this.order = order;
+	}
+
+}

@@ -112,9 +112,13 @@ public class CSVPersister extends AbstractPersister {
 			load(type);
 		}
 		List<AbstractEntity> records = cache.get(cname);
-		SimpleFilterQuery filter = new SimpleFilterQuery();
-		filter.parse(query);
-		result = filter.select(records);
+		if (query != null && !query.isEmpty()) {
+			SimpleFilterQuery filter = new SimpleFilterQuery();
+			filter.parse(query);
+			result = filter.select(records);
+		} else {
+			result = records;
+		}
 		return result;
 	}
 
