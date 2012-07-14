@@ -10,5 +10,5 @@ package com.wookler.core.persistence;
 public class ReferenceReflection {
 	public String Class;
 	public String Field;
-	public EnumRefereceType Type;
+	public EnumRefereceType Type = EnumRefereceType.One2One;
 }

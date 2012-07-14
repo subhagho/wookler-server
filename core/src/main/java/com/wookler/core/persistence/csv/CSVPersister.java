@@ -6,6 +6,7 @@ package com.wookler.core.persistence.csv;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +20,12 @@ import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AbstractPersister;
 import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.EnumPrimitives;
+import com.wookler.core.persistence.EnumRefereceType;
 import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.SimpleFilterQuery;
 import com.wookler.utils.AbstractParam;
+import com.wookler.utils.DateUtils;
 import com.wookler.utils.ListParam;
 import com.wookler.utils.ValueParam;
 
@@ -107,7 +111,7 @@ public class CSVPersister extends AbstractPersister {
 	 * @see com.wookler.core.persistence.AbstractPersister#read(java.util.List)
 	 */
 	@Override
-	public List<AbstractEntity> read(String query, Class<AbstractEntity> type)
+	public List<AbstractEntity> read(String query, Class<?> type)
 			throws Exception {
 		List<AbstractEntity> result = null;
 		String cname = type.getCanonicalName();
@@ -125,34 +129,39 @@ public class CSVPersister extends AbstractPersister {
 		return result;
 	}
 
-	protected void load(Class<AbstractEntity> type) throws Exception {
+	protected void load(Class<?> type) throws Exception {
 		if (!type.isAnnotationPresent(Entity.class))
 			throw new Exception("Class [" + type.getCanonicalName()
 					+ "] has not been annotated as an Entity.");
-		Entity eann = (Entity) type.getAnnotation(Entity.class);
-		String fname = eann.recordset() + ".CSV";
-		String path = datadir + "/" + fname;
+		synchronized (cache) {
+			if (cache.containsKey(type.getCanonicalName()))
+				return;
 
-		File fi = new File(path);
-		if (!fi.exists())
-			throw new Exception("Cannot find CSV file [" + path
-					+ "] for entity [" + type.getCanonicalName() + "]");
-		List<AbstractEntity> entities = new ArrayList<AbstractEntity>();
+			Entity eann = (Entity) type.getAnnotation(Entity.class);
+			String fname = eann.recordset() + ".CSV";
+			String path = datadir + "/" + fname;
 
-		CSVReader reader = new CSVReader(new FileReader(path), ',', '"');
-		String[] header = null;
-		while (true) {
-			String[] data = reader.readNext();
-			if (data == null)
-				break;
-			if (header == null) {
-				header = data;
-				continue;
+			File fi = new File(path);
+			if (!fi.exists())
+				throw new Exception("Cannot find CSV file [" + path
+						+ "] for entity [" + type.getCanonicalName() + "]");
+			List<AbstractEntity> entities = new ArrayList<AbstractEntity>();
+
+			CSVReader reader = new CSVReader(new FileReader(path), ',', '"');
+			String[] header = null;
+			while (true) {
+				String[] data = reader.readNext();
+				if (data == null)
+					break;
+				if (header == null) {
+					header = data;
+					continue;
+				}
+				AbstractEntity record = parseRecord(type, header, data);
+				entities.add(record);
 			}
-			AbstractEntity record = parseRecord(type, header, data);
-			entities.add(record);
+			cache.put(type.getCanonicalName(), entities);
 		}
-		cache.put(type.getCanonicalName(), entities);
 	}
 
 	protected AbstractEntity parseRecord(Class<?> type, String[] header,
@@ -167,18 +176,19 @@ public class CSVPersister extends AbstractPersister {
 			} else if (attr.Reference == null) {
 				setFieldValue(entity, attr.Field, data[ii]);
 			} else {
-
+				String query = attr.Reference.Field + "=" + data[ii];
+				List<AbstractEntity> refs = read(query,
+						Class.forName(attr.Reference.Class));
+				if (refs != null && refs.size() > 0) {
+					if (attr.Reference.Type == EnumRefereceType.One2One) {
+						setFieldValue(entity, attr.Field, refs.get(0));
+					} else {
+						setFieldValue(entity, attr.Field, refs);
+					}
+				}
 			}
 		}
 		return entity;
-	}
-
-	protected int getColumnIndex(String column, String[] header) {
-		for (int ii = 0; ii < header.length; ii++) {
-			if (column.compareTo(header[ii]) == 0)
-				return ii;
-		}
-		return -1;
 	}
 
 	/*
@@ -229,8 +239,41 @@ public class CSVPersister extends AbstractPersister {
 	@Override
 	protected void setFieldValue(AbstractEntity entity, Field fd, Object value)
 			throws Exception {
-
-		super.setFieldValue(entity, fd, value);
+		Object pvalue = value;
+		if (fd.getType().equals(String.class)) {
+			pvalue = (String) value;
+		} else if (fd.getType().equals(Date.class)) {
+			pvalue = DateUtils.fromString((String) value);
+		} else if (EnumPrimitives.isPrimitiveType(fd.getType())) {
+			EnumPrimitives pt = EnumPrimitives.type(fd.getType());
+			switch (pt) {
+			case ECharacter:
+				pvalue = ((String) value).charAt(0);
+				break;
+			case EShort:
+				pvalue = Short.parseShort((String) value);
+				break;
+			case EInteger:
+				pvalue = Integer.parseInt((String) value);
+				break;
+			case ELong:
+				pvalue = Long.parseLong((String) value);
+				break;
+			case EFloat:
+				pvalue = Float.parseFloat((String) value);
+				break;
+			case EDouble:
+				pvalue = Double.parseDouble((String) value);
+				break;
+			default:
+				throw new Exception("Unsupported primitive type [" + pt.name()
+						+ "]");
+			}
+		} else {
+			throw new Exception("Field type ["
+					+ fd.getType().getCanonicalName() + "] is not supported.");
+		}
+		super.setFieldValue(entity, fd, pvalue);
 	}
 
 }
