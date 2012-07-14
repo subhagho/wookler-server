@@ -167,7 +167,7 @@ public class Env {
 	 * @param filename
 	 *            - Configuration filename.
 	 */
-	public void create(String filename) {
+	public static void create(String filename) {
 		synchronized (_lock) {
 			try {
 				_instance = new Env(filename);
@@ -184,7 +184,7 @@ public class Env {
 	 * @return
 	 * @throws Exception
 	 */
-	public Env get() throws Exception {
+	public static Env get() throws Exception {
 		synchronized (_lock) {
 			if (_instance == null)
 				throw new Exception(
@@ -196,7 +196,7 @@ public class Env {
 	/**
 	 * Dispose the operating environment.
 	 */
-	public void dispose() {
+	public static void dispose() {
 		DataManager.dispose();
 		if (_instance.shared != null) {
 			_instance.shared.clear();

@@ -7,13 +7,13 @@
 	<core>
 		<datamanager>
 			<persistence>
-				<persister classname="com.wookler.core.persistence.csv.CSVPersister">
+				<persister name="CSVPERSISTER" class="com.wookler.core.persistence.csv.CSVPersister">
 					<params>
 						<param type="Value" name="key" value="CSVPERSISTER" />
 						<param type="Value" name="datadir" value="/var/wookler/data/" />
 					</params>
 				</persister>
-				<classmap classname="com.wookler.core.persistence.AbstractEntity"
+				<classmap class="com.wookler.core.persistence.AbstractEntity"
 					persister="CSVPERSISTER" />
 			</persistence>
 		</datamanager>
