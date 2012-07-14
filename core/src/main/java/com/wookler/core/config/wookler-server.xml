@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wookler>
+	<env>
+		<work directory="/tmp/wookler/work/" />
+		<temp directory="/tmp/wookler/temp/" />
+	</env>
+	<core>
+		<datamanager>
+			<persistence>
+				<persister classname="com.wookler.core.persistence.csv.CSVPersister">
+					<params>
+						<param type="Value" name="key" value="CSVPERSISTER" />
+						<param type="Value" name="datadir" value="/var/wookler/data/" />
+					</params>
+				</persister>
+				<classmap classname="com.wookler.core.persistence.AbstractEntity"
+					persister="CSVPERSISTER" />
+			</persistence>
+		</datamanager>
+	</core>
+</wookler>

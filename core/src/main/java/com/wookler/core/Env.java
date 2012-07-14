@@ -9,6 +9,8 @@ import java.util.HashMap;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.w3c.dom.Document;
 
+import com.wookler.core.persistence.DataManager;
+
 /**
  * Initializes the System Environment. Shared handles should be registered with
  * the Env instance.
@@ -17,6 +19,8 @@ import org.w3c.dom.Document;
  * 
  */
 public class Env {
+	public static final String _CONFIG_XPATH_ROOT_ = "/wookler";
+
 	public static final String _CONFIG_DIR_WORK_ = "env.work[@directory]";
 	public static final String _CONFIG_DIR_TEMP_ = "env.temp[@directory]";
 
@@ -37,6 +41,9 @@ public class Env {
 		tempdir = config.getString(_CONFIG_DIR_TEMP_);
 		if (tempdir == null || tempdir.isEmpty())
 			tempdir = System.getProperty("java.io.tmpdir");
+
+		// Initialized the Data<anager
+		DataManager.create(config);
 	}
 
 	/**
@@ -184,5 +191,16 @@ public class Env {
 						"Environment hasn't been initialized or initialization failed.");
 			return _instance;
 		}
+	}
+
+	/**
+	 * Dispose the operating environment.
+	 */
+	public void dispose() {
+		DataManager.dispose();
+		if (_instance.shared != null) {
+			_instance.shared.clear();
+		}
+		_instance.config = null;
 	}
 }

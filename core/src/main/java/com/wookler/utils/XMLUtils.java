@@ -23,6 +23,24 @@ public class XMLUtils {
 	public static final String _PARAM_ATTR_VALUE_ = "value";
 	public static final String _PARAM_ATTR_TYPE_ = "type";
 
+	private static XPath xpath = XPathFactory.newInstance().newXPath();
+
+	/**
+	 * Get the XML Nodes for the specified XPath.
+	 * 
+	 * @param path
+	 *            - XPath String
+	 * @param parent
+	 *            - Parent Node.
+	 * @return
+	 * @throws Exception
+	 */
+	public static NodeList search(String path, Element parent) throws Exception {
+		// XPath Query for showing all nodes value
+		XPathExpression expr = xpath.compile(path);
+		return (NodeList) expr.evaluate(parent, XPathConstants.NODESET);
+	}
+
 	/**
 	 * Extract the parameters specified in the XML document for the Element
 	 * specified by parent.
