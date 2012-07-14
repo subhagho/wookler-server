@@ -4,7 +4,9 @@
 package com.wookler.core.persistence;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author subhagho
@@ -62,8 +64,8 @@ public class ReflectionUtils {
 
 				HashMap<String, AttributeReflection> map = new HashMap<String, AttributeReflection>();
 
-				Field[] fields = type.getDeclaredFields();
-				if (fields != null && fields.length > 0) {
+				List<Field> fields = getFields(type);
+				if (fields != null && fields.size() > 0) {
 					for (Field fd : fields) {
 						if (!fd.isAnnotationPresent(Attribute.class))
 							continue;
@@ -112,6 +114,25 @@ public class ReflectionUtils {
 			}
 		}
 		return metacache.get(type.getCanonicalName());
+	}
+
+	private List<Field> getFields(Class<?> type) {
+		List<Field> array = new ArrayList<Field>();
+		getFields(type, array);
+		return array;
+	}
+
+	private void getFields(Class<?> type, List<Field> array) {
+		if (type.equals(Object.class))
+			return;
+		Field[] fields = type.getDeclaredFields();
+		if (fields != null && fields.length > 0) {
+			for (Field field : fields) {
+				array.add(field);
+			}
+		}
+		Class<?> suptype = type.getSuperclass();
+		getFields(suptype, array);
 	}
 
 	private static ReflectionUtils _instance = new ReflectionUtils();

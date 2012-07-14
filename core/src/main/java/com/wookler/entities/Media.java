@@ -53,6 +53,13 @@ public abstract class Media extends AbstractEntity {
 	}
 
 	/**
+	 * @param type
+	 */
+	public void setType(EnumMediaType type) {
+		this.type = type;
+	}
+
+	/**
 	 * @return the tags
 	 */
 	public String[] getTags() {

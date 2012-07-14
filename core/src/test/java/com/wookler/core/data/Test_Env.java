@@ -19,7 +19,7 @@ import com.wookler.utils.LogUtils;
 public class Test_Env {
 	private static final Logger log = LoggerFactory.getLogger(Test_Env.class);
 
-	private static final String configfile = "/Work/projects/wookler-server/core/src/main/java/com/wookler/core/config/wookler-server.xml";
+	public static final String configfile = "/Work/projects/wookler-server/core/src/main/java/com/wookler/core/config/wookler-server.xml";
 
 	/**
 	 * Test method for {@link com.wookler.core.Env#get()}.
