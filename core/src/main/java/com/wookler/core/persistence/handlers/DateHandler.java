@@ -17,11 +17,10 @@ public class DateHandler implements CustomFieldDataHandler {
 	 * 
 	 * @see
 	 * com.wookler.core.persistence.CustomFieldDataHandler#load(com.wookler.
-	 * core.persistence.AbstractEntity, java.lang.String, java.lang.Object[],
-	 * int)
+	 * core.persistence.AbstractEntity, java.lang.String, java.lang.Object)
 	 */
-	public void load(AbstractEntity entity, String field, Object[] record,
-			int column) throws Exception {
+	public void load(AbstractEntity entity, String field, Object data)
+			throws Exception {
 		// TODO Auto-generated method stub
 
 	}
@@ -31,11 +30,10 @@ public class DateHandler implements CustomFieldDataHandler {
 	 * 
 	 * @see
 	 * com.wookler.core.persistence.CustomFieldDataHandler#save(com.wookler.
-	 * core.persistence.AbstractEntity, java.lang.String, java.lang.Object[],
-	 * int)
+	 * core.persistence.AbstractEntity, java.lang.String, java.lang.Object)
 	 */
-	public void save(AbstractEntity entity, String field, Object[] record,
-			int column) throws Exception {
+	public void save(AbstractEntity entity, String field, Object data)
+			throws Exception {
 		// TODO Auto-generated method stub
 
 	}

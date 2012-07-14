@@ -21,6 +21,12 @@ public class DummyEntitiesData {
 		@Attribute(name = "FORint")
 		private int forint = -99999;
 
+		@Attribute(name = "FORInt")
+		private int forInt = -99999;
+
+		@Attribute(name = "FORString")
+		private String forString = "";
+
 		/**
 		 * @return the forint
 		 */
@@ -36,6 +42,45 @@ public class DummyEntitiesData {
 			this.forint = forint;
 		}
 
+		/**
+		 * @return the forInt
+		 */
+		public int getForInt() {
+			return forInt;
+		}
+
+		/**
+		 * @param forInt
+		 *            the forInt to set
+		 */
+		public void setForInt(int forInt) {
+			this.forInt = forInt;
+		}
+
+		/**
+		 * @return the forString
+		 */
+		public String getForString() {
+			return forString;
+		}
+
+		/**
+		 * @param forString
+		 *            the forString to set
+		 */
+		public void setForString(String forString) {
+			this.forString = forString;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "{" + forint + ", " + forInt + ", " + forString + "}";
+		}
 	}
 
 	@Entity(recordset = "EMBED")

@@ -9,7 +9,7 @@ package com.wookler.core.persistence.query;
  */
 public class SortColumn {
 	private String column;
-	private EnumSortOrder order;
+	private EnumSortOrder order = EnumSortOrder.DSC;
 
 	/**
 	 * @return the column

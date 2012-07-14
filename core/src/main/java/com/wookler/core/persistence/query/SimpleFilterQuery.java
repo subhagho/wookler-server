@@ -20,6 +20,8 @@ public class SimpleFilterQuery extends Query {
 
 	private ConditionMatcher matcher = new ConditionMatcher();
 
+	private FilterConditionParser parser = null;
+
 	/**
 	 * Get the parsed filter conditions.
 	 * 
@@ -39,7 +41,7 @@ public class SimpleFilterQuery extends Query {
 		if (query == null || query.isEmpty())
 			return;
 
-		FilterConditionParser parser = new FilterConditionParser();
+		parser = new FilterConditionParser();
 		conditions = parser.parse(query);
 	}
 
@@ -70,6 +72,19 @@ public class SimpleFilterQuery extends Query {
 	@Override
 	public List<AbstractEntity> select(List<AbstractEntity> entities)
 			throws Exception {
+		List<AbstractEntity> results = doSelect(entities);
+		if (parser.getSort() != null) {
+			EntityListSorter sorter = new EntityListSorter(parser.getSort());
+			sorter.sort(results);
+		}
+		if (parser.getLimit() > 0) {
+			results = results.subList(0, parser.getLimit() - 1);
+		}
+		return results;
+	}
+
+	public List<AbstractEntity> doSelect(List<AbstractEntity> entities)
+			throws Exception {
 		if (conditions != null && conditions.size() > 0) {
 			List<AbstractEntity> filtered = new ArrayList<AbstractEntity>();
 			for (AbstractEntity entity : entities) {
@@ -88,4 +103,5 @@ public class SimpleFilterQuery extends Query {
 		}
 		return entities;
 	}
+
 }

@@ -20,12 +20,10 @@ public interface CustomFieldDataHandler {
 	 *            - Field to load
 	 * @param record
 	 *            - Data record
-	 * @param column
-	 *            - Field Offset Index
-	 * @throws Exception
+	* @throws Exception
 	 */
-	public void load(AbstractEntity entity, String field, Object[] record,
-			int column) throws Exception;
+	public void load(AbstractEntity entity, String field, Object data)
+			throws Exception;
 
 	/**
 	 * Save a field value into the Data record.
@@ -36,11 +34,9 @@ public interface CustomFieldDataHandler {
 	 *            - Field to Save
 	 * @param record
 	 *            - Data record
-	 * @param column
-	 *            - Field Offset Index
 	 * @throws Exception
 	 */
-	public void save(AbstractEntity entity, String field, Object[] record,
-			int column) throws Exception;
+	public void save(AbstractEntity entity, String field, Object data)
+			throws Exception;
 
 }
