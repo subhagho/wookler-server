@@ -68,4 +68,30 @@ public class DateUtils {
 		DateFormat formatter = new SimpleDateFormat(format);
 		return formatter.format(dt);
 	}
+
+	/**
+	 * Parse a Data value form the String. Auto-detect the date string format.
+	 * 
+	 * Formats: <long>, <datestring> // Using the default format.,
+	 * <datestring;format>
+	 * 
+	 * @param dts
+	 * @return
+	 * @throws Exception
+	 */
+	public static final Date fromString(String dts) throws Exception {
+		Date ds = null;
+		try {
+			long dtvalue = Long.parseLong(dts);
+			ds = new Date(dtvalue);
+		} catch (Exception e) {
+			if (dts.indexOf(';') > 0) {
+				String[] parts = dts.split(";");
+				ds = DateUtils.parse(DateUtils.format(ds, parts[1]), parts[1]);
+			} else {
+				ds = DateUtils.parse(DateUtils.format(ds));
+			}
+		}
+		return ds;
+	}
 }

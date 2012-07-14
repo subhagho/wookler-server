@@ -14,5 +14,6 @@ public class AttributeReflection {
 	public String Column;
 	public Method Getter;
 	public Method Setter;
-	public ReferenceReflection Reference;
+	public CustomFieldDataHandler Convertor = null;
+	public ReferenceReflection Reference = null;
 }

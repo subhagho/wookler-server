@@ -20,7 +20,7 @@ public interface CustomFieldDataHandler {
 	 *            - Field to load
 	 * @param record
 	 *            - Data record
-	* @throws Exception
+	 * @throws Exception
 	 */
 	public void load(AbstractEntity entity, String field, Object data)
 			throws Exception;
@@ -32,11 +32,9 @@ public interface CustomFieldDataHandler {
 	 *            - Entity Instance
 	 * @param field
 	 *            - Field to Save
-	 * @param record
-	 *            - Data record
+	 * @return
 	 * @throws Exception
 	 */
-	public void save(AbstractEntity entity, String field, Object data)
-			throws Exception;
+	public Object save(AbstractEntity entity, String field) throws Exception;
 
 }

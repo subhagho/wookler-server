@@ -25,7 +25,7 @@ public abstract class Media extends AbstractEntity {
 	@XmlElement(name = "id")
 	private String id;
 
-	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayHandler")
+	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayConvertor")
 	@XmlElement(name = "tags")
 	private String[] tags;
 

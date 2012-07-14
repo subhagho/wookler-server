@@ -5,6 +5,7 @@ package com.wookler.core.persistence.csv;
 
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,9 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AbstractPersister;
+import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.SimpleFilterQuery;
 import com.wookler.utils.AbstractParam;
 import com.wookler.utils.ListParam;
@@ -152,11 +155,30 @@ public class CSVPersister extends AbstractPersister {
 		cache.put(type.getCanonicalName(), entities);
 	}
 
-	protected AbstractEntity parseRecord(Class<AbstractEntity> type,
-			String[] header, String[] data) throws Exception {
+	protected AbstractEntity parseRecord(Class<?> type, String[] header,
+			String[] data) throws Exception {
 		AbstractEntity entity = (AbstractEntity) type.newInstance();
 
+		for (int ii = 0; ii < header.length; ii++) {
+			AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+					header[ii]);
+			if (attr.Convertor != null) {
+				attr.Convertor.load(entity, attr.Column, data[ii]);
+			} else if (attr.Reference == null) {
+				setFieldValue(entity, attr.Field, data[ii]);
+			} else {
+
+			}
+		}
 		return entity;
+	}
+
+	protected int getColumnIndex(String column, String[] header) {
+		for (int ii = 0; ii < header.length; ii++) {
+			if (column.compareTo(header[ii]) == 0)
+				return ii;
+		}
+		return -1;
 	}
 
 	/*
@@ -194,6 +216,21 @@ public class CSVPersister extends AbstractPersister {
 	public void delete(AbstractEntity record) throws Exception {
 		throw new NotImplementedException(
 				"This is a dummy persister. Write operations are not supported.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.wookler.core.persistence.AbstractPersister#setFieldValue(com.wookler
+	 * .core.persistence.AbstractEntity, java.lang.reflect.Field,
+	 * java.lang.Object)
+	 */
+	@Override
+	protected void setFieldValue(AbstractEntity entity, Field fd, Object value)
+			throws Exception {
+
+		super.setFieldValue(entity, fd, value);
 	}
 
 }

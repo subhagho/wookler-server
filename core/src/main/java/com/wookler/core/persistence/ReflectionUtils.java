@@ -86,6 +86,25 @@ public class ReflectionUtils {
 							ar.Reference.Field = ref.attribute();
 							ar.Reference.Type = ref.association();
 						}
+						if (attr.handler() != null && !attr.handler().isEmpty()) {
+							String handler = attr.handler();
+							Class<?> cls = Class.forName(handler);
+							Object hobj = cls.newInstance();
+							if (hobj instanceof CustomFieldDataHandler) {
+								ar.Convertor = (CustomFieldDataHandler) hobj;
+							} else {
+								throw new Exception(
+										"["
+												+ type.getCanonicalName()
+												+ "]"
+												+ "Invalid Attribute : Convertor class ["
+												+ cls.getCanonicalName()
+												+ "] doesnot implement ["
+												+ CustomFieldDataHandler.class
+														.getCanonicalName()
+												+ "]");
+							}
+						}
 						map.put(ar.Column, ar);
 					}
 				}
@@ -95,7 +114,6 @@ public class ReflectionUtils {
 		return metacache.get(type.getCanonicalName());
 	}
 
-	
 	private static ReflectionUtils _instance = new ReflectionUtils();
 
 	/**
