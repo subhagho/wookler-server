@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.wookler</groupId>
-	<artifactId>core</artifactId>
+	<artifactId>wookler-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>core</name>
+	<name>wookler-server</name>
 	<url>http://www.wookler.com</url>
 
 	<properties>

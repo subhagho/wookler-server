@@ -123,7 +123,7 @@ public class Test_EntityListSorter {
 
 			EntityListSorter sorter = new EntityListSorter(columns);
 			int retval = sorter.compare(esrc, etgt);
-			assertEquals(true, (retval < 0));
+			assertEquals(true, (retval > 0));
 
 			column = new SortColumn();
 			column.setColumn("FORInt");
@@ -132,7 +132,7 @@ public class Test_EntityListSorter {
 
 			sorter = new EntityListSorter(columns);
 			retval = sorter.compare(esrc, etgt);
-			assertEquals(false, (retval < 0));
+			assertEquals(false, (retval > 0));
 
 			retval = sorter.compare(esrc, esrc);
 			assertEquals(true, (retval == 0));
