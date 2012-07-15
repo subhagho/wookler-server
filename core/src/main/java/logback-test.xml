@@ -19,10 +19,16 @@
 			</pattern>
 		</layout>
 	</appender>
-
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n
+			</pattern>
+		</layout>
+	</appender>
 
 	<root level="DEBUG">
 		<appender-ref ref="ROLLING" />
+		<appender-ref ref="STDOUT" />
 	</root>
 
 </configuration>

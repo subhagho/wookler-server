@@ -4,10 +4,14 @@
 		<work directory="/tmp/wookler/work/" />
 		<temp directory="/tmp/wookler/temp/" />
 	</env>
+	<server port="8090" numhtreads="5">
+		<web directory="/tmp/wookler/work/web" />
+	</server>
 	<core>
 		<datamanager>
 			<persistence>
-				<persister name="CSVPERSISTER" class="com.wookler.core.persistence.csv.CSVPersister">
+				<persister name="CSVPERSISTER"
+					class="com.wookler.core.persistence.csv.CSVPersister">
 					<params>
 						<param type="Value" name="key" value="CSVPERSISTER" />
 						<param type="Value" name="datadir" value="/var/wookler/data/" />
