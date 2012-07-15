@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlElement;
 public abstract class AbstractEntity {
 	protected EnumEntityState state = EnumEntityState.Unknown;
 
-	@Attribute(name = "TIMESTAMP", handler = "com.wookler.core.persistence.handlers.DateHandler")
+	@Attribute(name = "TIMESTAMP")
 	@XmlElement(name = "timestamp")
 	protected Date timestamp;
 

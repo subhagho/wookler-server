@@ -16,8 +16,8 @@ import com.wookler.core.persistence.Entity;
  * @author subhagho
  * 
  */
-@Entity(recordset = "SEQUENCE")
-@XmlRootElement(name = "sequence")
+@Entity(recordset = "CREATIVE")
+@XmlRootElement(name = "creative")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Creative extends AbstractEntity {
 	@Attribute(name = "ID")
@@ -28,8 +28,8 @@ public class Creative extends AbstractEntity {
 	@XmlElement(name = "html")
 	private String html;
 
-	@Attribute(name = "URL")
-	@XmlElement(name = "url")
+	@Attribute(name = "URI")
+	@XmlElement(name = "uri")
 	private String url;
 
 	/**
@@ -75,6 +75,22 @@ public class Creative extends AbstractEntity {
 	 */
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("[ID:").append(getId()).append("]");
+		buff.append(", [Timestamp:").append(getTimestamp().toString())
+				.append("]");
+		buff.append(", [HTML:").append(getHtml()).append("]");
+		buff.append(", [URL:").append(getUrl()).append("]");
+		return buff.toString();
 	}
 
 }

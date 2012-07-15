@@ -78,7 +78,7 @@ public class SimpleFilterQuery extends Query {
 			sorter.sort(results);
 		}
 		if (parser.getLimit() > 0) {
-			results = results.subList(0, parser.getLimit() - 1);
+			results = results.subList(0, parser.getLimit());
 		}
 		return results;
 	}

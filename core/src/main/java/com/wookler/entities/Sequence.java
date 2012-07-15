@@ -25,7 +25,7 @@ public class Sequence extends AbstractEntity {
 	@XmlElement(name = "mediaid")
 	private String mediaid;
 
-	@Attribute(name = "SEQID", keyattribute=true)
+	@Attribute(name = "SEQID", keyattribute = true)
 	@XmlElement(name = "sequenceid")
 	private long seqid;
 
@@ -39,9 +39,9 @@ public class Sequence extends AbstractEntity {
 
 	@Attribute(name = "CREATIVE")
 	@XmlElement(name = "creative")
-	@Reference(target="com.wookler.entities.Creative", attribute="id")
+	@Reference(target = "com.wookler.entities.Creative", attribute = "ID")
 	private Creative creative;
-	
+
 	/**
 	 * @return the mediaid
 	 */
@@ -110,10 +110,30 @@ public class Sequence extends AbstractEntity {
 	}
 
 	/**
-	 * @param creative the creative to set
+	 * @param creative
+	 *            the creative to set
 	 */
 	public void setCreative(Creative creative) {
 		this.creative = creative;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("[MEDIAID:").append(getMediaid()).append("]");
+		buff.append(", [Timestamp:").append(getTimestamp().toString())
+				.append("]");
+		buff.append(", [SequenceId:").append(getSeqid()).append("]");
+		buff.append(", [StartTime:").append(getStarttime()).append("]");
+		buff.append(", [EndTime:").append(getEndtime()).append("]");
+		buff.append(", [Creative:").append(getCreative().toString())
+				.append("]");
+		return buff.toString();
 	}
 
 }

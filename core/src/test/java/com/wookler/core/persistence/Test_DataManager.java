@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.wookler.core.Env;
 import com.wookler.core.data.Test_Env;
+import com.wookler.entities.Sequence;
 import com.wookler.entities.VideoMedia;
 import com.wookler.utils.LogUtils;
 
@@ -52,8 +53,20 @@ public class Test_DataManager {
 	public void testRead() {
 		try {
 			DataManager manager = DataManager.get();
-			List<AbstractEntity> entities = manager.read("", VideoMedia.class);
+			List<AbstractEntity> entities = manager.read(
+					"TYPE = Video; TAGS contains TV; SORT LENGTH ASC; LIMIT 2",
+					VideoMedia.class);
 			assertEquals(true, (entities != null && entities.size() > 0));
+			for (AbstractEntity entity : entities) {
+				log.info(entity.toString());
+				List<AbstractEntity> sequences = manager.read("MEDIAID="
+						+ ((VideoMedia) entity).getId()
+						+ "; CREATIVE.ID = 1; SORT STARTTIME ASC",
+						Sequence.class);
+				for (AbstractEntity seq : sequences) {
+					log.info("\tSEQUENCE : " + seq.toString());
+				}
+			}
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());

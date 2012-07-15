@@ -14,10 +14,10 @@
 				<maxFileSize>100MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
-		<encoder>
+		<layout class="ch.qos.logback.classic.PatternLayout">
 			<pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n
 			</pattern>
-		</encoder>
+		</layout>
 	</appender>
 
 

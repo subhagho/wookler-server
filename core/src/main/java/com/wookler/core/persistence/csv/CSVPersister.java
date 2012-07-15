@@ -6,11 +6,12 @@ package com.wookler.core.persistence.csv;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.NotImplementedException;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -19,6 +20,7 @@ import com.wookler.core.EnumInstanceState;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AbstractPersister;
 import com.wookler.core.persistence.AttributeReflection;
+import com.wookler.core.persistence.DataManager;
 import com.wookler.core.persistence.Entity;
 import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.EnumRefereceType;
@@ -177,7 +179,7 @@ public class CSVPersister extends AbstractPersister {
 				setFieldValue(entity, attr.Field, data[ii]);
 			} else {
 				String query = attr.Reference.Field + "=" + data[ii];
-				List<AbstractEntity> refs = read(query,
+				List<AbstractEntity> refs = DataManager.get().read(query,
 						Class.forName(attr.Reference.Class));
 				if (refs != null && refs.size() > 0) {
 					if (attr.Reference.Type == EnumRefereceType.One2One) {
@@ -236,7 +238,7 @@ public class CSVPersister extends AbstractPersister {
 	 * .core.persistence.AbstractEntity, java.lang.reflect.Field,
 	 * java.lang.Object)
 	 */
-	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void setFieldValue(AbstractEntity entity, Field fd, Object value)
 			throws Exception {
 		Object pvalue = value;
@@ -269,11 +271,15 @@ public class CSVPersister extends AbstractPersister {
 				throw new Exception("Unsupported primitive type [" + pt.name()
 						+ "]");
 			}
+		} else if (fd.getType().isEnum()) {
+			Class ecls = fd.getType();
+			pvalue = Enum.valueOf(ecls, (String) value);
+		} else if (pvalue.getClass().isAnnotationPresent(Entity.class)) {
+			pvalue = value;
 		} else {
 			throw new Exception("Field type ["
 					+ fd.getType().getCanonicalName() + "] is not supported.");
 		}
-		super.setFieldValue(entity, fd, pvalue);
+		PropertyUtils.setProperty(entity, fd.getName(), pvalue);
 	}
-
 }

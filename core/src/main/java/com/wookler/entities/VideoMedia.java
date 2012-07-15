@@ -119,4 +119,36 @@ public class VideoMedia extends Media {
 		this.source = source;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("[ID:").append(getId()).append("]");
+		buff.append(", [Timestamp:").append(getTimestamp().toString())
+				.append("]");
+		buff.append(", [Name:").append(getName()).append("]");
+		buff.append(", [Type:").append(getType()).append("]");
+		buff.append(", [Description:").append(getDescription()).append("]");
+		buff.append(", [Length:").append(getLength()).append("]");
+		buff.append(", [Location:").append(getLocation()).append("]");
+		buff.append(", [Source:").append(getSource()).append("]");
+		if (getTags() != null && getTags().length > 0) {
+			buff.append("[TAGS {");
+			boolean first = true;
+			for (String tag : getTags()) {
+				if (first)
+					first = false;
+				else
+					buff.append(", ");
+				buff.append(tag);
+			}
+			buff.append("}]");
+		}
+		return buff.toString();
+	}
+
 }
