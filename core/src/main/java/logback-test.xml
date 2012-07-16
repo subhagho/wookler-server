@@ -7,7 +7,7 @@
 		<file>${LOGDIR}/wookler.core.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>wookler.core-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<fileNamePattern>${LOGDIR}/wookler.core-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<!-- or whenever the file size reaches 100MB -->
