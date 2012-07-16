@@ -14,6 +14,9 @@ import com.wookler.core.persistence.AbstractEntity;
  * 
  */
 public abstract class Query {
+	public static final String _QUERY_CONDITION_AND_ = ";";
+	public static final String _QUERY_CONDITION_OR_ = ",";
+
 	/**
 	 * Parse the passed query.
 	 * 

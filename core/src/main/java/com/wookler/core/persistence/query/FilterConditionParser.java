@@ -37,7 +37,7 @@ public class FilterConditionParser {
 		quoted.clear();
 		List<FilterCondition> conditions = new ArrayList<FilterCondition>();
 		String filterstr = parseQuoted(query);
-		String[] filters = filterstr.split(";");
+		String[] filters = filterstr.split(Query._QUERY_CONDITION_AND_);
 		if (filters != null) {
 			for (String filter : filters) {
 				if (parseLimit(filter))
