@@ -36,4 +36,9 @@ public interface InitializedHandle {
 	 * @return
 	 */
 	public EnumInstanceState state();
+
+	/**
+	 * Dispose the Handle.
+	 */
+	public void dispose();
 }

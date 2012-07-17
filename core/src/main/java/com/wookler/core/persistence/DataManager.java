@@ -14,7 +14,9 @@ import org.w3c.dom.NodeList;
 
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.Env;
+import com.wookler.core.InitializedHandle;
 import com.wookler.utils.InstanceParam;
+import com.wookler.utils.ListParam;
 import com.wookler.utils.LogUtils;
 import com.wookler.utils.XMLUtils;
 
@@ -24,7 +26,7 @@ import com.wookler.utils.XMLUtils;
  * @author subhagho
  * 
  */
-public class DataManager {
+public class DataManager implements InitializedHandle {
 	public static final String _CONFIG_XPATH_ = "/core/datamanager";
 	public static final String _CONFIG_PERSIST_XPATH_ = "./persistence";
 	public static final String _CONFIG_PERSISTER_XPATH_ = "./persister";
@@ -118,6 +120,23 @@ public class DataManager {
 	}
 
 	/**
+	 * Get a handle to the Persistence Handler based on the name specified.
+	 * 
+	 * @param name
+	 *            - Persister Class name.
+	 * @return
+	 * @throws Exception
+	 */
+	public AbstractPersister getPersisterByName(String name) throws Exception {
+		if (persistmap.containsKey(name)) {
+			return persistmap.get(name);
+		}
+
+		throw new Exception("No persistence handler found for class [" + name
+				+ "]");
+	}
+
+	/**
 	 * Get the persistence handler defined for the specified entity type. If no
 	 * persistence handler found for the current class, search thru the super
 	 * classes to see if a handler is defined for any?
@@ -163,6 +182,60 @@ public class DataManager {
 		return persister.read(query, type);
 	}
 
+	/**
+	 * Fetch the entity records for the Class filtered by Query using the
+	 * specified persistence handler.
+	 * 
+	 * @param query
+	 *            - Query Condition string.
+	 * @param type
+	 *            - Entity Type.
+	 * @param persister
+	 *            - Persistence Handler
+	 * @return
+	 * @throws Exception
+	 */
+	public List<AbstractEntity> read(String query, Class<?> type,
+			AbstractPersister persister) throws Exception {
+		return persister.read(query, type);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.InitializedHandle#key()
+	 */
+	public String key() {
+		return DataManager.class.getCanonicalName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.InitializedHandle#init(com.wookler.utils.ListParam)
+	 */
+	public void init(ListParam param) throws Exception {
+		throw new Exception("Should not be called.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.InitializedHandle#state()
+	 */
+	public EnumInstanceState state() {
+		return state;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.InitializedHandle#dispose()
+	 */
+	public void dispose() {
+		return;
+	}
+
 	// Instance
 	private static DataManager _instance = new DataManager();
 
@@ -202,7 +275,7 @@ public class DataManager {
 	/**
 	 * Dispose the DataManager instance.
 	 */
-	public static void dispose() {
+	public static void release() {
 		synchronized (_instance) {
 			if (_instance.state == EnumInstanceState.Running) {
 				_instance.state = EnumInstanceState.Closed;
@@ -210,4 +283,5 @@ public class DataManager {
 			}
 		}
 	}
+
 }

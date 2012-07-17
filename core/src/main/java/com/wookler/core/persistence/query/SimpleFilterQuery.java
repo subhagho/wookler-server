@@ -16,11 +16,11 @@ import com.wookler.core.persistence.AbstractEntity;
  * 
  */
 public class SimpleFilterQuery extends Query {
-	private List<FilterCondition> conditions = null;
+	protected List<FilterCondition> conditions = null;
 
-	private ConditionMatcher matcher = new ConditionMatcher();
+	protected ConditionMatcher matcher = new ConditionMatcher();
 
-	private FilterConditionParser parser = null;
+	protected FilterConditionParser parser = null;
 
 	/**
 	 * Get the parsed filter conditions.

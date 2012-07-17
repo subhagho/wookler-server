@@ -5,6 +5,7 @@ package com.wookler.core.persistence;
 
 import java.util.List;
 
+import com.wookler.core.EnumInstanceState;
 import com.wookler.core.InitializedHandle;
 import com.wookler.utils.ListParam;
 
@@ -18,7 +19,7 @@ import com.wookler.utils.ListParam;
  *            - Entity Type(s).
  */
 public abstract class AbstractPersister implements InitializedHandle {
-	protected EnumPersisterState state = EnumPersisterState.Unknown;
+	protected EnumInstanceState state = EnumInstanceState.Unknown;
 
 	protected String classtype;
 

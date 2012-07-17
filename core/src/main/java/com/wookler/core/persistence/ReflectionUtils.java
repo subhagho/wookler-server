@@ -45,7 +45,7 @@ public class ReflectionUtils {
 		if (map.containsKey(column)) {
 			return map.get(column);
 		}
-		throw new Exception("No attributes found for entity ["
+		throw new AttributeNotFoundException("No attributes found for entity ["
 				+ type.getCanonicalName() + "] named [" + column + "]");
 	}
 
@@ -108,6 +108,7 @@ public class ReflectionUtils {
 							}
 						}
 						map.put(ar.Column, ar);
+						map.put(ar.Field.getName(), ar);
 					}
 				}
 				metacache.put(type.getCanonicalName(), map);
@@ -116,7 +117,7 @@ public class ReflectionUtils {
 		return metacache.get(type.getCanonicalName());
 	}
 
-	private List<Field> getFields(Class<?> type) {
+	public List<Field> getFields(Class<?> type) {
 		List<Field> array = new ArrayList<Field>();
 		getFields(type, array);
 		return array;

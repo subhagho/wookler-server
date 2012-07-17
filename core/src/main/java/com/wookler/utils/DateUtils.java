@@ -87,9 +87,9 @@ public class DateUtils {
 		} catch (Exception e) {
 			if (dts.indexOf(';') > 0) {
 				String[] parts = dts.split(";");
-				ds = DateUtils.parse(DateUtils.format(ds, parts[1]), parts[1]);
+				ds = DateUtils.parse(parts[0], parts[1]);
 			} else {
-				ds = DateUtils.parse(DateUtils.format(ds));
+				ds = DateUtils.parse(dts);
 			}
 		}
 		return ds;

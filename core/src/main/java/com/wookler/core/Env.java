@@ -198,7 +198,7 @@ public class Env {
 	 * Dispose the operating environment.
 	 */
 	public static void dispose() {
-		DataManager.dispose();
+		DataManager.release();
 		if (_instance.shared != null) {
 			_instance.shared.clear();
 		}

@@ -7,7 +7,7 @@ package com.wookler.core.persistence.query;
  * @author subhagho
  * 
  */
-public class FilterCondition {
+public class FilterCondition extends AbstractCondition{
 	public static final String _STRING_DEFAULT_ = "DEFAULT";
 	public static final String _STRING_NULL_ = "NULL";
 

@@ -41,9 +41,11 @@ public class CSVPersister extends AbstractPersister {
 
 	private String key;
 	private String datadir;
-	private EnumInstanceState state = EnumInstanceState.Unknown;
-
 	private HashMap<String, List<AbstractEntity>> cache = new HashMap<String, List<AbstractEntity>>();
+
+	public CSVPersister() {
+		classtype = this.getClass().getCanonicalName();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -281,5 +283,14 @@ public class CSVPersister extends AbstractPersister {
 					+ fd.getType().getCanonicalName() + "] is not supported.");
 		}
 		PropertyUtils.setProperty(entity, fd.getName(), pvalue);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.InitializedHandle#dispose()
+	 */
+	public void dispose() {
+		cache.clear();
 	}
 }

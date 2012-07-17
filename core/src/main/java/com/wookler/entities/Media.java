@@ -15,7 +15,7 @@ import com.wookler.core.persistence.Entity;
  * @author subhagho
  * 
  */
-@Entity
+@Entity(recordset = "MEDIA")
 public abstract class Media extends AbstractEntity {
 	@Attribute(name = "TYPE")
 	@XmlElement(name = "type")

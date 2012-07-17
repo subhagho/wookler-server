@@ -22,13 +22,27 @@ public @interface Entity {
 	 * 
 	 * @return
 	 */
-	String recordset() default "";
+	String recordset();
 
 	/**
-	 * Custom data persister class(name) to use for this entity. If no explicit persister is
-	 * specified the DataManager will search for the persister.
+	 * Custom data persister class(name) to use for this entity. If no explicit
+	 * persister is specified the DataManager will search for the persister.
 	 * 
 	 * @return
 	 */
 	String persister() default "";
+
+	/**
+	 * Is the entity cacheable?
+	 * 
+	 * @return
+	 */
+	boolean cached() default false;
+
+	/**
+	 * Time-to-Live for cached entities.
+	 * 
+	 * @return
+	 */
+	long TTL() default -1;
 }
