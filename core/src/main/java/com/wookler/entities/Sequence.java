@@ -21,7 +21,7 @@ import com.wookler.core.persistence.Reference;
 @XmlRootElement(name = "sequence")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Sequence extends AbstractEntity {
-	@Attribute(name = "MEDIAID")
+	@Attribute(name = "MEDIAID", keyattribute = true)
 	@XmlElement(name = "mediaid")
 	private String mediaid;
 

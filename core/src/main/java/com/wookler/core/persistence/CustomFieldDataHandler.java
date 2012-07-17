@@ -37,4 +37,10 @@ public interface CustomFieldDataHandler {
 	 */
 	public Object save(AbstractEntity entity, String field) throws Exception;
 
+	/**
+	 * Get the data type used to persist this record.
+	 * 
+	 * @return
+	 */
+	public Class<?> getDataType();
 }

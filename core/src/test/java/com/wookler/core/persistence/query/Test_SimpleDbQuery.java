@@ -5,12 +5,15 @@ package com.wookler.core.persistence.query;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wookler.entities.Sequence;
 import com.wookler.entities.VideoMedia;
 import com.wookler.utils.LogUtils;
 
@@ -49,6 +52,11 @@ public class Test_SimpleDbQuery {
 			dbq.parse(query);
 			String sql = dbq.parseSelectQuery(VideoMedia.class);
 			log.info("SQL[" + sql + "]");
+
+			List<String> ddls = dbq.getCreateTableDDL(Sequence.class);
+			for (String ddl : ddls) {
+				log.info("SQL[" + ddl + "]");
+			}
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());

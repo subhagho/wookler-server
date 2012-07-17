@@ -22,7 +22,7 @@ import com.wookler.core.persistence.Entity;
 public class Creative extends AbstractEntity {
 	@Attribute(name = "ID")
 	@XmlElement(name = "creativeid")
-	private long id;
+	private String id;
 
 	@Attribute(name = "HTML")
 	@XmlElement(name = "html")
@@ -35,7 +35,7 @@ public class Creative extends AbstractEntity {
 	/**
 	 * @return the id
 	 */
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -43,7 +43,7 @@ public class Creative extends AbstractEntity {
 	 * @param id
 	 *            the id to set
 	 */
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

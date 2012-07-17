@@ -15,6 +15,7 @@ import com.wookler.core.persistence.AttributeNotFoundException;
 import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
 import com.wookler.core.persistence.ReflectionUtils;
+import com.wookler.core.persistence.db.SQLDataType;
 import com.wookler.core.persistence.db.SqlConditionTransformer;
 
 /**
@@ -128,6 +129,95 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		}
 		log.debug("QUERY [" + qbuff.toString() + "]");
 		return qbuff.toString();
+	}
+
+	public List<String> getCreateTableDDL(Class<?> type) throws Exception {
+		if (!type.isAnnotationPresent(Entity.class))
+			throw new Exception("Class [" + type.getCanonicalName()
+					+ "] has not been annotated as an Entity.");
+
+		List<String> stmnts = new ArrayList<String>();
+		List<String> columns = new ArrayList<String>();
+		List<String> keycolumns = null;
+
+		String table = null;
+
+		// Get table name
+		Entity eann = (Entity) type.getAnnotation(Entity.class);
+		table = eann.recordset();
+
+		// Drop table statement
+		stmnts.add("drop table if exists " + table + " cascade");
+
+		// Get Columns
+		List<Field> fields = ReflectionUtils.get().getFields(type);
+		for (Field field : fields) {
+			try {
+				AttributeReflection attr = ReflectionUtils.get().getAttribute(
+						type, field.getName());
+
+				columns.add(getColumnDDL(attr));
+				if (attr.IsKeyColumn) {
+					if (keycolumns == null)
+						keycolumns = new ArrayList<String>();
+					keycolumns.add(attr.Column);
+				}
+			} catch (AttributeNotFoundException e) {
+				continue;
+			}
+		}
+
+		// Create table statement
+		StringBuffer buff = new StringBuffer();
+		buff.append("create table (");
+		boolean first = true;
+		for (String column : columns) {
+			if (first)
+				first = false;
+			else
+				buff.append(",");
+			buff.append(column);
+		}
+		buff.append(")");
+
+		stmnts.add(buff.toString());
+
+		// Create primary key (if any)
+		if (keycolumns != null && keycolumns.size() > 0) {
+			buff = new StringBuffer();
+			buff.append("alter table " + table
+					+ " add constraint primary key (");
+			first = true;
+			for (String column : keycolumns) {
+				if (first)
+					first = false;
+				else
+					buff.append(",");
+				buff.append(column);
+			}
+			buff.append(")");
+			stmnts.add(buff.toString());
+		}
+		return stmnts;
+	}
+
+	private String getColumnDDL(AttributeReflection attr) throws Exception {
+		Class<?> type = attr.Field.getType();
+		if (attr.Convertor != null) {
+			type = attr.Convertor.getDataType();
+		} else if (attr.Reference != null) {
+			Class<?> rtype = Class.forName(attr.Reference.Class);
+			AttributeReflection rattr = ReflectionUtils.get().getAttribute(
+					rtype, attr.Reference.Field);
+			type = rattr.Field.getType();
+		}
+
+		SQLDataType sqlt = SQLDataType.type(type);
+		String def = sqlt.name();
+		if (sqlt == SQLDataType.VARCHAR2) {
+			def = sqlt.name() + "(" + 1024 + ")";
+		}
+		return attr.Column + " " + def;
 	}
 
 	/**

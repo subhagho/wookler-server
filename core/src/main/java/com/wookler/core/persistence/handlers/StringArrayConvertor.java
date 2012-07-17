@@ -335,4 +335,13 @@ public class StringArrayConvertor implements CustomFieldDataHandler {
 				+ type.getCanonicalName() + "]");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.persistence.CustomFieldDataHandler#getDataType()
+	 */
+	public Class<?> getDataType() {
+		return String.class;
+	}
+
 }

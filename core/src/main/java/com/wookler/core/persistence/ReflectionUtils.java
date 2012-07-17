@@ -74,6 +74,7 @@ public class ReflectionUtils {
 						AttributeReflection ar = new AttributeReflection();
 						ar.Field = fd;
 						ar.Column = attr.name();
+						ar.IsKeyColumn = attr.keyattribute();
 
 						String mname = getMethodName("get", fd.getName());
 						ar.Getter = type.getMethod(mname);
