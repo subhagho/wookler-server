@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class ReflectionUtils {
 	private HashMap<String, HashMap<String, AttributeReflection>> metacache = new HashMap<String, HashMap<String, AttributeReflection>>();
+	private HashMap<String, List<Field>> fieldscache = new HashMap<String, List<Field>>();
 
 	/**
 	 * Get the Getter/Setter method name for the field.
@@ -45,8 +46,7 @@ public class ReflectionUtils {
 		if (map.containsKey(column)) {
 			return map.get(column);
 		}
-		throw new AttributeNotFoundException("No attributes found for entity ["
-				+ type.getCanonicalName() + "] named [" + column + "]");
+		return null;
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class ReflectionUtils {
 	 */
 	public HashMap<String, AttributeReflection> getEntityMetadata(Class<?> type)
 			throws Exception {
-		if (!metacache.containsKey(type.getCanonicalName())) {
+		if (!metacache.containsKey(type.getName())) {
 			synchronized (metacache) {
 
 				HashMap<String, AttributeReflection> map = new HashMap<String, AttributeReflection>();
@@ -75,6 +75,7 @@ public class ReflectionUtils {
 						ar.Field = fd;
 						ar.Column = attr.name();
 						ar.IsKeyColumn = attr.keyattribute();
+						ar.Size = attr.size();
 
 						String mname = getMethodName("get", fd.getName());
 						ar.Getter = type.getMethod(mname);
@@ -112,16 +113,22 @@ public class ReflectionUtils {
 						map.put(ar.Field.getName(), ar);
 					}
 				}
-				metacache.put(type.getCanonicalName(), map);
+				metacache.put(type.getName(), map);
 			}
 		}
-		return metacache.get(type.getCanonicalName());
+		return metacache.get(type.getName());
 	}
 
 	public List<Field> getFields(Class<?> type) {
-		List<Field> array = new ArrayList<Field>();
-		getFields(type, array);
-		return array;
+		if (!fieldscache.containsKey(type.getCanonicalName())) {
+			synchronized (fieldscache) {
+				List<Field> array = new ArrayList<Field>();
+				getFields(type, array);
+				fieldscache.put(type.getCanonicalName(), array);
+			}
+		}
+
+		return fieldscache.get(type.getCanonicalName());
 	}
 
 	private void getFields(Class<?> type, List<Field> array) {

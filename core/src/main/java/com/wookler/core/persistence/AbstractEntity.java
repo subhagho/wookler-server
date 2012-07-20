@@ -14,10 +14,11 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  */
 public abstract class AbstractEntity {
-	protected EnumEntityState state = EnumEntityState.Unknown;
+	public static final String _TX_TIMESTAMP_COLUMN_ = "TX_TIMESTAMP";
+	protected EnumEntityState state = EnumEntityState.Loaded;
 
-	@Attribute(name = "TIMESTAMP")
-	@XmlElement(name = "timestamp")
+	@Attribute(name = _TX_TIMESTAMP_COLUMN_)
+	@XmlElement(name = "tx-timestamp")
 	protected Date timestamp;
 
 	/**

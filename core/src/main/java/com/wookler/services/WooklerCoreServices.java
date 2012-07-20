@@ -10,6 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -45,12 +46,12 @@ public class WooklerCoreServices {
 	 * @return
 	 * @throws Exception
 	 */
-	@Path("/videos/{video}/{query}")
+	@Path("/videos/{video}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<List<AbstractEntity>> videos(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("video") String videoid,
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("query") String query)
+			@DefaultValue(_EMPTY_PATH_ELEMENT_) @QueryParam("query") String query)
 			throws Exception {
 		log.debug("QUERY [" + query + "]");
 		log.debug("VEDIO-ID [" + videoid + "]");
@@ -80,12 +81,12 @@ public class WooklerCoreServices {
 	 * @return
 	 * @throws Exception
 	 */
-	@Path("/sequences/{videoid}/{query}")
+	@Path("/sequences/{videoid}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<List<AbstractEntity>> sequences(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("query") String query)
+			@DefaultValue(_EMPTY_PATH_ELEMENT_) @QueryParam("query") String query)
 			throws Exception {
 		log.debug("VIDEO-ID:" + videoid);
 		String squery = "MEDIAID=" + videoid;

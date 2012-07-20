@@ -16,6 +16,7 @@ import com.wookler.core.persistence.Entity;
  * 
  */
 public class DummyEntitiesData {
+
 	@Entity(recordset = "EMBED2")
 	public static class EntityMatchEmbed2 extends AbstractEntity {
 		@Attribute(name = "FORint")

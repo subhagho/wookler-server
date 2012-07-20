@@ -4,6 +4,9 @@
 package com.wookler.core.persistence;
 
 /**
+ * Structure encapsulates the Entity Reference parameters extracted from the
+ * annotation using reflection.
+ * 
  * @author subhagho
  * 
  */

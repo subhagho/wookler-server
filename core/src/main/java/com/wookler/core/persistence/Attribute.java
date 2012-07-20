@@ -38,4 +38,11 @@ public @interface Attribute {
 	 * @return
 	 */
 	String handler() default "";
+
+	/**
+	 * Specify the column data size. Only applicable for String(s).
+	 * 
+	 * @return
+	 */
+	int size() default 0;
 }

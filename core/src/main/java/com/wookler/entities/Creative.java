@@ -13,6 +13,8 @@ import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
 
 /**
+ * Creative is the product/product display creative that is rendered.
+ * 
  * @author subhagho
  * 
  */
@@ -20,15 +22,16 @@ import com.wookler.core.persistence.Entity;
 @XmlRootElement(name = "creative")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Creative extends AbstractEntity {
-	@Attribute(name = "ID")
+	@Attribute(name = "ID", keyattribute = true, size = 256)
 	@XmlElement(name = "creativeid")
 	private String id;
 
-	@Attribute(name = "HTML")
+	// Max HTML size 10K
+	@Attribute(name = "HTML", size = 10 * 1024)
 	@XmlElement(name = "html")
 	private String html;
 
-	@Attribute(name = "URI")
+	@Attribute(name = "URI", size = 1024)
 	@XmlElement(name = "uri")
 	private String url;
 

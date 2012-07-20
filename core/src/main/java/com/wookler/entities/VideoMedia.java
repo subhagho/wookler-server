@@ -20,11 +20,11 @@ import com.wookler.core.persistence.Entity;
 @XmlRootElement(name = "video")
 @XmlAccessorType(XmlAccessType.NONE)
 public class VideoMedia extends Media {
-	@Attribute(name = "NAME")
+	@Attribute(name = "NAME", size = 512)
 	@XmlElement(name = "name")
 	private String name;
 
-	@Attribute(name = "DESC")
+	@Attribute(name = "DESC", size = 1024)
 	@XmlElement(name = "description")
 	private String description;
 
@@ -32,7 +32,7 @@ public class VideoMedia extends Media {
 	@XmlElement(name = "length")
 	private long length;
 
-	@Attribute(name = "URI")
+	@Attribute(name = "URI", size = 1024)
 	@XmlElement(name = "uri")
 	private String location;
 

@@ -5,7 +5,10 @@ package com.wookler.core.persistence.query;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -13,8 +16,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wookler.core.persistence.query.test.ReferenceRoot;
+import com.wookler.core.utils.InputWait;
+import com.wookler.entities.Creative;
 import com.wookler.entities.Sequence;
 import com.wookler.entities.VideoMedia;
+import com.wookler.utils.KeyValuePair;
 import com.wookler.utils.LogUtils;
 
 /**
@@ -41,26 +48,103 @@ public class Test_SimpleDbQuery {
 
 	/**
 	 * Test method for
-	 * {@link com.wookler.core.persistence.query.SimpleDbQuery#parseSelectQuery(java.lang.Class)}
+	 * {@link com.wookler.core.persistence.query.SimpleDbQuery#getSelectQuery(java.lang.Class)}
 	 * .
 	 */
 	@Test
-	public void testParseSelectQuery() {
+	public void testQuery() {
 		try {
-			String query = "ID=3;TYPE='Video';TIMESTAMP BETWEEN ['1/1/2001;MM/dd/yyyy', '1/1/2010;MM/dd/yyyy']";
+
+			String query = "STR=3;REF.STR='xxx';REF.REF.DT=12900123020";
 			SimpleDbQuery dbq = new SimpleDbQuery();
 			dbq.parse(query);
-			String sql = dbq.parseSelectQuery(VideoMedia.class);
+			String sql = dbq.getSelectQuery(ReferenceRoot.class);
 			log.info("SQL[" + sql + "]");
 
-			List<String> ddls = dbq.getCreateTableDDL(Sequence.class);
+			List<String> ddls = dbq.getCreateTableDDL(VideoMedia.class);
 			for (String ddl : ddls) {
 				log.info("SQL[" + ddl + "]");
 			}
+
+			ddls = dbq.getCreateTableDDL(Sequence.class);
+			for (String ddl : ddls) {
+				log.info("SQL[" + ddl + "]");
+			}
+
+			List<KeyValuePair<String>> indx = new ArrayList<KeyValuePair<String>>();
+			indx.add(new KeyValuePair<String>("TESTINDX", "MEDIAID,STARTTIME"));
+			ddls = dbq.getCreateIndexDDL(Sequence.class, indx);
+			for (String ddl : ddls) {
+				log.info("SQL[" + ddl + "]");
+			}
+
+			ddls = dbq.getCreateTableDDL(Creative.class);
+			for (String ddl : ddls) {
+				log.info("SQL[" + ddl + "]");
+			}
+
+			Map<String, String> updates = dbq.getUpdateQuery(Sequence.class);
+			for (String key : updates.keySet()) {
+				log.info("[CLASS:" + key + "][" + updates.get(key) + "]");
+			}
+
+			Map<String, String> inserts = dbq.getInsertQuery(Sequence.class);
+			for (String key : inserts.keySet()) {
+				log.info("[CLASS:" + key + "][" + inserts.get(key) + "]");
+			}
+
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());
 		}
 	}
 
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.SimpleDbQuery#getSelectQuery(java.lang.Class)}
+	 * .
+	 */
+	@Test
+	public void testPerfQuery() {
+		try {
+			while (true) {
+				long stime = new Date().getTime();
+				int count = 100000;
+
+				for (int ii = 0; ii < count; ii++) {
+					String query = "STR=3;REF.STR='xxx';REF.REF.DT=12900123020";
+					SimpleDbQuery dbq = new SimpleDbQuery();
+					dbq.parse(query);
+					String sql = dbq.getSelectQuery(ReferenceRoot.class);
+
+					/*
+					 * List<String> ddls =
+					 * dbq.getCreateTableDDL(VideoMedia.class);
+					 * 
+					 * ddls = dbq.getCreateTableDDL(Sequence.class);
+					 * 
+					 * List<KeyValuePair<String>> indx = new
+					 * ArrayList<KeyValuePair<String>>(); indx.add(new
+					 * KeyValuePair<String>("TESTINDX", "MEDIAID,STARTTIME"));
+					 * ddls = dbq.getCreateIndexDDL(Sequence.class, indx);
+					 * 
+					 * ddls = dbq.getCreateTableDDL(Creative.class);
+					 */
+					Map<String, String> updates = dbq
+							.getUpdateQuery(Sequence.class);
+
+					Map<String, String> inserts = dbq
+							.getInsertQuery(Sequence.class);
+				}
+
+				log.info("Time to process [" + count + "] loops : "
+						+ (new Date().getTime() - stime));
+				break;
+				// Thread.sleep(500);
+			}
+		} catch (Exception e) {
+			LogUtils.stacktrace(log, e);
+			fail(e.getLocalizedMessage());
+		}
+	}
 }

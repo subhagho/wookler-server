@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,13 @@ public class H2DbPersister extends AbstractDbPersister {
 
 	public static final String _PARAM_CONN_PASSWD_ = "password";
 
+	public static final String _PARAM_DBCONFIG_ = "setup";
+
+	public static final String _CONFIG_SETUP_VERSION_ = "db.version";
+
 	private int cpoolsize = 10;
+
+	private String dbconfig = null;
 
 	private String connurl = null;
 
@@ -149,6 +156,17 @@ public class H2DbPersister extends AbstractDbPersister {
 						password);
 				conns[ii].setAutoCommit(true);
 			}
+
+			param = params.get(_PARAM_DBCONFIG_);
+			if (param != null) {
+				if (!(param instanceof ValueParam))
+					throw new Exception(
+							"Invalid Configuration : Invalid parameter type ["
+									+ _PARAM_CONN_PASSWD_ + "]");
+				dbconfig = ((ValueParam) param).getValue();
+				checkSetup();
+			}
+
 			log.info("Created connection pool [size=" + cpoolsize
 					+ "], H2 Database [" + connurl + "]");
 			state = EnumInstanceState.Running;
@@ -156,6 +174,17 @@ public class H2DbPersister extends AbstractDbPersister {
 			state = EnumInstanceState.Exception;
 			throw e;
 		}
+	}
+
+	private void checkSetup() throws Exception {
+		XMLConfiguration config = new XMLConfiguration(dbconfig);
+
+		String version = config.getString(_CONFIG_SETUP_VERSION_);
+		if (version == null || version.isEmpty())
+			throw new Exception(
+					"Invalid DB Setup Configuration : Missing parameter ["
+							+ _CONFIG_SETUP_VERSION_ + "]");
+		
 	}
 
 	/*

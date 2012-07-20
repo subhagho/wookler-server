@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Date;
 
 import com.wookler.core.persistence.AttributeReflection;
+import com.wookler.core.persistence.Entity;
 import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.AbstractCondition;
@@ -14,6 +15,7 @@ import com.wookler.core.persistence.query.ConditionTransformer;
 import com.wookler.core.persistence.query.EnumOperator;
 import com.wookler.core.persistence.query.FilterCondition;
 import com.wookler.utils.DateUtils;
+import com.wookler.utils.KeyValuePair;
 
 /**
  * @author subhagho
@@ -32,7 +34,28 @@ public class SqlConditionTransformer implements ConditionTransformer {
 			throws Exception {
 		if (condition instanceof FilterCondition) {
 			FilterCondition fc = (FilterCondition) condition;
-			StringBuffer buff = new StringBuffer(fc.getColumn());
+			String cleft = null;
+			if (type != null) {
+				if (fc.getColumn().indexOf('.') > 0) {
+					String[] refpath = fc.getColumn().split("\\.");
+					KeyValuePair<Class<?>> kvp = getJoinCondition(refpath, 0,
+							type);
+					cleft = kvp.getKey();
+					type = kvp.getValue();
+				} else {
+					String table = null;
+
+					// Get table name
+					Entity eann = (Entity) type.getAnnotation(Entity.class);
+					table = eann.recordset();
+
+					cleft = table + "." + fc.getColumn();
+				}
+			} else {
+				cleft = fc.getColumn();
+			}
+
+			StringBuffer buff = new StringBuffer(cleft);
 			switch (fc.getComparator()) {
 			case Equal:
 				buff.append(" = ");
@@ -61,21 +84,55 @@ public class SqlConditionTransformer implements ConditionTransformer {
 			case Like:
 				buff.append(" like ");
 				break;
+			case Contains:
+				buff.append(" like ");
+				fc.setValue("%" + (String) fc.getValue() + "%");
+				break;
 			default:
 				throw new Exception("Operator [" + fc.getComparator().name()
 						+ "] not supported");
 			}
-			String value = getValue(fc, type);
-			buff.append(value);
+			if (type != null) {
+				String value = getValue(fc, type);
+				buff.append(value);
+			} else {
+				buff.append(fc.getValue());
+			}
 
 			return buff.toString();
 		}
 		return null;
 	}
 
-	private String getValue(FilterCondition fc, Class<?> type) throws Exception {
+	private KeyValuePair<Class<?>> getJoinCondition(String[] reference,
+			int offset, Class<?> type) throws Exception {
+		String column = reference[offset];
 		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
-				fc.getColumn());
+				column);
+		if (offset == reference.length - 1) {
+			Entity eann = (Entity) type.getAnnotation(Entity.class);
+			String table = eann.recordset();
+			String cleft = table.concat(".").concat(attr.Column);; 
+			return new KeyValuePair<Class<?>>(cleft, type);
+		} else {
+			if (attr.Reference == null)
+				throw new Exception(
+						"Invalid Condition : Cannot resolve column [" + column
+								+ "] for type [" + type.getCanonicalName()
+								+ "]");
+			Class<?> rtype = Class.forName(attr.Reference.Class);
+			return getJoinCondition(reference, offset + 1, rtype);
+		}
+	}
+
+	private String getValue(FilterCondition fc, Class<?> type) throws Exception {
+		String column = fc.getColumn();
+		if (column.indexOf('.') > 0) {
+			String[] parts = column.split("\\.");
+			column = parts[parts.length - 1];
+		}
+		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+				column);
 		if (fc.getValue() instanceof String) {
 			String value = (String) fc.getValue();
 			return quoteValue(value, attr.Field);

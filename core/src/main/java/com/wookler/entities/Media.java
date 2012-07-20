@@ -21,11 +21,11 @@ public abstract class Media extends AbstractEntity {
 	@XmlElement(name = "type")
 	protected EnumMediaType type;
 
-	@Attribute(name = "ID", keyattribute = true)
+	@Attribute(name = "ID", keyattribute = true, size = 256)
 	@XmlElement(name = "id")
 	private String id;
 
-	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayConvertor")
+	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayConvertor", size = 2048)
 	@XmlElement(name = "tags")
 	private String[] tags;
 
