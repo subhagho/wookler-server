@@ -175,19 +175,21 @@ public class CSVPersister extends AbstractPersister {
 		for (int ii = 0; ii < header.length; ii++) {
 			AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
 					header[ii]);
-			if (attr.Convertor != null) {
-				attr.Convertor.load(entity, attr.Column, data[ii]);
-			} else if (attr.Reference == null) {
-				setFieldValue(entity, attr.Field, data[ii]);
-			} else {
-				String query = attr.Reference.Field + "=" + data[ii];
-				List<AbstractEntity> refs = DataManager.get().read(query,
-						Class.forName(attr.Reference.Class));
-				if (refs != null && refs.size() > 0) {
-					if (attr.Reference.Type == EnumRefereceType.One2One) {
-						setFieldValue(entity, attr.Field, refs.get(0));
-					} else {
-						setFieldValue(entity, attr.Field, refs);
+			if (attr != null) {
+				if (attr.Convertor != null) {
+					attr.Convertor.load(entity, attr.Column, data[ii]);
+				} else if (attr.Reference == null) {
+					setFieldValue(entity, attr.Field, data[ii]);
+				} else {
+					String query = attr.Reference.Field + "=" + data[ii];
+					List<AbstractEntity> refs = DataManager.get().read(query,
+							Class.forName(attr.Reference.Class));
+					if (refs != null && refs.size() > 0) {
+						if (attr.Reference.Type == EnumRefereceType.One2One) {
+							setFieldValue(entity, attr.Field, refs.get(0));
+						} else {
+							setFieldValue(entity, attr.Field, refs);
+						}
 					}
 				}
 			}

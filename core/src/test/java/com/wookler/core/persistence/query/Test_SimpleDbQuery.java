@@ -8,7 +8,6 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.wookler.core.persistence.query.test.ReferenceRoot;
-import com.wookler.core.utils.InputWait;
 import com.wookler.entities.Creative;
 import com.wookler.entities.Sequence;
 import com.wookler.entities.VideoMedia;
@@ -83,15 +81,11 @@ public class Test_SimpleDbQuery {
 				log.info("SQL[" + ddl + "]");
 			}
 
-			Map<String, String> updates = dbq.getUpdateQuery(Sequence.class);
-			for (String key : updates.keySet()) {
-				log.info("[CLASS:" + key + "][" + updates.get(key) + "]");
-			}
+			String update = dbq.getUpdateQuery(Sequence.class);
+			log.info("[UPDATE][" + update + "]");
 
-			Map<String, String> inserts = dbq.getInsertQuery(Sequence.class);
-			for (String key : inserts.keySet()) {
-				log.info("[CLASS:" + key + "][" + inserts.get(key) + "]");
-			}
+			String insert = dbq.getInsertQuery(Sequence.class);
+			log.info("[INSERT][" + insert + "]");
 
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
@@ -130,11 +124,10 @@ public class Test_SimpleDbQuery {
 					 * 
 					 * ddls = dbq.getCreateTableDDL(Creative.class);
 					 */
-					Map<String, String> updates = dbq
-							.getUpdateQuery(Sequence.class);
+					String update = dbq.getUpdateQuery(Sequence.class);
 
-					Map<String, String> inserts = dbq
-							.getInsertQuery(Sequence.class);
+					String insert = dbq.getInsertQuery(Sequence.class);
+
 				}
 
 				log.info("Time to process [" + count + "] loops : "

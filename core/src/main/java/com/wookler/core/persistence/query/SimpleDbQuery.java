@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,10 @@ import com.wookler.utils.KeyValuePair;
  * 
  */
 public class SimpleDbQuery extends SimpleFilterQuery {
+	public static enum EnumQueryType {
+		SELECT, INSERT, UPDATE, DELETE;
+	}
+
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory
 			.getLogger(SimpleDbQuery.class);
@@ -37,8 +40,30 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 
 	private List<FilterCondition> postconditions = null;
 
+	private static HashMap<String, HashMap<String, String>> queryCache = new HashMap<String, HashMap<String, String>>();
+
 	public SimpleDbQuery() {
 		transformer = new SqlConditionTransformer();
+	}
+
+	private synchronized void addToCache(EnumQueryType type, Class<?> cls,
+			String sql) {
+		if (!queryCache.containsKey(type.name())) {
+			queryCache.put(type.name(), new HashMap<String, String>());
+		}
+		HashMap<String, String> cache = queryCache.get(type.name());
+		if (cache.containsKey(cls.getName()))
+			cache.remove(cls.getName());
+		cache.put(cls.getName(), sql);
+	}
+
+	private String getCachedQuery(EnumQueryType type, Class<?> cls) {
+		if (queryCache.containsKey(type.name())) {
+			HashMap<String, String> cache = queryCache.get(type.name());
+			if (cache.containsKey(cls.getName()))
+				return cache.get(cls.getName());
+		}
+		return null;
 	}
 
 	/**
@@ -49,17 +74,14 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, String> getInsertQuery(Class<?> type) throws Exception {
-		HashMap<String, String> queries = new HashMap<String, String>();
-		getInsertQuery(type, queries);
-		return queries;
-	}
-
-	private void getInsertQuery(Class<?> type, HashMap<String, String> queries)
-			throws Exception {
+	public String getInsertQuery(Class<?> type) throws Exception {
 		if (!type.isAnnotationPresent(Entity.class))
 			throw new Exception("Class [" + type.getCanonicalName()
 					+ "] has not been annotated as an Entity.");
+
+		String isql = getCachedQuery(EnumQueryType.INSERT, type);
+		if (isql != null)
+			return isql;
 
 		// Get table name
 		Entity eann = (Entity) type.getAnnotation(Entity.class);
@@ -73,7 +95,6 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		// Get Columns
 		List<Field> fields = ReflectionUtils.get().getFields(type);
 
-		List<AttributeReflection> refs = null;
 		boolean first = true;
 
 		for (Field field : fields) {
@@ -81,11 +102,6 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 					field.getName());
 			if (attr == null)
 				continue;
-			if (attr.Reference != null) {
-				if (refs == null)
-					refs = new ArrayList<AttributeReflection>();
-				refs.add(attr);
-			}
 			if (first)
 				first = false;
 			else {
@@ -101,13 +117,9 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 
 		if (values != null)
 			query.append(values);
-		queries.put(type.getCanonicalName(), query.toString());
-		if (refs != null) {
-			for (AttributeReflection attr : refs) {
-				Class<?> rt = Class.forName(attr.Reference.Class);
-				getInsertQuery(rt, queries);
-			}
-		}
+		addToCache(EnumQueryType.INSERT, type, query.toString());
+
+		return query.toString();
 	}
 
 	/**
@@ -118,17 +130,14 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, String> getUpdateQuery(Class<?> type) throws Exception {
-		HashMap<String, String> queries = new HashMap<String, String>();
-		getUpdateQuery(type, queries);
-		return queries;
-	}
-
-	private void getUpdateQuery(Class<?> type, HashMap<String, String> queries)
-			throws Exception {
+	public String getUpdateQuery(Class<?> type) throws Exception {
 		if (!type.isAnnotationPresent(Entity.class))
 			throw new Exception("Class [" + type.getCanonicalName()
 					+ "] has not been annotated as an Entity.");
+
+		String isql = getCachedQuery(EnumQueryType.UPDATE, type);
+		if (isql != null)
+			return isql;
 
 		// Get table name
 		Entity eann = (Entity) type.getAnnotation(Entity.class);
@@ -141,7 +150,6 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		// Get Columns
 		List<Field> fields = ReflectionUtils.get().getFields(type);
 
-		List<AttributeReflection> refs = null;
 		boolean first = true;
 		boolean wfirst = true;
 
@@ -160,14 +168,10 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 				} else
 					where.append(" and ");
 				where.append(attr.Column).append("=?");
-				continue;
+				if (attr.IsKeyColumn)
+					continue;
 			}
 
-			if (attr.Reference != null) {
-				if (refs == null)
-					refs = new ArrayList<AttributeReflection>();
-				refs.add(attr);
-			}
 			if (first)
 				first = false;
 			else
@@ -177,13 +181,10 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		}
 		if (where != null)
 			query.append(where);
-		queries.put(type.getCanonicalName(), query.toString());
-		if (refs != null) {
-			for (AttributeReflection attr : refs) {
-				Class<?> rt = Class.forName(attr.Reference.Class);
-				getUpdateQuery(rt, queries);
-			}
-		}
+
+		addToCache(EnumQueryType.UPDATE, type, query.toString());
+
+		return query.toString();
 	}
 
 	/**
@@ -199,13 +200,29 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			throw new Exception("Class [" + type.getCanonicalName()
 					+ "] has not been annotated as an Entity.");
 
-		List<String> columns = new ArrayList<String>();
 		List<String> tables = new ArrayList<String>();
 		int limit = parser.getLimit();
 		StringBuffer sort = new StringBuffer();
 		StringBuffer where = new StringBuffer();
 
-		getColumns(type, tables, columns);
+		String columnstr = getCachedQuery(EnumQueryType.SELECT, type);
+		if (columnstr == null) {
+			List<String> columns = new ArrayList<String>();
+
+			getColumns(type, tables, columns);
+
+			boolean first = true;
+			StringBuffer cbuff = new StringBuffer();
+			for (String column : columns) {
+				if (first)
+					first = false;
+				else
+					cbuff.append(',');
+				cbuff.append(' ').append(column);
+			}
+			columnstr = cbuff.toString();
+			addToCache(EnumQueryType.SELECT, type, columnstr);
+		}
 
 		// Get Where Clause
 		boolean first = true;
@@ -262,14 +279,8 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		StringBuffer qbuff = new StringBuffer("select ");
 		if (limit > 0)
 			qbuff.append(" top ").append(limit);
-		first = true;
-		for (String column : columns) {
-			if (first)
-				first = false;
-			else
-				qbuff.append(',');
-			qbuff.append(' ').append(column);
-		}
+		qbuff.append(columnstr);
+
 		first = true;
 		for (String table : tables) {
 			if (first) {

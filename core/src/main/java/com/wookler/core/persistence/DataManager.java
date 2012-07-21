@@ -284,4 +284,28 @@ public class DataManager implements InitializedHandle {
 		}
 	}
 
+	/**
+	 * Create a new instance of an AbstractEntity type. This method should be
+	 * used when creating new AbstarctEntity types.
+	 * 
+	 * @param type
+	 *            - Class (type) to create instance of.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends AbstractEntity> T newInstance(Class<?> type)
+			throws Exception {
+		Object obj = type.newInstance();
+		if (!(obj instanceof AbstractEntity)) {
+			throw new Exception("Invalid Class : [" + type.getCanonicalName()
+					+ "] does not extend ["
+					+ AbstractEntity.class.getCanonicalName() + "]");
+		}
+
+		((AbstractEntity) obj).setState(EnumEntityState.New);
+
+		return (T) obj;
+	}
 }

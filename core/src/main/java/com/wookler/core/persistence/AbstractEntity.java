@@ -69,4 +69,19 @@ public abstract class AbstractEntity {
 	public void delete() throws Exception {
 		(DataManager.get().getPersister(getClass())).save(this);
 	}
+
+	/**
+	 * @return the state
+	 */
+	public EnumEntityState getState() {
+		return state;
+	}
+
+	/**
+	 * @param state
+	 *            the state to set
+	 */
+	public void setState(EnumEntityState state) {
+		this.state = state;
+	}
 }
