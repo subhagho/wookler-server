@@ -49,25 +49,41 @@ public class WooklerCoreServices {
 	@Path("/videos/{video}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JResponse<List<AbstractEntity>> videos(
+	public JResponse<WooklerResponse> videos(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("video") String videoid,
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @QueryParam("query") String query)
-			throws Exception {
-		log.debug("QUERY [" + query + "]");
-		log.debug("VEDIO-ID [" + videoid + "]");
+			@DefaultValue("") @QueryParam("q") String query) throws Exception {
+		try {
+			log.debug("QUERY [" + query + "]");
+			log.debug("VEDIO-ID [" + videoid + "]");
 
-		String querystr = "";
-		if (query.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
-			querystr = query;
-		}
+			String querystr = "";
+			if (query.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
+				querystr = query;
+			}
 
-		DataManager dm = DataManager.get();
+			DataManager dm = DataManager.get();
 
-		if (videoid == null || videoid.isEmpty()
-				|| videoid.compareTo(_EMPTY_PATH_ELEMENT_) == 0)
-			return JResponse.ok(dm.read(querystr, VideoMedia.class)).build();
-		else {
-			return sequences(videoid, querystr);
+			if (videoid == null || videoid.isEmpty()
+					|| videoid.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				List<AbstractEntity> data = dm.read(querystr, VideoMedia.class);
+				WooklerResponse response = new WooklerResponse();
+				String path = "/videos" + (query != null ? "?q=" + query : "");
+				response.setRequest(path);
+				if (data == null || data.size() <= 0) {
+					response.setState(EnumResponseState.NoData);
+				} else {
+					response.setState(EnumResponseState.Success);
+					response.setData(data);
+				}
+				return JResponse.ok(response).build();
+			} else {
+				return sequences(videoid, querystr);
+			}
+		} catch (Exception e) {
+			WooklerResponse response = new WooklerResponse();
+			response.setState(EnumResponseState.Exception);
+			response.setMessage(e.getLocalizedMessage());
+			return JResponse.ok(response).build();
 		}
 	}
 
@@ -84,19 +100,36 @@ public class WooklerCoreServices {
 	@Path("/sequences/{videoid}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JResponse<List<AbstractEntity>> sequences(
+	public JResponse<WooklerResponse> sequences(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @QueryParam("query") String query)
-			throws Exception {
-		log.debug("VIDEO-ID:" + videoid);
-		String squery = "MEDIAID=" + videoid;
-		if (query != null && !query.isEmpty()
-				&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
-			squery = squery + Query._QUERY_CONDITION_AND_ + query;
+			@DefaultValue("") @QueryParam("q") String query) throws Exception {
+		try {
+			log.debug("VIDEO-ID:" + videoid);
+			String squery = "MEDIAID=" + videoid;
+			if (query != null && !query.isEmpty()
+					&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
+				squery = squery + Query._QUERY_CONDITION_AND_ + query;
 
-		log.debug("QUERY [" + squery + "]");
+			log.debug("QUERY [" + squery + "]");
 
-		DataManager dm = DataManager.get();
-		return JResponse.ok(dm.read(squery, Sequence.class)).build();
+			DataManager dm = DataManager.get();
+			List<AbstractEntity> data = dm.read(squery, Sequence.class);
+			WooklerResponse response = new WooklerResponse();
+			String path = "/videos/" + videoid
+					+ (query != null ? "?q=" + query : "");
+			response.setRequest(path);
+			if (data == null || data.size() <= 0) {
+				response.setState(EnumResponseState.NoData);
+			} else {
+				response.setState(EnumResponseState.Success);
+				response.setData(data);
+			}
+			return JResponse.ok(response).build();
+		} catch (Exception e) {
+			WooklerResponse response = new WooklerResponse();
+			response.setState(EnumResponseState.Exception);
+			response.setMessage(e.getLocalizedMessage());
+			return JResponse.ok(response).build();
+		}
 	}
 }
