@@ -22,6 +22,7 @@ import com.wookler.core.persistence.DataManager;
 import com.wookler.core.persistence.query.Query;
 import com.wookler.entities.Sequence;
 import com.wookler.entities.VideoMedia;
+import com.wookler.utils.LogUtils;
 
 /**
  * @author subhagho
@@ -43,6 +44,10 @@ public class WooklerCoreServices {
 	 *            - Video ID (Optional), default '-'
 	 * @param query
 	 *            - Filter Query (Optional), default '-'
+	 * @param page
+	 *            - Page Offset
+	 * @param size
+	 *            - Page Size
 	 * @return
 	 * @throws Exception
 	 */
@@ -51,20 +56,31 @@ public class WooklerCoreServices {
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> videos(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("video") String videoid,
-			@DefaultValue("") @QueryParam("q") String query) throws Exception {
+			@DefaultValue("") @QueryParam("q") String query,
+			@DefaultValue("1") @QueryParam("p") String page,
+			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
-			log.debug("QUERY [" + query + "]");
-			log.debug("VEDIO-ID [" + videoid + "]");
-
-			String querystr = "";
-			if (query.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
-				querystr = query;
-			}
-
-			DataManager dm = DataManager.get();
 
 			if (videoid == null || videoid.isEmpty()
 					|| videoid.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				String querystr = "";
+				if (query.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
+					querystr = query;
+				}
+				int pagec = Integer.parseInt(page);
+				int limit = Integer.parseInt(size);
+				int count = pagec * limit;
+
+				if (!querystr.isEmpty())
+					querystr = querystr + ";";
+
+				querystr = querystr + "LIMIT " + count;
+
+				log.debug("QUERY [" + querystr + "]");
+				log.debug("VEDIO-ID [" + videoid + "]");
+
+				DataManager dm = DataManager.get();
+
 				List<AbstractEntity> data = dm.read(querystr, VideoMedia.class);
 				WooklerResponse response = new WooklerResponse();
 				String path = "/videos" + (query != null ? "?q=" + query : "");
@@ -73,13 +89,107 @@ public class WooklerCoreServices {
 					response.setState(EnumResponseState.NoData);
 				} else {
 					response.setState(EnumResponseState.Success);
-					response.setData(data);
+					int stindex = limit * (pagec - 1);
+					if (stindex > 0) {
+						if (stindex > data.size()) {
+							response.setState(EnumResponseState.NoData);
+						} else {
+							List<AbstractEntity> subdata = data.subList(
+									stindex, data.size());
+							response.setData(subdata);
+						}
+					} else
+						response.setData(data);
 				}
 				return JResponse.ok(response).build();
 			} else {
-				return sequences(videoid, querystr);
+				return sequences(videoid, query, page, size);
 			}
 		} catch (Exception e) {
+			LogUtils.stacktrace(log, e);
+			log.error(e.getLocalizedMessage());
+
+			WooklerResponse response = new WooklerResponse();
+			response.setState(EnumResponseState.Exception);
+			response.setMessage(e.getLocalizedMessage());
+			return JResponse.ok(response).build();
+		}
+	}
+
+	/**
+	 * Select the latest Video Media and related data.
+	 * 
+	 * Note: Use URL escape sequence '%3B' for ';'
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Path("/videos/latest")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public JResponse<WooklerResponse> latest(
+			@DefaultValue("1") @QueryParam("p") String page,
+			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
+		return custom("PUBLISHED", page, size);
+	}
+
+	/**
+	 * Select the most popular Video Media and related data.
+	 * 
+	 * Note: Use URL escape sequence '%3B' for ';'
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Path("/videos/popular")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public JResponse<WooklerResponse> popular(
+			@DefaultValue("1") @QueryParam("p") String page,
+			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
+		return custom("VIEWS", page, size);
+	}
+
+	private JResponse<WooklerResponse> custom(String column, String page,
+			String size) throws Exception {
+		try {
+			int pagec = Integer.parseInt(page);
+			int limit = Integer.parseInt(size);
+			int count = pagec * limit;
+
+			String querystr = "LIMIT " + count + ";SORT " + column + " DSC";
+
+			String path = "/videos"
+					+ (querystr != null ? "?q=" + querystr : "");
+
+			log.debug("QUERY [" + querystr + "]");
+			DataManager dm = DataManager.get();
+			List<AbstractEntity> data = dm.read(querystr, VideoMedia.class);
+			WooklerResponse response = new WooklerResponse();
+
+			response.setRequest(path);
+			if (data == null || data.size() <= 0) {
+				response.setState(EnumResponseState.NoData);
+			} else {
+				response.setState(EnumResponseState.Success);
+				int stindex = limit * (pagec - 1);
+				if (stindex > 0) {
+					if (stindex > data.size()) {
+						response.setState(EnumResponseState.NoData);
+					} else {
+						List<AbstractEntity> subdata = data.subList(stindex,
+								data.size());
+						response.setData(subdata);
+					}
+				} else
+					response.setData(data);
+			}
+			return JResponse.ok(response).build();
+
+		} catch (Exception e) {
+			LogUtils.stacktrace(log, e);
+			log.error(e.getLocalizedMessage());
+
 			WooklerResponse response = new WooklerResponse();
 			response.setState(EnumResponseState.Exception);
 			response.setMessage(e.getLocalizedMessage());
@@ -102,30 +212,50 @@ public class WooklerCoreServices {
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> sequences(
 			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
-			@DefaultValue("") @QueryParam("q") String query) throws Exception {
+			@DefaultValue("") @QueryParam("q") String query,
+			@DefaultValue("1") @QueryParam("p") String page,
+			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
-			String squery = "MEDIAID=" + videoid;
+			StringBuffer squery = new StringBuffer("MEDIAID=" + videoid);
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
-				squery = squery + Query._QUERY_CONDITION_AND_ + query;
+				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
+						query);
+			int pagec = Integer.parseInt(page);
+			int limit = Integer.parseInt(size);
+			int count = pagec * limit;
+			squery = squery.append(";LIMIT ").append(count);
 
 			log.debug("QUERY [" + squery + "]");
 
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(squery, Sequence.class);
+			List<AbstractEntity> data = dm.read(squery.toString(),
+					Sequence.class);
 			WooklerResponse response = new WooklerResponse();
-			String path = "/videos/" + videoid
-					+ (query != null ? "?q=" + query : "");
+			String path = "/videos/" + videoid + "?q=" + squery.toString();
 			response.setRequest(path);
 			if (data == null || data.size() <= 0) {
 				response.setState(EnumResponseState.NoData);
 			} else {
 				response.setState(EnumResponseState.Success);
-				response.setData(data);
+				int stindex = limit * (pagec - 1);
+				if (stindex > 0) {
+					if (stindex > data.size()) {
+						response.setState(EnumResponseState.NoData);
+					} else {
+						List<AbstractEntity> subdata = data.subList(stindex,
+								data.size());
+						response.setData(subdata);
+					}
+				} else
+					response.setData(data);
 			}
 			return JResponse.ok(response).build();
 		} catch (Exception e) {
+			LogUtils.stacktrace(log, e);
+			log.error(e.getLocalizedMessage());
+
 			WooklerResponse response = new WooklerResponse();
 			response.setState(EnumResponseState.Exception);
 			response.setMessage(e.getLocalizedMessage());

@@ -40,6 +40,8 @@ public class FilterConditionParser {
 		String[] filters = filterstr.split(Query._QUERY_CONDITION_AND_);
 		if (filters != null) {
 			for (String filter : filters) {
+				if (filter.trim().isEmpty())
+					continue;
 				if (parseLimit(filter))
 					continue;
 				if (parseSort(filter))

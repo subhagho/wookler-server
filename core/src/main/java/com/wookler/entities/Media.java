@@ -3,6 +3,8 @@
  */
 package com.wookler.entities;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlElement;
 
 import com.wookler.core.persistence.AbstractEntity;
@@ -28,6 +30,14 @@ public abstract class Media extends AbstractEntity {
 	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayConvertor", size = 2048)
 	@XmlElement(name = "tags")
 	private String[] tags;
+
+	@Attribute(name = "PUBLISHED")
+	@XmlElement(name = "published")
+	private Date published;
+
+	@Attribute(name = "VIEWS")
+	@XmlElement(name = "views")
+	private long viewcount;
 
 	/**
 	 * @return
@@ -72,5 +82,35 @@ public abstract class Media extends AbstractEntity {
 	 */
 	public void setTags(String[] tags) {
 		this.tags = tags;
+	}
+
+	/**
+	 * @return the published
+	 */
+	public Date getPublished() {
+		return published;
+	}
+
+	/**
+	 * @param published
+	 *            the published to set
+	 */
+	public void setPublished(Date published) {
+		this.published = published;
+	}
+
+	/**
+	 * @return the viewcount
+	 */
+	public long getViewcount() {
+		return viewcount;
+	}
+
+	/**
+	 * @param viewcount
+	 *            the viewcount to set
+	 */
+	public void setViewcount(long viewcount) {
+		this.viewcount = viewcount;
 	}
 }

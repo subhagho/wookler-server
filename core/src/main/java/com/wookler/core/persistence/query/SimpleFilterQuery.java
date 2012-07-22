@@ -77,7 +77,7 @@ public class SimpleFilterQuery extends Query {
 			EntityListSorter sorter = new EntityListSorter(parser.getSort());
 			sorter.sort(results);
 		}
-		if (parser.getLimit() > 0) {
+		if (parser.getLimit() > 0 && results.size() > parser.getLimit()) {
 			results = results.subList(0, parser.getLimit());
 		}
 		return results;
