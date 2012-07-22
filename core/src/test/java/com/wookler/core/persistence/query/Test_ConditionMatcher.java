@@ -258,6 +258,30 @@ public class Test_ConditionMatcher {
 	 * .
 	 */
 	@Test
+	public void testMatchEnum() {
+		try {
+			EntityMatchRoot entity = new EntityMatchRoot();
+			ConditionMatcher matcher = new ConditionMatcher();
+			boolean retval = false;
+
+			retval = matcher.match(entity, "FOREnum", EnumOperator.Equal,
+					"cancel");
+			assertEquals(true, retval);
+			retval = matcher.match(entity, "FOREnum", EnumOperator.Equal,
+					"none");
+			assertEquals(false, retval);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link com.wookler.core.persistence.query.ConditionMatcher#match(com.wookler.core.persistence.AbstractEntity, java.lang.String, com.wookler.core.persistence.query.EnumOperator, java.lang.Object)}
+	 * .
+	 */
+	@Test
 	public void testMatchInt() {
 		try {
 			EntityMatchRoot entity = new EntityMatchRoot();

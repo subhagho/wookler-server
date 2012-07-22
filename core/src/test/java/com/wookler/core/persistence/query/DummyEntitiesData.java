@@ -16,6 +16,9 @@ import com.wookler.core.persistence.Entity;
  * 
  */
 public class DummyEntitiesData {
+	public static enum TENUM {
+		Ok, Cancel;
+	}
 
 	@Entity(recordset = "EMBED2")
 	public static class EntityMatchEmbed2 extends AbstractEntity {
@@ -174,7 +177,9 @@ public class DummyEntitiesData {
 		private EntityMatchEmbed forReference = new EntityMatchEmbed();
 		@Attribute(name = "FORArrayReference")
 		private EntityMatchEmbed2[] forArrayReference = new EntityMatchEmbed2[2];
-
+		@Attribute(name = "FOREnum")
+		private TENUM forEnum = TENUM.Cancel;
+		
 		public EntityMatchRoot() {
 			forStringContains.add("STRING_0");
 			forStringContains.add("STRING_1");
@@ -471,6 +476,20 @@ public class DummyEntitiesData {
 		 */
 		public void setForArrayReference(EntityMatchEmbed2[] forArrayReference) {
 			this.forArrayReference = forArrayReference;
+		}
+
+		/**
+		 * @return the forEnum
+		 */
+		public TENUM getForEnum() {
+			return forEnum;
+		}
+
+		/**
+		 * @param forEnum the forEnum to set
+		 */
+		public void setForEnum(TENUM forEnum) {
+			this.forEnum = forEnum;
 		}
 
 	}

@@ -199,8 +199,8 @@ public class ConditionMatcher {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <T extends Enum<T>> boolean compareEnum(Object src,
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static <T extends Enum> boolean compareEnum(Object src,
 			Object tgt) throws Exception {
 		String name = ((T) src).name();
 		if (name.compareToIgnoreCase((String) tgt) == 0)
