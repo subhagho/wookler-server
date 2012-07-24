@@ -24,7 +24,7 @@ public class Test_Param {
 	@Test
 	public void test() {
 		try {
-			String resource = "/com/wookler/core/data/param-test-config.xml";
+			String resource = "/param-test-config.xml";
 			InputStream is = Test_Param.class.getResourceAsStream(resource);
 			if (is == null)
 				throw new Exception("Failed to load resource [" + resource

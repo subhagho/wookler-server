@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wookler>
-	<env>
-		<work directory="/tmp/wookler/work/" />
-		<temp directory="/tmp/wookler/temp/" />
-	</env>
-</wookler>

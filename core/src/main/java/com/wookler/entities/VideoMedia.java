@@ -128,8 +128,9 @@ public class VideoMedia extends Media {
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
 		buff.append("[ID:").append(getId()).append("]");
-		buff.append(", [Timestamp:").append(getTimestamp().toString())
-				.append("]");
+		buff.append(", [Timestamp:")
+				.append((getTimestamp() != null ? getTimestamp().toString()
+						: "NULL")).append("]");
 		buff.append(", [Name:").append(getName()).append("]");
 		buff.append(", [Type:").append(getType()).append("]");
 		buff.append(", [Description:").append(getDescription()).append("]");

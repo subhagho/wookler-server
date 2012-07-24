@@ -96,4 +96,22 @@ public class Tag extends AbstractEntity {
 		this.value = value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("[MEDIAID:").append(getMediaid()).append("]");
+		buff.append(", [SEQID:").append(getSeqid()).append("]");
+		buff.append(", [Timestamp:")
+				.append((getTimestamp() != null ? getTimestamp().toString()
+						: "NULL")).append("]");
+		buff.append(", [NAME:").append(getName()).append("]");
+		buff.append(", [NAME:").append(getValue()).append("]");
+		return buff.toString();
+	}
+
 }

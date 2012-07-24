@@ -42,7 +42,6 @@ public class Env {
 		if (tempdir == null || tempdir.isEmpty())
 			tempdir = System.getProperty("java.io.tmpdir");
 
-		
 		// Initialized the Data<anager
 		DataManager.create(config);
 	}
@@ -168,13 +167,14 @@ public class Env {
 	 * @param filename
 	 *            - Configuration filename.
 	 */
-	public static void create(String filename) {
+	public static void create(String filename) throws Exception {
 		synchronized (_lock) {
 			try {
 				_instance = new Env(filename);
 			} catch (Exception e) {
 				e.printStackTrace();
 				_instance = null;
+				throw e;
 			}
 		}
 	}

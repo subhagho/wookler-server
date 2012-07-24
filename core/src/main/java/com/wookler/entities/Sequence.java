@@ -126,8 +126,9 @@ public class Sequence extends AbstractEntity {
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
 		buff.append("[MEDIAID:").append(getMediaid()).append("]");
-		buff.append(", [Timestamp:").append(getTimestamp().toString())
-				.append("]");
+		buff.append(", [Timestamp:")
+				.append((getTimestamp() != null ? getTimestamp().toString()
+						: "NULL")).append("]");
 		buff.append(", [SequenceId:").append(getSeqid()).append("]");
 		buff.append(", [StartTime:").append(getStarttime()).append("]");
 		buff.append(", [EndTime:").append(getEndtime()).append("]");

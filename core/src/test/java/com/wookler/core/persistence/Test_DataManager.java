@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.wookler.core.Env;
 import com.wookler.core.data.Test_Env;
 import com.wookler.entities.Sequence;
+import com.wookler.entities.Tag;
 import com.wookler.entities.VideoMedia;
 import com.wookler.utils.LogUtils;
 
@@ -65,6 +66,11 @@ public class Test_DataManager {
 						Sequence.class);
 				for (AbstractEntity seq : sequences) {
 					log.info("\tSEQUENCE : " + seq.toString());
+				}
+				List<AbstractEntity> tags = manager.read("MEDIAID="
+						+ ((VideoMedia) entity).getId(), Tag.class);
+				for (AbstractEntity tag : tags) {
+					log.info("\tTAG : " + tag.toString());
 				}
 			}
 		} catch (Exception e) {

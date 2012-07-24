@@ -89,8 +89,9 @@ public class Creative extends AbstractEntity {
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
 		buff.append("[ID:").append(getId()).append("]");
-		buff.append(", [Timestamp:").append(getTimestamp().toString())
-				.append("]");
+		buff.append(", [Timestamp:")
+				.append((getTimestamp() != null ? getTimestamp().toString()
+						: "NULL")).append("]");
 		buff.append(", [HTML:").append(getHtml()).append("]");
 		buff.append(", [URL:").append(getUrl()).append("]");
 		return buff.toString();
