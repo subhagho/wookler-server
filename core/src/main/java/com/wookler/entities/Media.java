@@ -27,6 +27,10 @@ public abstract class Media extends AbstractEntity {
 	@XmlElement(name = "id")
 	private String id;
 
+	@Attribute(name = "REFID", size = 256)
+	@XmlElement(name = "id")
+	private String refid;
+
 	@Attribute(name = "TAGS", handler = "com.wookler.core.persistence.handlers.StringArrayConvertor", size = 2048)
 	@XmlElement(name = "tags")
 	private String[] tags;
@@ -112,5 +116,20 @@ public abstract class Media extends AbstractEntity {
 	 */
 	public void setViewcount(long viewcount) {
 		this.viewcount = viewcount;
+	}
+
+	/**
+	 * @return the refid
+	 */
+	public String getRefid() {
+		return refid;
+	}
+
+	/**
+	 * @param refid
+	 *            the refid to set
+	 */
+	public void setRefid(String refid) {
+		this.refid = refid;
 	}
 }

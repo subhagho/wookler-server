@@ -233,6 +233,13 @@ public class DataManager implements InitializedHandle {
 	 * @see com.wookler.core.InitializedHandle#dispose()
 	 */
 	public void dispose() {
+		if (persisters != null && persisters.size() > 0) {
+			for (String key : persisters.keySet()) {
+				AbstractPersister pers = persisters.get(key);
+				if (pers != null)
+					pers.dispose();
+			}
+		}
 		return;
 	}
 
@@ -278,6 +285,7 @@ public class DataManager implements InitializedHandle {
 	public static void release() {
 		synchronized (_instance) {
 			if (_instance.state == EnumInstanceState.Running) {
+				_instance.dispose();
 				_instance.state = EnumInstanceState.Closed;
 				log.info("Dispoing the DataManager instance...");
 			}

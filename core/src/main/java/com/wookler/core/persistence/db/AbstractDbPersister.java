@@ -5,6 +5,7 @@ package com.wookler.core.persistence.db;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -373,6 +374,29 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 		int count = pstmnt.executeUpdate();
 		log.debug("[" + record.getClass().getCanonicalName()
 				+ "] created [count=" + count + "]");
+	}
+
+	protected boolean checkSchema() throws Exception {
+		Connection conn = getConnection(true);
+		boolean found = false;
+		try {
+			DatabaseMetaData dbm = conn.getMetaData();
+			Entity entity = DBVersion.class.getAnnotation(Entity.class);
+			String table = entity.recordset();
+
+			ResultSet rs = dbm.getTables(null, null, table,
+					new String[] { "TABLE" });
+			while (rs.next()) {
+				found = true;
+				break;
+			}
+			rs.close();
+
+		} finally {
+			if (conn != null)
+				releaseConnection(conn);
+		}
+		return found;
 	}
 
 	/*
