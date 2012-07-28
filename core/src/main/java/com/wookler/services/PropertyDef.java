@@ -5,7 +5,6 @@ package com.wookler.services;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -98,22 +97,25 @@ public class PropertyDef {
 	}
 
 	/**
-	 * @param dbsize the dbsize to set
+	 * @param dbsize
+	 *            the dbsize to set
 	 */
 	public void setDbsize(String dbsize) {
 		this.dbsize = dbsize;
 	}
 
-	public static PropertyDef load(Class<?> type, String field) throws Exception{
-		AttributeReflection attr = ReflectionUtils.get().getAttribute(type, field);
+	public static PropertyDef load(Class<?> type, String field)
+			throws Exception {
+		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+				field);
 		if (attr == null)
 			return null;
 		PropertyDef def = new PropertyDef();
 		def.dbcolumn = attr.Column;
 		def.name = attr.Column;
 		def.type = attr.Field.getType().getCanonicalName();
-		if (attr.Field.isAnnotationPresent(XmlAttribute.class)) {
-			XmlAttribute xattr = attr.Field.getAnnotation(XmlAttribute.class);
+		if (attr.Field.isAnnotationPresent(XmlElement.class)) {
+			XmlElement xattr = attr.Field.getAnnotation(XmlElement.class);
 			def.jsonname = xattr.name();
 		}
 		if (attr.Size > 0) {
@@ -121,7 +123,7 @@ public class PropertyDef {
 		} else {
 			def.dbsize = "-";
 		}
-		
+
 		return def;
 	}
 }

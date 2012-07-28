@@ -119,6 +119,7 @@ public class JettyServer {
 			server.start();
 			log.info("Jetty Server running...");
 			server.join();
+			
 		} finally {
 			Env.dispose();
 		}

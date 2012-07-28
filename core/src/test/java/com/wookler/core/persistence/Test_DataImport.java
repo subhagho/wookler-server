@@ -73,11 +73,14 @@ public class Test_DataImport {
 			source.init(params);
 
 			DataImport importer = new DataImport(source);
-			importer.load(new String[] { VideoMedia.class.getCanonicalName(),
-					Creative.class.getCanonicalName(),
-					Sequence.class.getCanonicalName(),
-					Tag.class.getCanonicalName(),
-					ProductHistory.class.getCanonicalName() });
+			/*
+			 * importer.load(new String[] { VideoMedia.class.getCanonicalName(),
+			 * Creative.class.getCanonicalName(),
+			 * Sequence.class.getCanonicalName(), Tag.class.getCanonicalName(),
+			 * ProductHistory.class.getCanonicalName() });
+			 */
+			importer.load(new String[] { ProductHistory.class
+					.getCanonicalName() });
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());

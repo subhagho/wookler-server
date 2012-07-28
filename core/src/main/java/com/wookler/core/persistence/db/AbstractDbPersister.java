@@ -268,6 +268,17 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 						value = "'" + value + "'";
 					}
 				}
+			} else {
+				Object dvalue = PropertyUtils.getSimpleProperty(entity,
+						attr.Field.getName());
+				AttributeReflection rattr = ReflectionUtils.get().getAttribute(
+						Class.forName(attr.Reference.Class),
+						attr.Reference.Field);
+				value = String.valueOf(PropertyUtils.getSimpleProperty(dvalue,
+						rattr.Field.getName()));
+				if (!EnumPrimitives.isPrimitiveType(field.getType())) {
+					value = "'" + value + "'";
+				}
 			}
 			buff.append(attr.Column).append("=").append(value);
 		}
@@ -373,6 +384,8 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 				Class<?> cls = Class.forName(attr.Reference.Class);
 				AttributeReflection rattr = ReflectionUtils.get().getAttribute(
 						cls, attr.Reference.Field);
+				value = PropertyUtils.getSimpleProperty(value,
+						rattr.Field.getName());
 				setPreparedValue(pstmnt, index, rattr, value, entity);
 			} else {
 				throw new Exception("Unsupported field type ["
