@@ -68,8 +68,10 @@ public class H2DbPersister extends AbstractDbPersister {
 
 	private Queue<Connection> freeconns = new LinkedBlockingQueue<Connection>();
 
+	private boolean checksetup = false;
+
 	public H2DbPersister() {
-		classtype = this.getClass().getCanonicalName();
+		key = this.getClass().getCanonicalName();
 	}
 
 	/*
@@ -120,6 +122,21 @@ public class H2DbPersister extends AbstractDbPersister {
 	@Override
 	public void init(ListParam params) throws Exception {
 		try {
+			AbstractParam pkey = params.get(_PARAM_KEY_);
+			if (pkey == null)
+				throw new Exception(
+						"Invalid Configuration : Missing paramter ["
+								+ _PARAM_KEY_ + "]");
+			if (!(pkey instanceof ValueParam)) {
+				throw new Exception(
+						"Invalid Configuration : Invalid Parameter type for ["
+								+ _PARAM_KEY_ + "]");
+			}
+			key = ((ValueParam) pkey).getValue();
+			if (key == null || key.isEmpty())
+				throw new Exception("Invalid Configuration : Param ["
+						+ _PARAM_KEY_ + "] is NULL or empty.");
+
 			Class.forName("org.h2.Driver");
 
 			AbstractParam param = params.get(_PARAM_POOL_SIZE_);
@@ -169,6 +186,7 @@ public class H2DbPersister extends AbstractDbPersister {
 				conns[ii] = DriverManager.getConnection(connurl, username,
 						password);
 				conns[ii].setAutoCommit(true);
+				freeconns.add(conns[ii]);
 			}
 			state = EnumInstanceState.Running;
 
@@ -179,7 +197,7 @@ public class H2DbPersister extends AbstractDbPersister {
 							"Invalid Configuration : Invalid parameter type ["
 									+ _PARAM_CONN_PASSWD_ + "]");
 				dbconfig = ((ValueParam) param).getValue();
-				checkSetup();
+				checksetup = true;
 			}
 
 			log.info("Created connection pool [size=" + cpoolsize
@@ -205,6 +223,7 @@ public class H2DbPersister extends AbstractDbPersister {
 			Statement stmnt = conn.createStatement();
 			try {
 				for (String sql : createsql) {
+					log.debug("TABLE SQL [" + sql + "]");
 					stmnt.execute(sql);
 				}
 
@@ -223,6 +242,7 @@ public class H2DbPersister extends AbstractDbPersister {
 							Class<?> cls = Class.forName(eclass);
 							createsql = dbq.getCreateTableDDL(cls);
 							for (String sql : createsql) {
+								log.debug("TABLE SQL [" + sql + "]");
 								stmnt.execute(sql);
 							}
 						}
@@ -255,6 +275,7 @@ public class H2DbPersister extends AbstractDbPersister {
 
 						createsql = dbq.getCreateIndexDDL(cls, columns);
 						for (String sql : createsql) {
+							log.debug("INDEX SQL [" + sql + "]");
 							stmnt.execute(sql);
 						}
 					}
@@ -309,6 +330,17 @@ public class H2DbPersister extends AbstractDbPersister {
 			log.error(e.getLocalizedMessage());
 			LogUtils.stacktrace(log, e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.persistence.AbstractPersister#postinit()
+	 */
+	@Override
+	public void postinit() throws Exception {
+		if (checksetup)
+			checkSetup();
 	}
 
 }

@@ -16,12 +16,17 @@
 				columns="MEDIAID,SEQID" />
 			<index name="INDX_SEQ_02" entity="com.wookler.entities.Sequence"
 				columns="MEDIAID,STARTTIME" />
-
+			<entity>com.wookler.entities.Creative</entity>
+			<index name="INDX_CR_01" entity="com.wookler.entities.Creative"
+				columns="ID" />
 			<entity>com.wookler.entities.VideoMedia</entity>
 			<index name="INDX_VM_01" entity="com.wookler.entities.VideoMedia"
 				columns="TYPE,ID" />
 			<index name="INDX_VM_02" entity="com.wookler.entities.VideoMedia"
 				columns="TYPE,NAME" />
+			<entity>com.wookler.entities.ProductHistory</entity>
+			<index name="INDX_PH_01" entity="com.wookler.entities.ProductHistory"
+				columns="CREATIVE" />
 		</entities>
 	</db>
 </h2>

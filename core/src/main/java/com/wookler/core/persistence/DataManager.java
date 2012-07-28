@@ -3,6 +3,7 @@
  */
 package com.wookler.core.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,6 +67,8 @@ public class DataManager implements InitializedHandle {
 	}
 
 	private void initPersisters(Element root) throws Exception {
+		List<AbstractPersister> pers = new ArrayList<AbstractPersister>();
+
 		NodeList pernl = XMLUtils.search(_CONFIG_PERSISTER_XPATH_, root);
 		if (pernl != null && pernl.getLength() > 0) {
 			for (int ii = 0; ii < pernl.getLength(); ii++) {
@@ -81,6 +84,7 @@ public class DataManager implements InitializedHandle {
 					ap.init(ip.getParams());
 					persisters.put(cls.getCanonicalName(), ap);
 					persisters.put(ap.key(), ap);
+					pers.add(ap);
 				} else {
 					throw new Exception(
 							"Invalid Configuration : Persister class ["
@@ -116,6 +120,9 @@ public class DataManager implements InitializedHandle {
 									+ persister + "] does not exist.");
 				}
 			}
+		}
+		for (AbstractPersister per : pers) {
+			per.postinit();
 		}
 	}
 
@@ -198,6 +205,18 @@ public class DataManager implements InitializedHandle {
 	public List<AbstractEntity> read(String query, Class<?> type,
 			AbstractPersister persister) throws Exception {
 		return persister.read(query, type);
+	}
+
+	/**
+	 * Save the entity. (Insert/Update/Delete) based on entity status.
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws Exception
+	 */
+	public int save(AbstractEntity entity) throws Exception {
+		AbstractPersister persister = getPersister(entity.getClass());
+		return persister.save(entity);
 	}
 
 	/*

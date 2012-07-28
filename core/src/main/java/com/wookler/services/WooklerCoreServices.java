@@ -27,6 +27,9 @@ import com.wookler.entities.VideoMedia;
 import com.wookler.utils.LogUtils;
 
 /**
+ * Core services for fetching Entity data. (CRUD services are part of a separate
+ * class.)
+ * 
  * @author subhagho
  * 
  */
@@ -270,6 +273,20 @@ public class WooklerCoreServices {
 		}
 	}
 
+	/**
+	 * Get the product trends.
+	 * 
+	 * @param period
+	 *            - Trend period (daily, weekly, monthly, - default total)
+	 * @param query
+	 *            - Additional filters
+	 * @param page
+	 *            - page offset
+	 * @param size
+	 *            - page size
+	 * @return
+	 * @throws Exception
+	 */
 	@Path("/products/{period}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

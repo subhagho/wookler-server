@@ -27,7 +27,11 @@ public enum EnumEntityState {
 	 */
 	Loaded,
 	/**
-	 * Uninitialized state of an entity.
+	 * Force overwrite of data if timestamp conflict exists.
 	 */
-	Unknown
+	Overwrite,
+	/**
+	 * Entity state unknown.
+	 */
+	Unknown;
 }

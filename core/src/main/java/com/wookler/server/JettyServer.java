@@ -44,78 +44,84 @@ public class JettyServer {
 	private ServerConfig serverConfig = new ServerConfig();
 
 	private void start(String[] args) throws Exception {
-
-		CmdLineParser parser = new CmdLineParser(this);
-
-		// if you have a wider console, you could increase the value;
-		// here 80 is also the default
-		parser.setUsageWidth(80);
-
 		try {
-			// parse the arguments.
-			parser.parseArgument(args);
-			Env.create(config);
+			CmdLineParser parser = new CmdLineParser(this);
 
-			serverConfig.init(Env.get().getConfig());
-			if (port != null && !port.isEmpty()) {
-				serverConfig.setPort(Integer.parseInt(port));
+			// if you have a wider console, you could increase the value;
+			// here 80 is also the default
+			parser.setUsageWidth(80);
+
+			try {
+				// parse the arguments.
+				parser.parseArgument(args);
+				Env.create(config);
+
+				serverConfig.init(Env.get().getConfig());
+				if (port != null && !port.isEmpty()) {
+					serverConfig.setPort(Integer.parseInt(port));
+				}
+				if (webroot != null && !webroot.isEmpty()) {
+					serverConfig.setWebRoot(webroot);
+				}
+			} catch (CmdLineException e) {
+				System.err.println("Usage : "
+						+ this.getClass().getCanonicalName() + " "
+						+ parser.printExample(ExampleMode.ALL));
+				throw e;
 			}
-			if (webroot != null && !webroot.isEmpty()) {
-				serverConfig.setWebRoot(webroot);
-			}
-		} catch (CmdLineException e) {
-			System.err.println("Usage : " + this.getClass().getCanonicalName()
-					+ " " + parser.printExample(ExampleMode.ALL));
-			throw e;
+			Server server = new Server(serverConfig.getPort());
+			Map<String, Object> initMap = new HashMap<String, Object>();
+			initMap.put("com.sun.jersey.api.json.POJOMappingFeature", "true");
+			initMap.put("com.sun.jersey.config.property.packages",
+					"com.wookler.services");
+			initMap.put("com.sun.jersey.config.property.resourceConfigClass",
+					"com.sun.jersey.api.core.PackagesResourceConfig");
+
+			ServletHolder sh = new ServletHolder(new ServletContainer(
+					new PackagesResourceConfig(initMap)));
+
+			log.info("Starting Jetty Server:");
+			log.info("\tPort : " + serverConfig.getPort());
+			log.info("\tThreads : " + serverConfig.getNumThreads());
+			log.info("\tWeb Root : " + serverConfig.getWebRoot());
+
+			// un-comment these to enable tracing of requests and responses
+
+			// sh.setInitParameter("com.sun.jersey.config.feature.Debug",
+			// "true");
+			// sh.setInitParameter("com.sun.jersey.config.feature.Trace",
+			// "true");
+			//
+			// sh.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters",
+			// "com.sun.jersey.api.container.filter.LoggingFilter");
+			// sh.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters",
+			// "com.sun.jersey.api.container.filter.LoggingFilter");
+			ContextHandlerCollection ctxs = new ContextHandlerCollection();
+			server.setHandler(ctxs);
+
+			Context restctx = new Context(ctxs, "/", Context.SESSIONS);
+			restctx.setContextPath("/rest");
+			restctx.addServlet(sh, "/*");
+
+			WebAppContext webctx = new WebAppContext();
+			webctx.setDescriptor(serverConfig.getWebRoot() + "/WEB-INF/web.xml");
+			webctx.setResourceBase(serverConfig.getWebRoot());
+			webctx.setContextPath("/web");
+			webctx.setParentLoaderPriority(true);
+
+			ctxs.setHandlers(new Handler[] { restctx, webctx });
+
+			QueuedThreadPool qtp = new QueuedThreadPool(
+					serverConfig.getNumThreads());
+			qtp.setName("WooklerJettyServer");
+			server.setThreadPool(qtp);
+
+			server.start();
+			log.info("Jetty Server running...");
+			server.join();
+		} finally {
+			Env.dispose();
 		}
-		Server server = new Server(serverConfig.getPort());
-		Map<String, Object> initMap = new HashMap<String, Object>();
-		initMap.put("com.sun.jersey.api.json.POJOMappingFeature", "true");
-		initMap.put("com.sun.jersey.config.property.packages",
-				"com.wookler.services");
-		initMap.put("com.sun.jersey.config.property.resourceConfigClass",
-				"com.sun.jersey.api.core.PackagesResourceConfig");
-
-		ServletHolder sh = new ServletHolder(new ServletContainer(
-				new PackagesResourceConfig(initMap)));
-
-		log.info("Starting Jetty Server:");
-		log.info("\tPort : " + serverConfig.getPort());
-		log.info("\tThreads : " + serverConfig.getNumThreads());
-		log.info("\tWeb Root : " + serverConfig.getWebRoot());
-
-		// un-comment these to enable tracing of requests and responses
-
-		// sh.setInitParameter("com.sun.jersey.config.feature.Debug", "true");
-		// sh.setInitParameter("com.sun.jersey.config.feature.Trace", "true");
-		//
-		// sh.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters",
-		// "com.sun.jersey.api.container.filter.LoggingFilter");
-		// sh.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters",
-		// "com.sun.jersey.api.container.filter.LoggingFilter");
-
-		Context restctx = new Context(server, "/", Context.SESSIONS);
-		restctx.setContextPath("/rest");
-		restctx.addServlet(sh, "/*");
-
-		WebAppContext webctx = new WebAppContext();
-		webctx.setDescriptor(serverConfig.getWebRoot() + "/WEB-INF/web.xml");
-		webctx.setResourceBase(serverConfig.getWebRoot());
-		webctx.setContextPath("/web");
-		webctx.setParentLoaderPriority(true);
-
-		ContextHandlerCollection ctxs = new ContextHandlerCollection();
-		ctxs.setHandlers(new Handler[] { restctx, webctx });
-
-		server.setHandler(ctxs);
-		QueuedThreadPool qtp = new QueuedThreadPool(
-				serverConfig.getNumThreads());
-		qtp.setName("WooklerJettyServer");
-		server.setThreadPool(qtp);
-
-		server.start();
-		log.info("Jetty Server running...");
-		server.join();
 	}
 
 	/**

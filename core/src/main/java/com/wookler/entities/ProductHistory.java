@@ -17,8 +17,8 @@ import com.wookler.core.persistence.Reference;
  * @author subhagho
  * 
  */
-@Entity(recordset = "PRODUCT_HISTORY")
-@XmlRootElement(name = "product_history")
+@Entity(recordset = "PRODUCTHISTORY")
+@XmlRootElement(name = "producthistory")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ProductHistory extends AbstractEntity {
 	@Attribute(name = "CREATIVE", keyattribute = true, size = 256)

@@ -37,23 +37,17 @@ import com.wookler.utils.ValueParam;
  */
 public class CSVPersister extends AbstractPersister {
 	public static final String _PARAM_DATADIR_ = "datadir";
-	public static final String _PARAM_KEY_ = "key";
 
-	private String key;
 	private String datadir;
 	private HashMap<String, List<AbstractEntity>> cache = new HashMap<String, List<AbstractEntity>>();
+	private EnumImportFormat format = EnumImportFormat.CSV;
 
 	public CSVPersister() {
-		classtype = this.getClass().getCanonicalName();
+		key = this.getClass().getCanonicalName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.wookler.core.InitializedHandle#key()
-	 */
-	public String key() {
-		return key;
+	public CSVPersister(EnumImportFormat format) {
+		this.format = format;
 	}
 
 	/*
@@ -142,16 +136,20 @@ public class CSVPersister extends AbstractPersister {
 				return;
 
 			Entity eann = (Entity) type.getAnnotation(Entity.class);
-			String fname = eann.recordset() + ".CSV";
+			String fname = eann.recordset() + "." + format.name();
 			String path = datadir + "/" + fname;
 
 			File fi = new File(path);
 			if (!fi.exists())
-				throw new Exception("Cannot find CSV file [" + path
+				throw new Exception("Cannot find file [" + path
 						+ "] for entity [" + type.getCanonicalName() + "]");
 			List<AbstractEntity> entities = new ArrayList<AbstractEntity>();
 
-			CSVReader reader = new CSVReader(new FileReader(path), ',', '"');
+			char sep = ',';
+			if (format == EnumImportFormat.TSV) {
+				sep = '\t';
+			}
+			CSVReader reader = new CSVReader(new FileReader(path), sep, '"');
 			String[] header = null;
 			while (true) {
 				String[] data = reader.readNext();
@@ -161,6 +159,8 @@ public class CSVPersister extends AbstractPersister {
 					header = data;
 					continue;
 				}
+				if (data.length < header.length)
+					continue;
 				AbstractEntity record = parseRecord(type, header, data);
 				entities.add(record);
 			}
@@ -205,7 +205,7 @@ public class CSVPersister extends AbstractPersister {
 	 * persistence.AbstractEntity)
 	 */
 	@Override
-	public void save(AbstractEntity record) throws Exception {
+	public int save(AbstractEntity record) throws Exception {
 		throw new NotImplementedException(
 				"This is a dummy persister. Write operations are not supported.");
 	}
@@ -216,20 +216,7 @@ public class CSVPersister extends AbstractPersister {
 	 * @see com.wookler.core.persistence.AbstractPersister#save(java.util.List)
 	 */
 	@Override
-	public void save(List<AbstractEntity> records) throws Exception {
-		throw new NotImplementedException(
-				"This is a dummy persister. Write operations are not supported.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.wookler.core.persistence.AbstractPersister#delete(com.wookler.core
-	 * .persistence.AbstractEntity)
-	 */
-	@Override
-	public void delete(AbstractEntity record) throws Exception {
+	public int save(List<AbstractEntity> records) throws Exception {
 		throw new NotImplementedException(
 				"This is a dummy persister. Write operations are not supported.");
 	}
@@ -294,5 +281,15 @@ public class CSVPersister extends AbstractPersister {
 	 */
 	public void dispose() {
 		cache.clear();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.persistence.AbstractPersister#postinit()
+	 */
+	@Override
+	public void postinit() throws Exception {
+		// Do nothing...
 	}
 }

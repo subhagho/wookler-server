@@ -44,6 +44,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 
 	public SimpleDbQuery() {
 		transformer = new SqlConditionTransformer();
+		parser = new FilterConditionParser();
 	}
 
 	private synchronized void addToCache(EnumQueryType type, Class<?> cls,
@@ -144,7 +145,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		String table = eann.recordset();
 
 		StringBuffer query = new StringBuffer();
-		query.append("update table ").append(table).append(" set ");
+		query.append("update ").append(table).append(" set ");
 		StringBuffer where = null;
 
 		// Get Columns
@@ -187,6 +188,53 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		return query.toString();
 	}
 
+	public String getDeleteQuery(Class<?> type) throws Exception {
+		if (!type.isAnnotationPresent(Entity.class))
+			throw new Exception("Class [" + type.getCanonicalName()
+					+ "] has not been annotated as an Entity.");
+
+		String isql = getCachedQuery(EnumQueryType.DELETE, type);
+		if (isql != null)
+			return isql;
+
+		// Get table name
+		Entity eann = (Entity) type.getAnnotation(Entity.class);
+		String table = eann.recordset();
+
+		StringBuffer query = new StringBuffer();
+		query.append("delete from ").append(table);
+		StringBuffer where = null;
+
+		// Get Columns
+		List<Field> fields = ReflectionUtils.get().getFields(type);
+
+		boolean wfirst = true;
+
+		for (Field field : fields) {
+			AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+					field.getName());
+			if (attr == null)
+				continue;
+			if (attr.IsKeyColumn) {
+				if (wfirst) {
+					where = new StringBuffer();
+					where.append(" where ");
+					wfirst = false;
+				} else
+					where.append(" and ");
+				where.append(attr.Column).append("=?");
+				if (attr.IsKeyColumn)
+					continue;
+			}
+		}
+		if (where != null)
+			query.append(where);
+
+		addToCache(EnumQueryType.DELETE, type, query.toString());
+
+		return query.toString();
+	}
+
 	/**
 	 * Parse the filter condition and generate a SQL Select Query.
 	 * 
@@ -205,27 +253,30 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		StringBuffer sort = new StringBuffer();
 		StringBuffer where = new StringBuffer();
 
-		String columnstr = getCachedQuery(EnumQueryType.SELECT, type);
-		if (columnstr == null) {
-			List<String> columns = new ArrayList<String>();
+		/*
+		 * String columnstr = getCachedQuery(EnumQueryType.SELECT, type); if
+		 * (columnstr == null) {
+		 */
+		List<String> columns = new ArrayList<String>();
 
-			getColumns(type, tables, columns);
+		getColumns(type, tables, columns);
 
-			boolean first = true;
-			StringBuffer cbuff = new StringBuffer();
-			for (String column : columns) {
-				if (first)
-					first = false;
-				else
-					cbuff.append(',');
-				cbuff.append(' ').append(column);
-			}
-			columnstr = cbuff.toString();
-			addToCache(EnumQueryType.SELECT, type, columnstr);
+		boolean first = true;
+		StringBuffer cbuff = new StringBuffer();
+		for (String column : columns) {
+			if (first)
+				first = false;
+			else
+				cbuff.append(',');
+			cbuff.append(' ').append(column);
 		}
+		String columnstr = cbuff.toString();
+		/*
+		 * addToCache(EnumQueryType.SELECT, type, columnstr); }
+		 */
 
 		// Get Where Clause
-		boolean first = true;
+		first = true;
 		if (conditions != null && conditions.size() > 0) {
 			for (AbstractCondition condition : conditions) {
 				if (condition instanceof FilterCondition) {
@@ -386,7 +437,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 
 		// Create table statement
 		StringBuffer buff = new StringBuffer();
-		buff.append("create table (");
+		buff.append("create table ").append(table).append(" ( ");
 		boolean first = true;
 		for (String column : columns) {
 			if (first)
@@ -403,7 +454,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		if (keycolumns != null && keycolumns.size() > 0) {
 			buff = new StringBuffer();
 			buff.append("alter table ").append(table)
-					.append(" add constraint primary key (");
+					.append(" add primary key (");
 			first = true;
 			for (String column : keycolumns) {
 				if (first)
@@ -481,6 +532,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 	private String getColumnDDL(AttributeReflection attr) throws Exception {
 		Class<?> type = attr.Field.getType();
 		AttributeReflection tattr = attr;
+		StringBuffer coldef = new StringBuffer();
 		if (attr.Convertor != null) {
 			type = attr.Convertor.getDataType();
 		} else if (attr.Reference != null) {
@@ -501,7 +553,11 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			def = sqlt.name().concat("(").concat(String.valueOf(size))
 					.concat(")");
 		}
-		return attr.Column + " " + def;
+		coldef.append(attr.Column).append(' ').append(def);
+		if (attr.IsKeyColumn) {
+			coldef.append(" not null");
+		}
+		return coldef.toString();
 	}
 
 	/**

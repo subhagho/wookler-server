@@ -86,7 +86,7 @@ public class SqlConditionTransformer implements ConditionTransformer {
 				break;
 			case Contains:
 				buff.append(" like ");
-				fc.setValue("%" + (String) fc.getValue() + "%");
+				fc.setValue("'%" + (String) fc.getValue() + "%'");
 				break;
 			default:
 				throw new Exception("Operator [" + fc.getComparator().name()
@@ -112,7 +112,8 @@ public class SqlConditionTransformer implements ConditionTransformer {
 		if (offset == reference.length - 1) {
 			Entity eann = (Entity) type.getAnnotation(Entity.class);
 			String table = eann.recordset();
-			String cleft = table.concat(".").concat(attr.Column);; 
+			String cleft = table.concat(".").concat(attr.Column);
+			;
 			return new KeyValuePair<Class<?>>(cleft, type);
 		} else {
 			if (attr.Reference == null)

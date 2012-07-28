@@ -76,6 +76,7 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 		String selectsql = parser.getSelectQuery(type);
 		Statement stmnt = conn.createStatement();
 		try {
+			log.debug("SELECT SQL [" + selectsql + "]");
 			ResultSet rs = stmnt.executeQuery(selectsql);
 			List<AbstractEntity> entities = new ArrayList<AbstractEntity>();
 			List<Field> fields = ReflectionUtils.get().getFields(type);
@@ -110,6 +111,7 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void setColumnValue(String tabprefix, ResultSet rs,
 			AttributeReflection attr, AbstractEntity entity) throws Exception {
 
@@ -180,6 +182,14 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 				PropertyUtils.setSimpleProperty(entity, attr.Field.getName(),
 						dt);
 			}
+		} else if (attr.Field.getType().isEnum()) {
+			String value = rs.getString(tabprefix + "." + attr.Column);
+			if (!rs.wasNull()) {
+				Class ecls = attr.Field.getType();
+				Object evalue = Enum.valueOf(ecls, value);
+				PropertyUtils.setSimpleProperty(entity, attr.Field.getName(),
+						evalue);
+			}
 		} else if (attr.Reference != null) {
 			Class<?> rt = Class.forName(attr.Reference.Class);
 			Object obj = rt.newInstance();
@@ -202,39 +212,84 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 	 * persistence.AbstractEntity)
 	 */
 	@Override
-	public void save(AbstractEntity record) throws Exception {
-		if (record.getState() == EnumEntityState.New)
-			insert(record);
-		else if (record.getState() == EnumEntityState.Deleted)
-			delete(record);
-		else
-			update(record);
-	}
-
-	private void save(AbstractEntity record, Connection conn) throws Exception {
-		if (record.getState() == EnumEntityState.New)
-			insert(record, conn);
-		else if (record.getState() != EnumEntityState.Deleted)
-			update(record, conn);
-	}
-
-	private void insert(AbstractEntity record) throws Exception {
-		if (!record.getClass().isAnnotationPresent(Entity.class))
-			throw new Exception("Class ["
-					+ record.getClass().getCanonicalName()
-					+ "] has not been annotated as an Entity.");
-
+	public int save(AbstractEntity record) throws Exception {
 		Connection conn = getConnection(true);
 		try {
-			insert(record, conn);
+			return save(record, conn);
+
 		} finally {
 			if (conn != null)
 				releaseConnection(conn);
 		}
 	}
 
-	private void insert(AbstractEntity record, Connection conn)
-			throws Exception {
+	public boolean recordExists(AbstractEntity entity) throws Exception {
+		String query = getQueryByKey(entity);
+		if (query != null && !query.isEmpty()) {
+			List<AbstractEntity> exists = read(query, entity.getClass());
+			if (exists == null || exists.size() == 0)
+				return false;
+			else {
+				if (entity.getState() == EnumEntityState.Overwrite) {
+					AbstractEntity en = exists.get(0);
+					entity.setTimestamp(en.getTimestamp());
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private String getQueryByKey(AbstractEntity entity) throws Exception {
+		StringBuffer buff = new StringBuffer();
+		List<Field> fields = ReflectionUtils.get().getFields(entity.getClass());
+		boolean first = true;
+		for (Field field : fields) {
+			AttributeReflection attr = ReflectionUtils.get().getAttribute(
+					entity.getClass(), field.getName());
+			if (attr == null || !attr.IsKeyColumn)
+				continue;
+
+			if (first)
+				first = false;
+			else
+				buff.append(';');
+
+			String value = null;
+			if (attr.Reference == null) {
+				if (field.getType().equals(Date.class)) {
+					Date dt = (Date) PropertyUtils.getSimpleProperty(entity,
+							attr.Field.getName());
+					value = String.valueOf(dt.getTime());
+				} else {
+					value = String.valueOf(PropertyUtils.getSimpleProperty(
+							entity, attr.Field.getName()));
+					if (!EnumPrimitives.isPrimitiveType(field.getType())) {
+						value = "'" + value + "'";
+					}
+				}
+			}
+			buff.append(attr.Column).append("=").append(value);
+		}
+		return buff.toString();
+	}
+
+	private int save(AbstractEntity record, Connection conn) throws Exception {
+		if (record.getState() == EnumEntityState.New)
+			return insert(record, conn);
+		else if (record.getState() == EnumEntityState.Deleted)
+			return delete(record, conn);
+		else if (record.getState() == EnumEntityState.Loaded)
+			return update(record, conn);
+		else {
+			if (recordExists(record))
+				return update(record, conn);
+			else
+				return insert(record, conn);
+		}
+	}
+
+	private int insert(AbstractEntity record, Connection conn) throws Exception {
 		Class<?> type = record.getClass();
 
 		SimpleDbQuery parser = new SimpleDbQuery();
@@ -261,16 +316,18 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 					.compareTo(AbstractEntity._TX_TIMESTAMP_COLUMN_) == 0) {
 				value = new Date();
 			}
-			setPreparedValue(pstmnt, index, attr, value);
+			setPreparedValue(pstmnt, index, attr, value, record);
 			index++;
 		}
 		int count = pstmnt.executeUpdate();
 		log.debug("[" + record.getClass().getCanonicalName()
 				+ "] created [count=" + count + "]");
+		return count;
 	}
 
 	private void setPreparedValue(PreparedStatement pstmnt, int index,
-			AttributeReflection attr, Object value) throws Exception {
+			AttributeReflection attr, Object value, AbstractEntity entity)
+			throws Exception {
 		Class<?> type = attr.Field.getType();
 		if (EnumPrimitives.isPrimitiveType(type)) {
 			EnumPrimitives prim = EnumPrimitives.type(type);
@@ -301,8 +358,22 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 			if (type.equals(String.class)) {
 				pstmnt.setString(index, (String) value);
 			} else if (type.equals(Date.class)) {
-				long dtval = ((Date) value).getTime();
+				long dtval = new Date().getTime();
+				if (value != null)
+					dtval = ((Date) value).getTime();
 				pstmnt.setLong(index, dtval);
+			} else if (value instanceof Enum) {
+				pstmnt.setString(index, getEnumValue(value));
+			} else if (attr.Convertor != null) {
+				pstmnt.setString(
+						index,
+						(String) attr.Convertor.save(entity,
+								attr.Field.getName()));
+			} else if (attr.Reference != null) {
+				Class<?> cls = Class.forName(attr.Reference.Class);
+				AttributeReflection rattr = ReflectionUtils.get().getAttribute(
+						cls, attr.Reference.Field);
+				setPreparedValue(pstmnt, index, rattr, value, entity);
 			} else {
 				throw new Exception("Unsupported field type ["
 						+ type.getCanonicalName() + "]");
@@ -310,23 +381,12 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 		}
 	}
 
-	private void update(AbstractEntity record) throws Exception {
-		if (!record.getClass().isAnnotationPresent(Entity.class))
-			throw new Exception("Class ["
-					+ record.getClass().getCanonicalName()
-					+ "] has not been annotated as an Entity.");
-
-		Connection conn = getConnection(true);
-		try {
-			update(record, conn);
-		} finally {
-			if (conn != null)
-				releaseConnection(conn);
-		}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private <T extends Enum> String getEnumValue(Object value) {
+		return ((T) value).name();
 	}
 
-	private void update(AbstractEntity record, Connection conn)
-			throws Exception {
+	private int update(AbstractEntity record, Connection conn) throws Exception {
 		Class<?> type = record.getClass();
 
 		SimpleDbQuery parser = new SimpleDbQuery();
@@ -362,18 +422,20 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 				value = new Date();
 				keyattrs.add(attr);
 			}
-			setPreparedValue(pstmnt, index, attr, value);
+			setPreparedValue(pstmnt, index, attr, value, record);
 			index++;
 		}
 		for (int ii = 0; ii < keyattrs.size(); ii++) {
 			Object value = PropertyUtils.getSimpleProperty(record,
 					keyattrs.get(ii).Field.getName());
-			setPreparedValue(pstmnt, (index + ii), keyattrs.get(ii), value);
+			setPreparedValue(pstmnt, (index + ii), keyattrs.get(ii), value,
+					record);
 		}
 
 		int count = pstmnt.executeUpdate();
 		log.debug("[" + record.getClass().getCanonicalName()
-				+ "] created [count=" + count + "]");
+				+ "] updated [count=" + count + "]");
+		return count;
 	}
 
 	protected boolean checkSchema() throws Exception {
@@ -405,9 +467,10 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 	 * @see com.wookler.core.persistence.AbstractPersister#save(java.util.List)
 	 */
 	@Override
-	public void save(List<AbstractEntity> records) throws Exception {
+	public int save(List<AbstractEntity> records) throws Exception {
 
 		Connection conn = getConnection(true);
+		int count = 0;
 		try {
 			for (AbstractEntity record : records) {
 				if (!record.getClass().isAnnotationPresent(Entity.class))
@@ -415,8 +478,9 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 							+ record.getClass().getCanonicalName()
 							+ "] has not been annotated as an Entity.");
 
-				save(record, conn);
+				count += save(record, conn);
 			}
+			return count;
 		} finally {
 			if (conn != null)
 				releaseConnection(conn);
@@ -424,17 +488,39 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.wookler.core.persistence.AbstractPersister#delete(com.wookler.core
-	 * .persistence.AbstractEntity)
-	 */
-	@Override
-	public void delete(AbstractEntity record) throws Exception {
-		// TODO Auto-generated method stub
+	private int delete(AbstractEntity record, Connection conn) throws Exception {
+		Class<?> type = record.getClass();
 
+		SimpleDbQuery parser = new SimpleDbQuery();
+
+		String sql = parser.getDeleteQuery(type);
+
+		PreparedStatement pstmnt = conn.prepareStatement(sql);
+
+		List<AttributeReflection> keyattrs = new ArrayList<AttributeReflection>();
+
+		List<Field> fields = ReflectionUtils.get().getFields(type);
+		for (Field field : fields) {
+			AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+					field.getName());
+			if (attr == null)
+				continue;
+
+			if (attr.IsKeyColumn) {
+				keyattrs.add(attr);
+				continue;
+			}
+		}
+		for (int ii = 0; ii < keyattrs.size(); ii++) {
+			Object value = PropertyUtils.getSimpleProperty(record,
+					keyattrs.get(ii).Field.getName());
+			setPreparedValue(pstmnt, ii + 1, keyattrs.get(ii), value, record);
+		}
+
+		int count = pstmnt.executeUpdate();
+		log.debug("[" + record.getClass().getCanonicalName()
+				+ "] deleted [count=" + count + "]");
+		return count;
 	}
 
 	/**

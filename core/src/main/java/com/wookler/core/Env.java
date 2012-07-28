@@ -42,7 +42,7 @@ public class Env {
 		if (tempdir == null || tempdir.isEmpty())
 			tempdir = System.getProperty("java.io.tmpdir");
 
-		// Initialized the Data<anager
+		// Initialized the DataManager
 		DataManager.create(config);
 	}
 
@@ -198,10 +198,13 @@ public class Env {
 	 * Dispose the operating environment.
 	 */
 	public static void dispose() {
-		DataManager.release();
-		if (_instance.shared != null) {
-			_instance.shared.clear();
+		if (_instance != null) {
+			DataManager.release();
+			if (_instance.shared != null) {
+				_instance.shared.clear();
+			}
+			_instance.config = null;
 		}
-		_instance.config = null;
+		_instance = null;
 	}
 }

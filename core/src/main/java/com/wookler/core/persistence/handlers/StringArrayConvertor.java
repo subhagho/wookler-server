@@ -168,7 +168,7 @@ public class StringArrayConvertor implements CustomFieldDataHandler {
 					attr.Field.getName());
 			if (data == null)
 				return null;
-			convertToString(data, attr.Field);
+			return convertToString(data, attr.Field);
 		}
 		throw new Exception("Object field [" + attr.Field.getName()
 				+ "] is not an array.");

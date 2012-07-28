@@ -103,7 +103,7 @@ public class Test_SimpleDbQuery {
 		try {
 			while (true) {
 				long stime = new Date().getTime();
-				int count = 100000;
+				int count = 10;
 
 				for (int ii = 0; ii < count; ii++) {
 					String query = "STR=3;REF.STR='xxx';REF.REF.DT=12900123020";

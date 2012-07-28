@@ -17,12 +17,13 @@
 						<param type="Value" name="datadir" value="/var/wookler/data/" />
 					</params>
 				</persister>
-				<!-- 
+
 				<persister name="H2PERSISTER"
 					class="com.wookler.core.persistence.db.H2DbPersister">
 					<params>
 						<param type="Value" name="key" value="H2PERSISTER" />
-						<param type="Value" name="url" value="jdbc:h2:/var/wookler/data/h2/wookler" />
+						<param type="Value" name="url"
+							value="jdbc:h2:/var/wookler/data/h2/wookler" />
 						<param type="Value" name="poolsize" value="20" />
 						<param type="Value" name="user" value="wookler" />
 						<param type="Value" name="password" value="w00kler" />
@@ -30,9 +31,11 @@
 							value="/var/wookler/config/h2/h2-db-setup.xml" />
 					</params>
 				</persister>
-				 -->
+
+				<classmap class="com.wookler.core.persistence.db.DBVersion"
+					persister="H2PERSISTER" />
 				<classmap class="com.wookler.core.persistence.AbstractEntity"
-					persister="CSVPERSISTER" />
+					persister="H2PERSISTER" />
 			</persistence>
 		</datamanager>
 	</core>

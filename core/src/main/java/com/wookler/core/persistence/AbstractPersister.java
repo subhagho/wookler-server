@@ -19,9 +19,11 @@ import com.wookler.utils.ListParam;
  *            - Entity Type(s).
  */
 public abstract class AbstractPersister implements InitializedHandle {
+	public static final String _PARAM_KEY_ = "key";
+
 	protected EnumInstanceState state = EnumInstanceState.Unknown;
 
-	protected String classtype;
+	protected String key;
 
 	/**
 	 * Get the key to be used to lookup this Persister in the cache. Usually the
@@ -30,9 +32,8 @@ public abstract class AbstractPersister implements InitializedHandle {
 	 * @return
 	 */
 	public String key() {
-		return classtype;
+		return key;
 	}
-
 
 	/**
 	 * Initialize the persistence handler.
@@ -42,6 +43,13 @@ public abstract class AbstractPersister implements InitializedHandle {
 	 * @throws Exception
 	 */
 	public abstract void init(ListParam params) throws Exception;
+
+	/**
+	 * Method do be called post initialization.
+	 * 
+	 * @throws Exception
+	 */
+	public abstract void postinit() throws Exception;
 
 	/**
 	 * Load a list of entity records based on the column keys specified.
@@ -64,7 +72,7 @@ public abstract class AbstractPersister implements InitializedHandle {
 	 *            - Entity record instance.
 	 * @throws Exception
 	 */
-	public abstract void save(AbstractEntity record) throws Exception;
+	public abstract int save(AbstractEntity record) throws Exception;
 
 	/**
 	 * Bulk save a list of entity records.
@@ -73,14 +81,6 @@ public abstract class AbstractPersister implements InitializedHandle {
 	 *            - List of entity records.
 	 * @throws Exception
 	 */
-	public abstract void save(List<AbstractEntity> records) throws Exception;
+	public abstract int save(List<AbstractEntity> records) throws Exception;
 
-	/**
-	 * Delete the specified entity record.
-	 * 
-	 * @param record
-	 *            - Entity record.
-	 * @throws Exception
-	 */
-	public abstract void delete(AbstractEntity record) throws Exception;
 }
