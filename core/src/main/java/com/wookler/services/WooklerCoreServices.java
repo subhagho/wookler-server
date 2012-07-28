@@ -3,6 +3,7 @@
  */
 package com.wookler.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -20,6 +21,7 @@ import com.sun.jersey.api.JResponse;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.DataManager;
 import com.wookler.core.persistence.query.Query;
+import com.wookler.entities.Creative;
 import com.wookler.entities.ProductHistory;
 import com.wookler.entities.Sequence;
 import com.wookler.entities.Tag;
@@ -39,6 +41,55 @@ public class WooklerCoreServices {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(WooklerCoreServices.class);
+
+	@Path("/schema/{type}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public JResponse<WooklerResponse> schema(
+			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("type") String type)
+			throws Exception {
+		try {
+			List<Class<?>> types = new ArrayList<Class<?>>();
+			if (type.compareToIgnoreCase("video") == 0
+					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				types.add(VideoMedia.class);
+			}
+
+			if (type.compareToIgnoreCase("sequence") == 0
+					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				types.add(Sequence.class);
+			}
+			if (type.compareToIgnoreCase("creative") == 0
+					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				types.add(Creative.class);
+			}
+			if (type.compareToIgnoreCase("tag") == 0
+					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				types.add(Tag.class);
+			}
+			if (type.compareToIgnoreCase("producthistory") == 0
+					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+				types.add(ProductHistory.class);
+			}
+			List<EntityDef> defs = new ArrayList<EntityDef>();
+			for (Class<?> ct : types) {
+				EntityDef def = EntityDef.load(ct);
+				defs.add(def);
+			}
+			WooklerResponse response = new WooklerResponse();
+			response.setState(EnumResponseState.Success);
+			response.setData(defs);
+			return JResponse.ok(response).build();
+		} catch (Exception e) {
+			LogUtils.stacktrace(log, e);
+			log.error(e.getLocalizedMessage());
+
+			WooklerResponse response = new WooklerResponse();
+			response.setState(EnumResponseState.Exception);
+			response.setMessage(e.getLocalizedMessage());
+			return JResponse.ok(response).build();
+		}
+	}
 
 	/**
 	 * Select Video Media and related data.
