@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE=wookler.tar.gz
+PACKAGE=./target/wookler.tar.gz
 
 
 LIBFILE=`find . -name wookler*.jar`
