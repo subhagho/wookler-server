@@ -4,6 +4,6 @@ curl -i -H "Content-Type: application/json" -X POST -d '{"state":"Unknown","time
 
 {"state":"Loaded","timestamp":0,"id":"400","html":"<div></div>","url":"http://wookler.com"}
 
-curl -i -H "Content-Type: application/json" -X POST -d '{"state":"Unknown","timestamp":0,"id":"400","html":"<div></div>","url":"http://wookler.com"}' http://localhost:8090/rest/wookler/core/crud/save/creative
+curl -i -H "Content-Type: application/json" -X POST -d '{"state":"Overwrite","timestamp":0,"id":"400","html":"<div></div>","url":"http://wookler.com"}' http://localhost:8090/rest/wookler/core/crud/save/creative
 
-curl -i -X POST http://localhost:8090/rest/import/process?entity=video "Content-Type: text/plain" -vF"file=@VIDEO.csv"
+curl -i -X POST http://localhost:8090/rest/import/process?entity=video -vF"file=@VIDEO.csv"

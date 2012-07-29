@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -17,10 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.wookler.core.Env;
 import com.wookler.core.data.Test_Env;
-import com.wookler.entities.EnumVideoSource;
-import com.wookler.entities.Sequence;
-import com.wookler.entities.Tag;
-import com.wookler.entities.VideoMedia;
+import com.wookler.entities.media.EnumVideoSource;
+import com.wookler.entities.media.VideoMedia;
 import com.wookler.utils.LogUtils;
 
 /**
@@ -57,49 +54,11 @@ public class Test_DataManager {
 	public void testRead() {
 		try {
 			DataManager manager = DataManager.get();
-			int count = 100;
-			long stime = new Date().getTime();
-			for (int ii = 0; ii < count; ii++) {
-				int id = ii % 6;
-
-				List<AbstractEntity> entities = manager.read(
-						"TYPE = Video; ID = " + id
-								+ "; SORT LENGTH ASC; LIMIT 2",
-						VideoMedia.class);
-				if (entities != null)
-					log.debug("[ID=" + id + "] size = " + entities.size());
-
-				// assertEquals(true, (entities != null && entities.size() >
-				// 0));
-				if (entities.size() > 0) {
-					for (AbstractEntity entity : entities) {
-						log.info(entity.toString());
-						List<AbstractEntity> sequences = manager
-								.read("MEDIAID="
-										+ ((VideoMedia) entity).getId()
-										+ "; CREATIVE.ID = 1; SORT STARTTIME ASC",
-										Sequence.class);
-						for (AbstractEntity seq : sequences) {
-							log.debug("\tSEQUENCE : " + seq.toString());
-						}
-						List<AbstractEntity> tags = manager.read("MEDIAID="
-								+ ((VideoMedia) entity).getId(), Tag.class);
-						for (AbstractEntity tag : tags) {
-							log.debug("\tTAG : " + tag.toString());
-						}
-					}
-				}
-			}
-			long etime = new Date().getTime();
-			log.info("Time to execute [" + count + "] iterations = "
-					+ (etime - stime) / 1000 + " secs");
 
 			AbstractEntity ae = DataManager.newInstance(VideoMedia.class);
 			VideoMedia vm = (VideoMedia) ae;
 
-			UUID uuid = UUID.randomUUID();
-
-			vm.setId(uuid.toString());
+			// vm.setId(uuid.toString());
 			vm.setLength(new Date().getTime());
 			vm.setName("TEST-MEDIA-VIDEO");
 			vm.setPublished(new Date());
@@ -110,15 +69,18 @@ public class Test_DataManager {
 
 			manager.save(vm);
 
-			List<AbstractEntity> vmf = manager.read("ID=" + uuid.toString(),
+			List<AbstractEntity> vmf = manager.read("NAME=TEST-MEDIA-VIDEO",
 					VideoMedia.class);
+			vm = (VideoMedia) vmf.get(0);
+			String id = vm.getId();
+
 			log.info("Found Video [" + vmf.get(0).toString() + "]");
 
 			vm.setState(EnumEntityState.Deleted);
 
 			manager.save(vm);
 
-			vmf = manager.read("ID=" + uuid.toString(), VideoMedia.class);
+			vmf = manager.read("ID=" + id, VideoMedia.class);
 
 			assertEquals(0, vmf.size());
 		} catch (Exception e) {

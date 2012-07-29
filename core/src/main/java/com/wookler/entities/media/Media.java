@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import java.util.Date;
 
@@ -23,7 +23,7 @@ public abstract class Media extends AbstractEntity {
 	@XmlElement(name = "type")
 	protected EnumMediaType type;
 
-	@Attribute(name = "ID", keyattribute = true, size = 256)
+	@Attribute(name = "ID", keyattribute = true, size = 256, autoincr = true)
 	@XmlElement(name = "id")
 	private String id;
 

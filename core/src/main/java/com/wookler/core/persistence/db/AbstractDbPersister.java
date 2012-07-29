@@ -318,6 +318,13 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 
 			Object value = PropertyUtils.getSimpleProperty(record,
 					field.getName());
+			if (value == null) {
+				if (attr.IsKeyColumn && attr.AutoIncrement) {
+					Entity entity = record.getClass().getAnnotation(
+							Entity.class);
+					value = getSequenceValue(entity, attr, conn);
+				}
+			}
 			if (attr.Reference != null) {
 				save((AbstractEntity) value, conn);
 				AttributeReflection rattr = ReflectionUtils.get().getAttribute(
@@ -335,6 +342,9 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 				+ "] created [count=" + count + "]");
 		return count;
 	}
+
+	protected abstract Object getSequenceValue(Entity entity,
+			AttributeReflection attr, Connection conn) throws Exception;
 
 	private void setPreparedValue(PreparedStatement pstmnt, int index,
 			AttributeReflection attr, Object value, AbstractEntity entity)
@@ -384,7 +394,9 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 				Class<?> cls = Class.forName(attr.Reference.Class);
 				AttributeReflection rattr = ReflectionUtils.get().getAttribute(
 						cls, attr.Reference.Field);
-				value = PropertyUtils.getSimpleProperty(value,
+				Object refval = PropertyUtils.getSimpleProperty(entity,
+						attr.Field.getName());
+				value = PropertyUtils.getSimpleProperty(refval,
 						rattr.Field.getName());
 				setPreparedValue(pstmnt, index, rattr, value, entity);
 			} else {
@@ -518,10 +530,8 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 					field.getName());
 			if (attr == null)
 				continue;
-
 			if (attr.IsKeyColumn) {
 				keyattrs.add(attr);
-				continue;
 			}
 		}
 		for (int ii = 0; ii < keyattrs.size(); ii++) {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h2>
+	<db version="1.0">
+		<entities>
+			<entity>com.wookler.entities.media.Tag</entity>
+			<index name="INDX_TAG_01" entity="com.wookler.entities.media.Tag"
+				columns="MEDIAID,SEQID,NAME" />
+			<index name="INDX_TAG_02" entity="com.wookler.entities.media.Tag"
+				columns="MEDIAID,NAME" />
+			<index name="INDX_TAG_03" entity="com.wookler.entities.media.Tag"
+				columns="NAME" />
+			<index name="INDX_TAG_04" entity="com.wookler.entities.media.Tag"
+				columns="VALUE,NAME" />
+			<entity>com.wookler.entities.media.Sequence</entity>
+			<index name="INDX_SEQ_01" entity="com.wookler.entities.media.Sequence"
+				columns="MEDIAID,SEQID" />
+			<index name="INDX_SEQ_02" entity="com.wookler.entities.media.Sequence"
+				columns="MEDIAID,STARTTIME" />
+			<entity>com.wookler.entities.media.Creative</entity>
+			<index name="INDX_CR_01" entity="com.wookler.entities.media.Creative"
+				columns="ID" />
+			<entity>com.wookler.entities.media.VideoMedia</entity>
+			<index name="INDX_VM_01" entity="com.wookler.entities.media.VideoMedia"
+				columns="TYPE,ID" />
+			<index name="INDX_VM_02" entity="com.wookler.entities.media.VideoMedia"
+				columns="TYPE,NAME" />
+			<entity>com.wookler.entities.media.ProductHistory</entity>
+			<index name="INDX_PH_01" entity="com.wookler.entities.media.ProductHistory"
+				columns="CREATIVE" />
+			<entity>com.wookler.entities.media.UserRating</entity>
+			<index name="INDX_RT_01" entity="com.wookler.entities.media.UserRating"
+				columns="REFERENCEID,RATING" />
+		</entities>
+	</db>
+</h2>

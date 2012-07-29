@@ -1,14 +1,13 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
 
@@ -19,22 +18,30 @@ import com.wookler.core.persistence.Entity;
 @Entity(recordset = "TAG")
 @XmlRootElement(name = "tag")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Tag extends AbstractEntity {
-	@Attribute(name = "MEDIAID", keyattribute = true, size = 256)
+public class Tag extends RatedEntity {
+	@Attribute(name = "MEDIAID", size = 256)
 	@XmlElement(name = "mediaid")
 	private String mediaid;
 
-	@Attribute(name = "SEQID", keyattribute = true)
+	@Attribute(name = "SEQID")
 	@XmlElement(name = "sequenceid")
 	private long seqid;
 
-	@Attribute(name = "NAME", keyattribute = true, size = 512)
+	@Attribute(name = "ID", keyattribute = true, autoincr = true)
+	@XmlElement(name = "id")
+	private String id;
+
+	@Attribute(name = "NAME", size = 512)
 	@XmlElement(name = "name")
 	private String name;
 
 	@Attribute(name = "VALUE", size = 512)
 	@XmlElement(name = "value")
 	private String value;
+
+	@Attribute(name = "SOURCE", size = 512)
+	@XmlElement(name = "source")
+	private EnumTagSource source = EnumTagSource.System;
 
 	/**
 	 * @return the mediaid
@@ -94,6 +101,36 @@ public class Tag extends AbstractEntity {
 	 */
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public EnumTagSource getSource() {
+		return source;
+	}
+
+	/**
+	 * @param source
+	 *            the source to set
+	 */
+	public void setSource(EnumTagSource source) {
+		this.source = source;
 	}
 
 	/*

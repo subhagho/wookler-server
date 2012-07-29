@@ -159,6 +159,10 @@ public class DataManager implements InitializedHandle {
 			return persistmap.get(key);
 		}
 		Class<?> ttype = type;
+		key = type.getPackage().getName();
+		if (persistmap.containsKey(key)) {
+			return persistmap.get(key);
+		}
 		while (true) {
 			ttype = ttype.getSuperclass();
 			if (ttype.getCanonicalName().compareTo(

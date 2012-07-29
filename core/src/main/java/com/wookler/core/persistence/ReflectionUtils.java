@@ -76,6 +76,7 @@ public class ReflectionUtils {
 						ar.Column = attr.name();
 						ar.IsKeyColumn = attr.keyattribute();
 						ar.Size = attr.size();
+						ar.AutoIncrement = attr.autoincr();
 
 						String mname = getMethodName("get", fd.getName());
 						ar.Getter = type.getMethod(mname);

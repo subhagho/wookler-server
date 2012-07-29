@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.db.SQLDataType;
 import com.wookler.core.persistence.db.SqlConditionTransformer;
@@ -30,7 +31,6 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		SELECT, INSERT, UPDATE, DELETE;
 	}
 
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory
 			.getLogger(SimpleDbQuery.class);
 
@@ -231,7 +231,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			query.append(where);
 
 		addToCache(EnumQueryType.DELETE, type, query.toString());
-
+		log.debug("[DELETE : " + query.toString() + "]");
 		return query.toString();
 	}
 
@@ -432,6 +432,19 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 				if (keycolumns == null)
 					keycolumns = new ArrayList<String>();
 				keycolumns.add(attr.Column);
+				if (attr.AutoIncrement) {
+					if (EnumPrimitives.isPrimitiveType(attr.Field.getType())) {
+						EnumPrimitives prim = EnumPrimitives.type(attr.Field
+								.getType());
+						if (prim == EnumPrimitives.ELong
+								|| prim == EnumPrimitives.EInteger) {
+							List<String> ddls = createSequenceDDL(eann, attr);
+							if (ddls.size() > 0) {
+								stmnts.addAll(ddls);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -467,6 +480,22 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			stmnts.add(buff.toString());
 		}
 		return stmnts;
+	}
+
+	private List<String> createSequenceDDL(Entity entity,
+			AttributeReflection attr) throws Exception {
+		List<String> ddls = new ArrayList<String>();
+		String name = getSequenceName(entity, attr);
+		ddls.add("drop sequence if exists " + name);
+		ddls.add("create sequence if not exists " + name);
+		return ddls;
+	}
+
+	public static String getSequenceName(Entity entity, AttributeReflection attr) {
+		StringBuffer buff = new StringBuffer();
+		buff.append("SEQ_").append(entity.recordset()).append("_")
+				.append(attr.Column);
+		return buff.toString();
 	}
 
 	/**

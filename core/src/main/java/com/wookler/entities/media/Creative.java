@@ -1,14 +1,13 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
 
@@ -21,8 +20,8 @@ import com.wookler.core.persistence.Entity;
 @Entity(recordset = "CREATIVE")
 @XmlRootElement(name = "creative")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Creative extends AbstractEntity {
-	@Attribute(name = "ID", keyattribute = true, size = 256)
+public class Creative extends RatedEntity {
+	@Attribute(name = "ID", keyattribute = true, size = 256, autoincr = true)
 	@XmlElement(name = "creativeid")
 	private String id;
 

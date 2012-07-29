@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 /**
  * Defines the Video Source the content links to.

@@ -45,4 +45,11 @@ public @interface Attribute {
 	 * @return
 	 */
 	int size() default 0;
+
+	/**
+	 * Column is auto-incremented.
+	 * 
+	 * @return
+	 */
+	boolean autoincr() default false;
 }

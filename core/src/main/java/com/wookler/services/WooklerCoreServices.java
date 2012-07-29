@@ -21,11 +21,11 @@ import com.sun.jersey.api.JResponse;
 import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.core.persistence.DataManager;
 import com.wookler.core.persistence.query.Query;
-import com.wookler.entities.Creative;
-import com.wookler.entities.ProductHistory;
-import com.wookler.entities.Sequence;
-import com.wookler.entities.Tag;
-import com.wookler.entities.VideoMedia;
+import com.wookler.entities.media.Creative;
+import com.wookler.entities.media.ProductHistory;
+import com.wookler.entities.media.Sequence;
+import com.wookler.entities.media.Tag;
+import com.wookler.entities.media.VideoMedia;
 import com.wookler.utils.LogUtils;
 
 /**

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

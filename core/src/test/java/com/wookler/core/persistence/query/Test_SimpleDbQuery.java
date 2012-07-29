@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.wookler.core.persistence.query.test.ReferenceRoot;
-import com.wookler.entities.Creative;
-import com.wookler.entities.Sequence;
-import com.wookler.entities.VideoMedia;
+import com.wookler.entities.media.Creative;
+import com.wookler.entities.media.Sequence;
+import com.wookler.entities.media.VideoMedia;
 import com.wookler.utils.KeyValuePair;
 import com.wookler.utils.LogUtils;
 

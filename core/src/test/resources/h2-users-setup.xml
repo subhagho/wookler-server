@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h2>
+	<db version="1.0">
+		<entities>
+			<entity>com.wookler.entities.users.Profile</entity>
+			<index name="INDX_PR_01" entity="com.wookler.entities.users.Profile"
+				columns="EMAIL" />
+			<entity>com.wookler.entities.users.Subscription</entity>
+			<index name="INDX_SU_01" entity="com.wookler.entities.users.Subscription"
+				columns="PROFILE" />
+			<index name="INDX_SU_02" entity="com.wookler.entities.users.Subscription"
+				columns="TAXONOMY" />
+			<index name="INDX_SU_02" entity="com.wookler.entities.users.Subscription"
+				columns="VALUE" />
+			<entity>com.wookler.entities.users.Contribution</entity>
+			<index name="INDX_CON_01" entity="com.wookler.entities.users.Contribution"
+				columns="PROFILE, CONTRIBSTATE" />
+			<entity>com.wookler.entities.users.Notification</entity>
+			<index name="INDX_NOT_01" entity="com.wookler.entities.users.Notification"
+				columns="PROFILE, NOTIFYSTATE" />
+			<entity>com.wookler.entities.interactions.Activity</entity>
+			<index name="INDX_ACT_01" entity="com.wookler.entities.interactions.Activity"
+				columns="PROFILEID,ACTIVITYTYPE" />
+			<index name="INDX_ACT_02" entity="com.wookler.entities.interactions.Activity"
+				columns="PROFILEID,TX_TIMESTAMP" />
+		</entities>
+	</db>
+</h2>

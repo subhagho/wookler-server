@@ -18,6 +18,7 @@ public class AttributeReflection {
 	public Method Getter;
 	public Method Setter;
 	public boolean IsKeyColumn = false;
+	public boolean AutoIncrement = false;
 	public int Size;
 	public CustomFieldDataHandler Convertor = null;
 	public ReferenceReflection Reference = null;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,7 +22,7 @@ import com.wookler.core.persistence.Reference;
 @XmlAccessorType(XmlAccessType.NONE)
 public class ProductHistory extends AbstractEntity {
 	@Attribute(name = "CREATIVE", keyattribute = true, size = 256)
-	@Reference(target = "com.wookler.entities.Creative", attribute = "ID")
+	@Reference(target = "com.wookler.entities.media.Creative", attribute = "ID")
 	@XmlElement(name = "creativeid")
 	private Creative creative;
 

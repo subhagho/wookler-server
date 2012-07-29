@@ -5,10 +5,12 @@ package com.wookler.core.persistence.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.configuration.XMLConfiguration;
@@ -19,7 +21,10 @@ import org.w3c.dom.NodeList;
 
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.persistence.AbstractEntity;
+import com.wookler.core.persistence.AttributeReflection;
 import com.wookler.core.persistence.DataManager;
+import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.query.SimpleDbQuery;
 import com.wookler.utils.AbstractParam;
 import com.wookler.utils.KeyValuePair;
@@ -286,8 +291,7 @@ public class H2DbPersister extends AbstractDbPersister {
 
 			}
 		} else {
-			List<AbstractEntity> versions = DataManager.get().read("",
-					DBVersion.class);
+			List<AbstractEntity> versions = read("", DBVersion.class);
 			if (versions == null || versions.isEmpty()) {
 				throw new Exception(
 						"Error retrieving Schema Version. Database might be corrupted.");
@@ -343,4 +347,40 @@ public class H2DbPersister extends AbstractDbPersister {
 			checkSetup();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.wookler.core.persistence.db.AbstractDbPersister#getSequenceValue(
+	 * com.wookler.core.persistence.Entity,
+	 * com.wookler.core.persistence.AttributeReflection, java.sql.Connection)
+	 */
+	@Override
+	protected Object getSequenceValue(Entity entity, AttributeReflection attr,
+			Connection conn) throws Exception {
+		if (EnumPrimitives.isPrimitiveType(attr.Field.getType())) {
+			EnumPrimitives prim = EnumPrimitives.type(attr.Field.getType());
+			if (prim == EnumPrimitives.ELong || prim == EnumPrimitives.EInteger) {
+				String seqname = SimpleDbQuery.getSequenceName(entity, attr);
+
+				String sql = "select NEXT VALUE FOR " + seqname;
+				Statement stmnt = conn.createStatement();
+
+				try {
+					ResultSet rs = stmnt.executeQuery(sql);
+					while (rs.next()) {
+						return rs.getLong(1);
+					}
+				} finally {
+					if (stmnt != null && !stmnt.isClosed())
+						stmnt.close();
+				}
+			}
+		} else if (attr.Field.getType().equals(String.class)) {
+			UUID uuid = UUID.randomUUID();
+			return uuid.toString();
+		}
+		throw new Exception("Cannot generate sequence for type ["
+				+ attr.Field.getType().getCanonicalName() + "]");
+	}
 }

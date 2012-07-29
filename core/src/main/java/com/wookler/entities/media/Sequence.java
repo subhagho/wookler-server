@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wookler.entities;
+package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +25,7 @@ public class Sequence extends AbstractEntity {
 	@XmlElement(name = "mediaid")
 	private String mediaid;
 
-	@Attribute(name = "SEQID", keyattribute = true)
+	@Attribute(name = "SEQID", keyattribute = true, autoincr = true)
 	@XmlElement(name = "sequenceid")
 	private long seqid;
 
@@ -39,7 +39,7 @@ public class Sequence extends AbstractEntity {
 
 	@Attribute(name = "CREATIVE")
 	@XmlElement(name = "creative")
-	@Reference(target = "com.wookler.entities.Creative", attribute = "ID")
+	@Reference(target = "com.wookler.entities.media.Creative", attribute = "ID")
 	private Creative creative;
 
 	/**
