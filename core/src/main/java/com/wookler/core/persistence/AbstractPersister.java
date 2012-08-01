@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.InitializedHandle;
+import com.wookler.core.persistence.AbstractEntity;
 import com.wookler.utils.ListParam;
 
 /**

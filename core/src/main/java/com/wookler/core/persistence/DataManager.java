@@ -16,6 +16,8 @@ import org.w3c.dom.NodeList;
 import com.wookler.core.EnumInstanceState;
 import com.wookler.core.Env;
 import com.wookler.core.InitializedHandle;
+import com.wookler.core.persistence.AbstractEntity;
+import com.wookler.core.persistence.EnumEntityState;
 import com.wookler.utils.InstanceParam;
 import com.wookler.utils.ListParam;
 import com.wookler.utils.LogUtils;

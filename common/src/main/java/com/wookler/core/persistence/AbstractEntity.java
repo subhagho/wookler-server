@@ -7,6 +7,9 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import com.wookler.core.persistence.Attribute;
+import com.wookler.core.persistence.EnumEntityState;
+
 /**
  * Abstract class, to be inherited by all entities that are persisted.
  * 
@@ -49,27 +52,7 @@ public abstract class AbstractEntity {
 		if (state == EnumEntityState.Deleted)
 			return;
 	}
-
-	/**
-	 * Persist this instance of the Entity. Persistence handlers should be
-	 * implemented by the inherited classes.
-	 * 
-	 * @throws Exception
-	 */
-	public void save() throws Exception {
-		(DataManager.get().getPersister(getClass())).save(this);
-	}
-
-	/**
-	 * Delete this instance of the Entity. This will delete the entity from the
-	 * persistence store.
-	 * 
-	 * @throws Exception
-	 */
-	public void delete() throws Exception {
-		(DataManager.get().getPersister(getClass())).save(this);
-	}
-
+	
 	/**
 	 * @return the state
 	 */

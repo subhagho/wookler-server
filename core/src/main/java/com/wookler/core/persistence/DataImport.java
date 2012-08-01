@@ -8,6 +8,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wookler.core.persistence.AbstractEntity;
+import com.wookler.core.persistence.EnumEntityState;
+
 /**
  * Utility class to import data from one source to another.
  * 

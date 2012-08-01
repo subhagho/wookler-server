@@ -5,6 +5,8 @@ package com.wookler.core.persistence;
 
 import java.lang.reflect.Method;
 
+import com.wookler.core.persistence.CustomFieldDataHandler;
+
 /**
  * Structure encapsulates the Entity Attribute parameters extracted from the
  * annotation using reflection.
