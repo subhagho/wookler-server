@@ -84,8 +84,7 @@ public class Test_DataImport {
 			 * Sequence.class.getCanonicalName(), Tag.class.getCanonicalName(),
 			 * ProductHistory.class.getCanonicalName() });
 			 */
-			importer.load(new String[] { Notification.class
-					.getCanonicalName() });
+			importer.load(new String[] { Profile.class.getCanonicalName() });
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());
