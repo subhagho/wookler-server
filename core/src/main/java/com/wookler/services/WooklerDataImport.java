@@ -7,11 +7,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -24,11 +26,16 @@ import com.wookler.core.Env;
 import com.wookler.core.persistence.DataImport;
 import com.wookler.core.persistence.csv.CSVPersister;
 import com.wookler.core.persistence.csv.EnumImportFormat;
+import com.wookler.entities.interactions.Activity;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.ProductHistory;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
+import com.wookler.entities.users.Contribution;
+import com.wookler.entities.users.Notification;
+import com.wookler.entities.users.Profile;
+import com.wookler.entities.users.Subscription;
 import com.wookler.utils.FileUtils;
 import com.wookler.utils.ListParam;
 import com.wookler.utils.LogUtils;
@@ -46,7 +53,7 @@ public class WooklerDataImport {
 	@POST
 	@Path("/process")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public JResponse<WooklerResponse> process(
+	public JResponse<WooklerResponse> process(@Context HttpServletRequest req,
 			@FormDataParam("file") InputStream datastream,
 			@FormDataParam("file") FormDataContentDisposition fileinfo,
 			@QueryParam("entity") String entity,
@@ -68,6 +75,16 @@ public class WooklerDataImport {
 				type = Tag.class;
 			} else if (entity.compareToIgnoreCase("producthistory") == 0) {
 				type = ProductHistory.class;
+			} else if (entity.compareToIgnoreCase("profile") == 0) {
+				type = Profile.class;
+			} else if (entity.compareToIgnoreCase("contribution") == 0) {
+				type = Contribution.class;
+			} else if (entity.compareToIgnoreCase("subscription") == 0) {
+				type = Subscription.class;
+			} else if (entity.compareToIgnoreCase("notification") == 0) {
+				type = Notification.class;
+			} else if (entity.compareToIgnoreCase("activity") == 0) {
+				type = Activity.class;
 			}
 
 			if (type == null) {

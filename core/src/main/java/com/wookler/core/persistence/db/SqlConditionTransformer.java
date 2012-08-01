@@ -109,6 +109,9 @@ public class SqlConditionTransformer implements ConditionTransformer {
 		String column = reference[offset];
 		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
 				column);
+		if (attr == null)
+			throw new Exception("No attribute found for column [" + column
+					+ "]");
 		if (offset == reference.length - 1) {
 			Entity eann = (Entity) type.getAnnotation(Entity.class);
 			String table = eann.recordset();

@@ -3,10 +3,12 @@
  */
 package com.wookler.services;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -24,11 +26,11 @@ import com.wookler.utils.LogUtils;
  * @author subhagho
  * 
  */
-@Path("/wookler/core/crud/")
-public class WooklerCrudServices {
+@Path("/wookler/crud/media/")
+public class WooklerMediaCrudServices {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(WooklerCrudServices.class);
+			.getLogger(WooklerMediaCrudServices.class);
 
 	/**
 	 * Add/Update/Delete VideoMedia instance.
@@ -44,7 +46,8 @@ public class WooklerCrudServices {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> video(VideoMedia video) throws Exception {
+	public JResponse<WooklerResponse> video(@Context HttpServletRequest req,
+			VideoMedia video) throws Exception {
 		try {
 			int count = DataManager.get().save(video);
 			WooklerResponse response = new WooklerResponse();
@@ -76,7 +79,8 @@ public class WooklerCrudServices {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> sequence(Sequence seq) throws Exception {
+	public JResponse<WooklerResponse> sequence(@Context HttpServletRequest req,
+			Sequence seq) throws Exception {
 		try {
 			int count = DataManager.get().save(seq);
 			WooklerResponse response = new WooklerResponse();
@@ -108,8 +112,8 @@ public class WooklerCrudServices {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> creative(Creative creative)
-			throws Exception {
+	public JResponse<WooklerResponse> creative(@Context HttpServletRequest req,
+			Creative creative) throws Exception {
 		try {
 			int count = DataManager.get().save(creative);
 			WooklerResponse response = new WooklerResponse();
@@ -141,7 +145,8 @@ public class WooklerCrudServices {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> tag(Tag tag) throws Exception {
+	public JResponse<WooklerResponse> tag(@Context HttpServletRequest req,
+			Tag tag) throws Exception {
 		try {
 			int count = DataManager.get().save(tag);
 			WooklerResponse response = new WooklerResponse();

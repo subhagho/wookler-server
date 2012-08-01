@@ -45,4 +45,11 @@ public @interface Entity {
 	 * @return
 	 */
 	long TTL() default -1;
+
+	/**
+	 * Cache this entity.
+	 * 
+	 * @return
+	 */
+	boolean cache() default false;
 }

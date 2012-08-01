@@ -28,6 +28,8 @@ public class PropertyDef {
 	private String dbcolumn;
 	@XmlElement(name = "Size")
 	private String dbsize;
+	@XmlElement(name = "Enumeration")
+	private String[] enumeration;
 
 	/**
 	 * @return the name
@@ -123,7 +125,38 @@ public class PropertyDef {
 		} else {
 			def.dbsize = "-";
 		}
-
+		if (attr.Field.getType().isEnum()) {
+			def.enumeration = getEnumValues(attr.Field.getType());
+		}
 		return def;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static <T extends Enum> String[] getEnumValues(Class<?> type)
+			throws Exception {
+		T[] enums = (T[]) type.getEnumConstants();
+		if (enums != null && enums.length > 0) {
+			String[] values = new String[enums.length];
+			for (int ii = 0; ii < enums.length; ii++) {
+				values[ii] = enums[ii].name();
+			}
+			return values;
+		}
+		return null;
+	}
+
+	/**
+	 * @return the enumeration
+	 */
+	public String[] getEnumeration() {
+		return enumeration;
+	}
+
+	/**
+	 * @param enumeration
+	 *            the enumeration to set
+	 */
+	public void setEnumeration(String[] enumeration) {
+		this.enumeration = enumeration;
 	}
 }

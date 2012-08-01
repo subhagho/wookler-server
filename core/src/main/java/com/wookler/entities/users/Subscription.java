@@ -21,6 +21,8 @@ import com.wookler.core.persistence.Reference;
 @XmlRootElement(name = "subscription")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Subscription extends AbstractEntity {
+	public static final String _SUBSCRIBE_ALL_ = "ALL";
+
 	@Attribute(name = "ID", size = 256, autoincr = true)
 	@XmlElement(name = "id")
 	private String id;

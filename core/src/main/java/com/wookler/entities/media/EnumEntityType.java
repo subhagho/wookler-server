@@ -8,5 +8,5 @@ package com.wookler.entities.media;
  * 
  */
 public enum EnumEntityType {
-	Creative, Tag, Contribution;
+	Creative, Tag, Contribution, Comment;
 }

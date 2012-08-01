@@ -38,6 +38,11 @@ public class Notification extends AbstractEntity {
 	@XmlElement(name = "content")
 	private String content;
 
+	@Attribute(name = "SUBSCRIPTION", size = 512)
+	@XmlElement(name = "subscription")
+	@Reference(target = "com.wookler.entities.users.Subscription", attribute = "ID")
+	private Subscription subscription;
+
 	/**
 	 * @return the id
 	 */
@@ -96,6 +101,21 @@ public class Notification extends AbstractEntity {
 	 */
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	/**
+	 * @return the subscription
+	 */
+	public Subscription getSubscription() {
+		return subscription;
+	}
+
+	/**
+	 * @param subscription
+	 *            the subscription to set
+	 */
+	public void setSubscription(Subscription subscription) {
+		this.subscription = subscription;
 	}
 
 }

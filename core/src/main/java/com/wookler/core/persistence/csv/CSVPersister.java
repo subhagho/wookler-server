@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -36,6 +38,8 @@ import com.wookler.utils.ValueParam;
  * 
  */
 public class CSVPersister extends AbstractPersister {
+	private static final Logger log = LoggerFactory
+			.getLogger(CSVPersister.class);
 	public static final String _PARAM_DATADIR_ = "datadir";
 
 	private String datadir;
@@ -162,6 +166,10 @@ public class CSVPersister extends AbstractPersister {
 				if (data.length < header.length)
 					continue;
 				AbstractEntity record = parseRecord(type, header, data);
+				if (record == null) {
+					log.warn("Parse returned NULL");
+					continue;
+				}
 				entities.add(record);
 			}
 			cache.put(type.getCanonicalName(), entities);
@@ -190,6 +198,10 @@ public class CSVPersister extends AbstractPersister {
 						} else {
 							setFieldValue(entity, attr.Field, refs);
 						}
+					} else {
+						throw new Exception(
+								"Not record found for reference key : [QUERY:"
+										+ query + "]");
 					}
 				}
 			}

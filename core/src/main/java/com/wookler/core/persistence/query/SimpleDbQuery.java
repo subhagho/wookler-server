@@ -387,7 +387,8 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 					joinconditions = new ArrayList<FilterCondition>();
 
 				joinconditions.add(cond);
-				getColumns(rtype, tables, columns);
+				if (!tables.contains(rtable))
+					getColumns(rtype, tables, columns);
 			}
 		}
 	}

@@ -14,11 +14,16 @@ import org.slf4j.LoggerFactory;
 import com.wookler.core.Env;
 import com.wookler.core.data.Test_Env;
 import com.wookler.core.persistence.csv.CSVPersister;
+import com.wookler.entities.interactions.Activity;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.ProductHistory;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
+import com.wookler.entities.users.Contribution;
+import com.wookler.entities.users.Notification;
+import com.wookler.entities.users.Profile;
+import com.wookler.entities.users.Subscription;
 import com.wookler.utils.ListParam;
 import com.wookler.utils.LogUtils;
 import com.wookler.utils.ValueParam;
@@ -79,7 +84,7 @@ public class Test_DataImport {
 			 * Sequence.class.getCanonicalName(), Tag.class.getCanonicalName(),
 			 * ProductHistory.class.getCanonicalName() });
 			 */
-			importer.load(new String[] { ProductHistory.class
+			importer.load(new String[] { Notification.class
 					.getCanonicalName() });
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);

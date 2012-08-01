@@ -286,6 +286,9 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 	}
 
 	private int save(AbstractEntity record, Connection conn) throws Exception {
+		if (record == null)
+			throw new Exception("Invalid entity record : Null record");
+
 		if (record.getState() == EnumEntityState.New)
 			return insert(record, conn);
 		else if (record.getState() == EnumEntityState.Deleted)

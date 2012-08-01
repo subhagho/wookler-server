@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.wookler.core.persistence.Attribute;
 import com.wookler.core.persistence.Entity;
 import com.wookler.core.persistence.Reference;
+import com.wookler.entities.media.EnumMediaType;
 import com.wookler.entities.media.RatedEntity;
 
 /**
@@ -33,6 +34,10 @@ public class Contribution extends RatedEntity {
 	@Reference(target = "com.wookler.entities.users.Profile", attribute = "ID")
 	private Profile profile;
 
+	@Attribute(name = "TYPE", size = 1024)
+	@XmlElement(name = "type")
+	private EnumContributionType type;
+
 	@Attribute(name = "TAXONOMY", size = 1024)
 	@XmlElement(name = "taxonomy")
 	private String taxonomy;
@@ -48,6 +53,14 @@ public class Contribution extends RatedEntity {
 	@Attribute(name = "CONTRIBSTATE", size = 64)
 	@XmlElement(name = "contribstate")
 	private EnumContribState contribstate = EnumContribState.Pending;
+
+	@Attribute(name = "MEDIATYPE", size = 64)
+	@XmlElement(name = "mediatype")
+	private EnumMediaType mediatype;
+
+	@Attribute(name = "MEDIAID", size = 256)
+	@XmlElement(name = "mediaid")
+	private String mediaid;
 
 	/**
 	 * @return the id
@@ -137,5 +150,50 @@ public class Contribution extends RatedEntity {
 	 */
 	public void setContribstate(EnumContribState contribstate) {
 		this.contribstate = contribstate;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public EnumContributionType getType() {
+		return type;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setType(EnumContributionType type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the mediatype
+	 */
+	public EnumMediaType getMediatype() {
+		return mediatype;
+	}
+
+	/**
+	 * @param mediatype
+	 *            the mediatype to set
+	 */
+	public void setMediatype(EnumMediaType mediatype) {
+		this.mediatype = mediatype;
+	}
+
+	/**
+	 * @return the mediaid
+	 */
+	public String getMediaid() {
+		return mediaid;
+	}
+
+	/**
+	 * @param mediaid
+	 *            the mediaid to set
+	 */
+	public void setMediaid(String mediaid) {
+		this.mediaid = mediaid;
 	}
 }

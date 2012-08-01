@@ -39,7 +39,7 @@ public class FileUtils {
 			size = source.read(data);
 			if (size < 0)
 				break;
-			fos.write(data);
+			fos.write(data, 0, size);
 		}
 		fos.flush();
 		fos.close();

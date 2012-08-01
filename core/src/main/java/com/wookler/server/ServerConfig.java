@@ -12,6 +12,8 @@ import com.wookler.core.Env;
  * 
  */
 public class ServerConfig {
+	public static final String _EMPTY_PATH_ELEMENT_ = "-";
+
 	public static final String _SERVER_CONFIG_KEY_ = "SERVER-CONFIG";
 
 	public static final String _CONFIG_SERVER_WEBROOT_ = "server.web[@directory]";

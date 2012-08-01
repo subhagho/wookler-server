@@ -5,6 +5,9 @@ package com.wookler.core.persistence;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility class to import data from one source to another.
  * 
@@ -12,6 +15,7 @@ import java.util.List;
  * 
  */
 public class DataImport {
+	private static final Logger log = LoggerFactory.getLogger(DataImport.class);
 	private AbstractPersister source;
 
 	/**
@@ -38,6 +42,11 @@ public class DataImport {
 			if (data != null && data.size() > 0) {
 				AbstractPersister dest = DataManager.get().getPersister(cls);
 				for (AbstractEntity en : data) {
+					if (en == null) {
+						log.warn("Data Import : null record found. [PERSISTER:"
+								+ source.getClass().getCanonicalName() + "]");
+						continue;
+					}
 					en.setState(EnumEntityState.Overwrite);
 					dest.save(en);
 				}

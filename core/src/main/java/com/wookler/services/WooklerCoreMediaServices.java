@@ -6,12 +6,14 @@ package com.wookler.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import com.wookler.entities.media.ProductHistory;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
+import com.wookler.server.ServerConfig;
 import com.wookler.utils.LogUtils;
 
 /**
@@ -35,40 +38,41 @@ import com.wookler.utils.LogUtils;
  * @author subhagho
  * 
  */
-@Path("/wookler/core/data/")
-public class WooklerCoreServices {
-	private static final String _EMPTY_PATH_ELEMENT_ = "-";
-
+@Path("/wookler/core/media/")
+public class WooklerCoreMediaServices {
+	
 	private static final Logger log = LoggerFactory
-			.getLogger(WooklerCoreServices.class);
+			.getLogger(WooklerCoreMediaServices.class);
 
 	@Path("/schema/{type}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> schema(
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("type") String type)
+	public JResponse<WooklerResponse> schema(@Context HttpServletRequest req,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("type") String type)
 			throws Exception {
 		try {
+			log.debug("[SESSIONID:" + req.getSession().getId() + "]");
+
 			List<Class<?>> types = new ArrayList<Class<?>>();
 			if (type.compareToIgnoreCase("video") == 0
-					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| type.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				types.add(VideoMedia.class);
 			}
 
 			if (type.compareToIgnoreCase("sequence") == 0
-					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| type.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				types.add(Sequence.class);
 			}
 			if (type.compareToIgnoreCase("creative") == 0
-					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| type.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				types.add(Creative.class);
 			}
 			if (type.compareToIgnoreCase("tag") == 0
-					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| type.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				types.add(Tag.class);
 			}
 			if (type.compareToIgnoreCase("producthistory") == 0
-					|| type.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| type.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				types.add(ProductHistory.class);
 			}
 			List<EntityDef> defs = new ArrayList<EntityDef>();
@@ -111,16 +115,17 @@ public class WooklerCoreServices {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> videos(
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("video") String videoid,
+			@Context HttpServletRequest req,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("video") String videoid,
 			@DefaultValue("") @QueryParam("q") String query,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 
 			if (videoid == null || videoid.isEmpty()
-					|| videoid.compareTo(_EMPTY_PATH_ELEMENT_) == 0) {
+					|| videoid.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) == 0) {
 				String querystr = "";
-				if (query.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
+				if (query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 					querystr = query;
 				}
 				int pagec = Integer.parseInt(page);
@@ -159,7 +164,7 @@ public class WooklerCoreServices {
 				}
 				return JResponse.ok(response).build();
 			} else {
-				return sequences(videoid, query, page, size);
+				return sequences(req, videoid, query, page, size);
 			}
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
@@ -183,7 +188,7 @@ public class WooklerCoreServices {
 	@Path("/videos/latest")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> latest(
+	public JResponse<WooklerResponse> latest(@Context HttpServletRequest req,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		return custom("PUBLISHED", page, size);
@@ -200,7 +205,7 @@ public class WooklerCoreServices {
 	@Path("/videos/popular")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public JResponse<WooklerResponse> popular(
+	public JResponse<WooklerResponse> popular(@Context HttpServletRequest req,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		return custom("VIEWS", page, size);
@@ -267,20 +272,21 @@ public class WooklerCoreServices {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> tags(
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("seqid") String seqid,
+			@Context HttpServletRequest req,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("seqid") String seqid,
 			@DefaultValue("") @QueryParam("q") String query,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
 			StringBuffer squery = new StringBuffer("MEDIAID=" + videoid);
-			if (seqid.compareTo(_EMPTY_PATH_ELEMENT_) != 0) {
+			if (seqid.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 				squery.append(Query._QUERY_CONDITION_AND_).append("SEQID=")
 						.append(seqid);
 			}
 			if (query != null && !query.isEmpty()
-					&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
+					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
 						query);
 			int pagec = Integer.parseInt(page);
@@ -342,7 +348,8 @@ public class WooklerCoreServices {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> products(
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("period") String period,
+			@Context HttpServletRequest req,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("period") String period,
 			@DefaultValue("") @QueryParam("q") String query,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
@@ -360,7 +367,7 @@ public class WooklerCoreServices {
 			StringBuffer squery = new StringBuffer("SORT " + periodtype
 					+ " DSC");
 			if (query != null && !query.isEmpty()
-					&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
+					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
 						query);
 			int pagec = Integer.parseInt(page);
@@ -419,7 +426,8 @@ public class WooklerCoreServices {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JResponse<WooklerResponse> sequences(
-			@DefaultValue(_EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
+			@Context HttpServletRequest req,
+			@DefaultValue(ServerConfig._EMPTY_PATH_ELEMENT_) @PathParam("videoid") String videoid,
 			@DefaultValue("") @QueryParam("q") String query,
 			@DefaultValue("1") @QueryParam("p") String page,
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
@@ -427,7 +435,7 @@ public class WooklerCoreServices {
 			log.debug("VIDEO-ID:" + videoid);
 			StringBuffer squery = new StringBuffer("MEDIAID=" + videoid);
 			if (query != null && !query.isEmpty()
-					&& query.compareTo(_EMPTY_PATH_ELEMENT_) != 0)
+					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
 						query);
 			int pagec = Integer.parseInt(page);
