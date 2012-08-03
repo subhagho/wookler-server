@@ -3,26 +3,30 @@
  */
 package com.wookler.server;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.ExampleMode;
 import org.kohsuke.args4j.Option;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.wookler.core.Env;
+import com.wookler.utils.KeyValuePair;
 
 /**
  * @author subhagho
@@ -99,17 +103,40 @@ public class JettyServer {
 			ContextHandlerCollection ctxs = new ContextHandlerCollection();
 			server.setHandler(ctxs);
 
-			Context restctx = new Context(ctxs, "/", Context.SESSIONS);
+			List<Handler> handlers = new ArrayList<Handler>();
+
+			ServletContextHandler restctx = new ServletContextHandler(
+					ServletContextHandler.SESSIONS);
 			restctx.setContextPath("/rest");
 			restctx.addServlet(sh, "/*");
+			handlers.add(restctx);
 
-			WebAppContext webctx = new WebAppContext();
-			webctx.setDescriptor(serverConfig.getWebRoot() + "/WEB-INF/web.xml");
-			webctx.setResourceBase(serverConfig.getWebRoot());
-			webctx.setContextPath("/web");
-			webctx.setParentLoaderPriority(true);
+			if (serverConfig.getWebapps() != null) {
+				for (KeyValuePair<String> webapp : serverConfig.getWebapps()) {
+					String warfile = serverConfig.getWebRoot() + "/"
+							+ webapp.getValue();
+					File fi = new File(warfile);
+					if (!fi.exists())
+						throw new Exception("Cannot find WAR file ["
+								+ fi.getAbsolutePath() + "]");
 
-			ctxs.setHandlers(new Handler[] { restctx, webctx });
+					WebAppContext webctx = new WebAppContext();
+					// webctx.setDescriptor(serverConfig.getWebRoot() +
+					// "/WEB-INF/web.xml");
+					// webctx.setResourceBase(serverConfig.getWebRoot());
+					webctx.setContextPath("/web" + webapp.getKey());
+					webctx.setWar(warfile);
+					webctx.setParentLoaderPriority(true);
+
+					handlers.add(webctx);
+				}
+			}
+			Handler[] harray = new Handler[handlers.size()];
+			for (int ii = 0; ii < handlers.size(); ii++) {
+				harray[ii] = handlers.get(ii);
+			}
+
+			ctxs.setHandlers(harray);
 
 			QueuedThreadPool qtp = new QueuedThreadPool(
 					serverConfig.getNumThreads());
@@ -118,8 +145,9 @@ public class JettyServer {
 
 			server.start();
 			log.info("Jetty Server running...");
+			log.info("Root directory [" + new File(".").getAbsolutePath() + "]");
 			server.join();
-			
+
 		} finally {
 			Env.dispose();
 		}

@@ -14,4 +14,4 @@ do
 done
 export CLASSPATH
 echo "Using classpath $CLASSPATH..."
-java -cp $CLASSPATH $@
+/usr/bin/java -cp $CLASSPATH $@

@@ -5,7 +5,11 @@
 		<temp directory="/tmp/wookler/temp/" />
 	</env>
 	<server port="8090" numhtreads="5">
-		<web directory="/tmp/wookler/work/web" />
+		<web directory="/tmp/wookler/work/web">
+			<webapps>
+				<app context="/home" war="web.war" />
+			</webapps>
+		</web>
 	</server>
 	<core>
 		<datamanager>
