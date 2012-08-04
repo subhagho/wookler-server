@@ -28,10 +28,13 @@ public class ServerConfig {
 	public static final String _CONFIG_SERVER_WEBAPPS_ = "/wookler/server/web/webapps/app";
 
 	public static final String _CONFIG_SERVER_PORT_ = "server[@port]";
+	public static final String _CONFIG_SERVER_STOPPORT_ = "server[@monitorport]";
 	public static final String _CONFIG_SERVER_NTHREADS_ = "server[@numthreads]";
 	public static final String _CONFIG_JETTY_HOME_ = "server.home";
 
 	private int port = 8080;
+	private int monitorPort = 8099;
+
 	private String webRoot;
 	private int numThreads = 10;
 	private List<KeyValuePair<String>> webapps = null;
@@ -64,6 +67,10 @@ public class ServerConfig {
 		value = config.getString(_CONFIG_JETTY_HOME_);
 		if (value != null && !value.isEmpty())
 			jettyHome = value;
+
+		value = config.getString(_CONFIG_SERVER_STOPPORT_);
+		if (value != null && !value.isEmpty())
+			monitorPort = Integer.parseInt(value);
 
 		loadWebApps(config.getDocument());
 
@@ -153,6 +160,13 @@ public class ServerConfig {
 	 */
 	public String getJettyHome() {
 		return jettyHome;
+	}
+
+	/**
+	 * @return the monitorPort
+	 */
+	public int getMonitorPort() {
+		return monitorPort;
 	}
 
 }
