@@ -84,6 +84,11 @@ public class JettyServer {
 			ServletHolder sh = new ServletHolder(new ServletContainer(
 					new PackagesResourceConfig(initMap)));
 
+			String jettyhome = serverConfig.getJettyHome();
+			if (jettyhome != null && !jettyhome.isEmpty()) {
+				System.setProperty("jetty.home", jettyhome);
+			}
+
 			log.info("Starting Jetty Server:");
 			log.info("\tPort : " + serverConfig.getPort());
 			log.info("\tThreads : " + serverConfig.getNumThreads());

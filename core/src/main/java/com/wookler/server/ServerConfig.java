@@ -29,11 +29,14 @@ public class ServerConfig {
 
 	public static final String _CONFIG_SERVER_PORT_ = "server[@port]";
 	public static final String _CONFIG_SERVER_NTHREADS_ = "server[@numthreads]";
+	public static final String _CONFIG_JETTY_HOME_ = "server.home";
 
 	private int port = 8080;
 	private String webRoot;
 	private int numThreads = 10;
 	private List<KeyValuePair<String>> webapps = null;
+
+	private String jettyHome = null;
 
 	/**
 	 * Initialize the Server Configuration.
@@ -57,6 +60,10 @@ public class ServerConfig {
 			webRoot = value;
 		else
 			webRoot = Env.get().getWorkdir();
+
+		value = config.getString(_CONFIG_JETTY_HOME_);
+		if (value != null && !value.isEmpty())
+			jettyHome = value;
 
 		loadWebApps(config.getDocument());
 
@@ -139,6 +146,13 @@ public class ServerConfig {
 	 */
 	public List<KeyValuePair<String>> getWebapps() {
 		return webapps;
+	}
+
+	/**
+	 * @return the jettyHome
+	 */
+	public String getJettyHome() {
+		return jettyHome;
 	}
 
 }

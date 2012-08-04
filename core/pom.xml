@@ -4,7 +4,7 @@
 
 	<groupId>com.wookler</groupId>
 	<artifactId>wookler-server</artifactId>
-	<version>0.0.1-build2</version>
+	<version>0.0.2-build1</version>
 	<packaging>jar</packaging>
 
 	<name>wookler-server</name>

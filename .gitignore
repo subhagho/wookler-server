@@ -11,3 +11,4 @@
 .project
 .settings
 core/target/*
+core/runserver.local.sh

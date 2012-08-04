@@ -4,7 +4,7 @@
 		<work directory="/tmp/wookler/work/" />
 		<temp directory="/tmp/wookler/temp/" />
 	</env>
-	<server port="8090" numhtreads="5">
+	<server port="8090" numhtreads="5" home="/tmp/wookler/work/jetty">
 		<web directory="/tmp/wookler/work/web">
 			<webapps>
 				<app context="/home" war="web.war" />
