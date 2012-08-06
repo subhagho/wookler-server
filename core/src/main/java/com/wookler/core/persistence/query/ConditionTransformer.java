@@ -13,12 +13,9 @@ public interface ConditionTransformer {
 	 * 
 	 * @param condition
 	 *            - Filter Condition to transform.
-	 * @param type
-	 *            - AbstractEntity Class type
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	public String transform(AbstractCondition condition, Class<?> type)
-			throws Exception;
+	public String transform(AbstractCondition condition) throws Exception;
 }

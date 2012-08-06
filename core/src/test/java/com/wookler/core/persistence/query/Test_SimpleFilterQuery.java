@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.DummyEntitiesData.EntityMatchRoot;
 
 /**
@@ -20,17 +21,19 @@ public class Test_SimpleFilterQuery {
 	@Test
 	public void testDoSelect() {
 		try {
+			ReflectionUtils.get().getEntityMetadata(EntityMatchRoot.class);
+
 			String qstring = "FORReference.FORReference.FORint=99999;FORDate > "
 					+ new Date(0).getTime();
 			EntityMatchRoot entity = new EntityMatchRoot();
 			SimpleFilterQuery query = new SimpleFilterQuery();
-			query.parse(qstring);
+			query.parse(new Class<?>[] { EntityMatchRoot.class }, qstring);
 			boolean retval = query.doSelect(entity);
 			assertEquals(true, retval);
 
 			qstring = "FORReference.FORReference.FORint=987666;FORDate > "
 					+ new Date(0).getTime();
-			query.parse(qstring);
+			query.parse(new Class<?>[] { EntityMatchRoot.class }, qstring);
 			retval = query.doSelect(entity);
 			assertEquals(false, retval);
 		} catch (Exception e) {

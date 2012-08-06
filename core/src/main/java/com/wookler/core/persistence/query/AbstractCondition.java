@@ -10,5 +10,21 @@ package com.wookler.core.persistence.query;
  * 
  */
 public abstract class AbstractCondition {
+	protected EnumConditionType conditiontype = EnumConditionType.Value;
+
+	/**
+	 * @return the conditiontype
+	 */
+	public EnumConditionType getConditionType() {
+		return conditiontype;
+	}
+
+	/**
+	 * @param conditiontype
+	 *            the conditiontype to set
+	 */
+	public void setConditionType(EnumConditionType conditiontype) {
+		this.conditiontype = conditiontype;
+	}
 
 }

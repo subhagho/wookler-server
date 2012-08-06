@@ -120,10 +120,15 @@ public class CSVPersister extends AbstractPersister {
 		if (!cache.containsKey(cname)) {
 			load(type);
 		}
+
+		// Make sure the type for the class is available.
+		ReflectionUtils.get().getEntityMetadata(type);
+
 		List<AbstractEntity> records = cache.get(cname);
 		if (query != null && !query.isEmpty()) {
 			SimpleFilterQuery filter = new SimpleFilterQuery();
-			filter.parse(query);
+
+			filter.parse(new Class<?>[] { type }, query);
 			result = filter.select(records);
 		} else {
 			result = records;

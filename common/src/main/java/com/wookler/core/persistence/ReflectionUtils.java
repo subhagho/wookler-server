@@ -17,6 +17,7 @@ import com.wookler.core.persistence.CustomFieldDataHandler;
 public class ReflectionUtils {
 	private HashMap<String, HashMap<String, AttributeReflection>> metacache = new HashMap<String, HashMap<String, AttributeReflection>>();
 	private HashMap<String, List<Field>> fieldscache = new HashMap<String, List<Field>>();
+	private HashMap<String, Class<?>> typecahce = new HashMap<String, Class<?>>();
 
 	/**
 	 * Get the Getter/Setter method name for the field.
@@ -63,7 +64,11 @@ public class ReflectionUtils {
 			throws Exception {
 		if (!metacache.containsKey(type.getName())) {
 			synchronized (metacache) {
+				if (!type.isAnnotationPresent(Entity.class))
+					throw new Exception("Class [" + type.getCanonicalName()
+							+ "] does not implement Entity annotation.");
 
+				Entity eann = type.getAnnotation(Entity.class);
 				HashMap<String, AttributeReflection> map = new HashMap<String, AttributeReflection>();
 
 				List<Field> fields = getFields(type);
@@ -117,9 +122,17 @@ public class ReflectionUtils {
 					}
 				}
 				metacache.put(type.getName(), map);
+				typecahce.put(eann.recordset(), type);
 			}
 		}
 		return metacache.get(type.getName());
+	}
+
+	public Class<?> getType(String table) {
+		if (typecahce.containsKey(table)) {
+			return typecahce.get(table);
+		}
+		return null;
 	}
 
 	public List<Field> getFields(Class<?> type) {

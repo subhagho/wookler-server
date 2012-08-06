@@ -7,33 +7,35 @@ package com.wookler.core.persistence.query;
  * @author subhagho
  * 
  */
-public class FilterCondition extends AbstractCondition{
+public class FilterCondition extends AbstractCondition {
 	public static final String _STRING_DEFAULT_ = "DEFAULT";
 	public static final String _STRING_NULL_ = "NULL";
 
-	private String column;
+	private AbstractConditionPredicate left;
 	private EnumOperator comparator;
-	private Object value;
+	private AbstractConditionPredicate right;
 
-	public FilterCondition(String column, EnumOperator comparator, Object value) {
-		this.column = column;
+	public FilterCondition(AbstractConditionPredicate left,
+			EnumOperator comparator, AbstractConditionPredicate right) {
+		this.left = left;
 		this.comparator = comparator;
-		this.value = value;
+		this.right = right;
 	}
 
-	/**
-	 * @return the column
-	 */
-	public String getColumn() {
-		return column;
+	public FilterCondition(Class<?> type, String column,
+			EnumOperator comparator, Object value) {
+		this.left = new ColumnConditionPredicate(type, column);
+		this.comparator = comparator;
+		this.right = new ValueConditionPredicate(value);
+		this.conditiontype = EnumConditionType.Value;
 	}
 
-	/**
-	 * @param column
-	 *            the column to set
-	 */
-	public void setColumn(String column) {
-		this.column = column;
+	public FilterCondition(Class<?> ltype, String lcolumn,
+			EnumOperator comparator, Class<?> rtype, String rcolumn) {
+		this.left = new ColumnConditionPredicate(ltype, lcolumn);
+		this.comparator = comparator;
+		this.right = new ColumnConditionPredicate(rtype, rcolumn);
+		this.conditiontype = EnumConditionType.Join;
 	}
 
 	/**
@@ -51,21 +53,6 @@ public class FilterCondition extends AbstractCondition{
 		this.comparator = comparator;
 	}
 
-	/**
-	 * @return the value
-	 */
-	public Object getValue() {
-		return value;
-	}
-
-	/**
-	 * @param value
-	 *            the value to set
-	 */
-	public void setValue(Object value) {
-		this.value = value;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -74,27 +61,43 @@ public class FilterCondition extends AbstractCondition{
 	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		buff.append(column).append(" ").append(comparator.name()).append(" ");
-		if (value != null) {
-			if (!value.getClass().isArray()) {
-				buff.append(value.toString());
-			} else {
-				String[] data = (String[]) value;
-				buff.append("[");
-				boolean first = true;
-				for (String dd : data) {
-					if (first)
-						first = false;
-					else
-						buff.append(", ");
-					buff.append(dd);
-				}
-
-				buff.append("]");
-			}
+		buff.append(left.toString()).append(" ").append(comparator.name())
+				.append(" ");
+		if (right != null) {
+			buff.append(right.toString());
 		} else {
 			buff.append("NULL");
 		}
 		return buff.toString();
+	}
+
+	/**
+	 * @return the left
+	 */
+	public AbstractConditionPredicate getLeft() {
+		return left;
+	}
+
+	/**
+	 * @param left
+	 *            the left to set
+	 */
+	public void setLeft(AbstractConditionPredicate left) {
+		this.left = left;
+	}
+
+	/**
+	 * @return the right
+	 */
+	public AbstractConditionPredicate getRight() {
+		return right;
+	}
+
+	/**
+	 * @param right
+	 *            the right to set
+	 */
+	public void setRight(AbstractConditionPredicate right) {
+		this.right = right;
 	}
 }

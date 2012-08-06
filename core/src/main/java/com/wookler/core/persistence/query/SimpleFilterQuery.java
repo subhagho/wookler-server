@@ -37,12 +37,27 @@ public class SimpleFilterQuery extends Query {
 	 * @see com.wookler.core.persistence.query.Query#parse(java.lang.String)
 	 */
 	@Override
-	public void parse(String query) throws Exception {
+	public void parse(List<Class<?>> tables, String query) throws Exception {
 		if (query == null || query.isEmpty())
 			return;
 
 		parser = new FilterConditionParser();
-		conditions = parser.parse(query);
+		conditions = parser.parse(tables, query);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.wookler.core.persistence.query.Query#parse(java.lang.String[],
+	 * java.lang.String)
+	 */
+	@Override
+	public void parse(Class<?>[] tables, String query) throws Exception {
+		List<Class<?>> tabs = new ArrayList<Class<?>>();
+		for (Class<?> table : tables) {
+			tabs.add(table);
+		}
+		parse(tabs, query);
 	}
 
 	/*
@@ -55,8 +70,25 @@ public class SimpleFilterQuery extends Query {
 	public boolean doSelect(AbstractEntity entity) throws Exception {
 		if (conditions != null && conditions.size() > 0) {
 			for (FilterCondition condition : conditions) {
-				if (!matcher.match(entity, condition.getColumn(),
-						condition.getComparator(), condition.getValue())) {
+
+				AbstractConditionPredicate acp = condition.getLeft();
+				if (!(acp instanceof ColumnConditionPredicate))
+					throw new Exception(
+							"Invalid Filter Condition : Expecting type ["
+									+ ColumnConditionPredicate.class
+											.getCanonicalName() + "]");
+				ColumnConditionPredicate ccp = (ColumnConditionPredicate) acp;
+
+				acp = condition.getRight();
+				if (!(acp instanceof ValueConditionPredicate))
+					throw new Exception(
+							"Invalid Filter Condition : Expecting type ["
+									+ ValueConditionPredicate.class
+											.getCanonicalName() + "]");
+				ValueConditionPredicate vcp = (ValueConditionPredicate) acp;
+
+				if (!matcher.match(entity, ccp.getColumn(),
+						condition.getComparator(), vcp.getValue())) {
 					return false;
 				}
 			}
@@ -90,8 +122,24 @@ public class SimpleFilterQuery extends Query {
 			for (AbstractEntity entity : entities) {
 				boolean select = true;
 				for (FilterCondition condition : conditions) {
-					if (!matcher.match(entity, condition.getColumn(),
-							condition.getComparator(), condition.getValue())) {
+					AbstractConditionPredicate acp = condition.getLeft();
+					if (!(acp instanceof ColumnConditionPredicate))
+						throw new Exception(
+								"Invalid Filter Condition : Expecting type ["
+										+ ColumnConditionPredicate.class
+												.getCanonicalName() + "]");
+					ColumnConditionPredicate ccp = (ColumnConditionPredicate) acp;
+
+					acp = condition.getRight();
+					if (!(acp instanceof ValueConditionPredicate))
+						throw new Exception(
+								"Invalid Filter Condition : Expecting type ["
+										+ ValueConditionPredicate.class
+												.getCanonicalName() + "]");
+					ValueConditionPredicate vcp = (ValueConditionPredicate) acp;
+
+					if (!matcher.match(entity, ccp.getColumn(),
+							condition.getComparator(), vcp.getValue())) {
 						select = false;
 						break;
 					}

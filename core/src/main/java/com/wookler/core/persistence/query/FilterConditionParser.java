@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.wookler.core.persistence.Entity;
+import com.wookler.core.persistence.ReflectionUtils;
+
 /**
  * @author subhagho
  * 
@@ -24,6 +27,8 @@ public class FilterConditionParser {
 
 	private List<SortColumn> sort = null;
 
+	private List<Class<?>> tables = null;
+
 	private int limit = -1;
 
 	/**
@@ -33,8 +38,11 @@ public class FilterConditionParser {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<FilterCondition> parse(String query) throws Exception {
+	public List<FilterCondition> parse(List<Class<?>> tables, String query)
+			throws Exception {
 		quoted.clear();
+		this.tables = tables;
+
 		List<FilterCondition> conditions = new ArrayList<FilterCondition>();
 		String filterstr = parseQuoted(query);
 		String[] filters = filterstr.split(Query._QUERY_CONDITION_AND_);
@@ -110,7 +118,8 @@ public class FilterConditionParser {
 					parts[1] = quoted.get(parts[1]);
 				}
 				EnumOperator eoper = EnumOperator.parse(oper);
-				FilterCondition cond = new FilterCondition(parts[0].trim(),
+				FilterCondition cond = new FilterCondition(getTableType(
+						tables.get(0), parts[0].trim()), parts[0].trim(),
 						eoper, parts[1]);
 				return cond;
 			}
@@ -129,8 +138,8 @@ public class FilterConditionParser {
 				switch (eoper) {
 				case Like:
 				case Contains:
-					FilterCondition cond = new FilterCondition(column, eoper,
-							value);
+					FilterCondition cond = new FilterCondition(getTableType(
+							tables.get(0), column), column, eoper, value);
 					return cond;
 				case Between:
 					String vregx = "\\[(.*),(.*)\\]";
@@ -145,7 +154,8 @@ public class FilterConditionParser {
 						if (quoted.containsKey(values[1]))
 							values[1] = quoted.get(values[1]);
 
-						FilterCondition bcond = new FilterCondition(column,
+						FilterCondition bcond = new FilterCondition(
+								getTableType(tables.get(0), column), column,
 								eoper, values);
 						return bcond;
 					}
@@ -163,7 +173,8 @@ public class FilterConditionParser {
 								}
 							}
 						}
-						FilterCondition bcond = new FilterCondition(column,
+						FilterCondition bcond = new FilterCondition(
+								getTableType(tables.get(0), column), column,
 								eoper, values);
 						return bcond;
 					}
@@ -171,6 +182,16 @@ public class FilterConditionParser {
 			}
 		}
 		throw new Exception("Error parsing filter condition [" + filter + "]");
+	}
+
+	private Class<?> getTableType(Class<?> type, String column) {
+		Entity eann = type.getAnnotation(Entity.class);
+		String table = eann.recordset();
+		if (column.indexOf('.') > 0) {
+			String[] parts = column.split("\\.");
+			table = parts[0];
+		}
+		return ReflectionUtils.get().getType(table);
 	}
 
 	private String parseQuoted(String condition) {

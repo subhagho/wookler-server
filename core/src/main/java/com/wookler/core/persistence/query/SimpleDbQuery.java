@@ -248,7 +248,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			throw new Exception("Class [" + type.getCanonicalName()
 					+ "] has not been annotated as an Entity.");
 
-		List<String> tables = new ArrayList<String>();
+		HashMap<String, String> tables = new HashMap<String, String>();
 		int limit = parser.getLimit();
 		StringBuffer sort = new StringBuffer();
 		StringBuffer where = new StringBuffer();
@@ -286,7 +286,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 							postconditions = new ArrayList<FilterCondition>();
 						postconditions.add(fc);
 					}
-					String strcond = transformer.transform(condition, type);
+					String strcond = transformer.transform(condition);
 					if (first)
 						first = false;
 					else
@@ -299,7 +299,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			for (AbstractCondition condition : joinconditions) {
 				if (condition instanceof FilterCondition) {
 					FilterCondition fc = (FilterCondition) condition;
-					String strcond = transformer.transform(fc, null);
+					String strcond = transformer.transform(fc);
 					if (first)
 						first = false;
 					else
@@ -333,7 +333,7 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		qbuff.append(columnstr);
 
 		first = true;
-		for (String table : tables) {
+		for (String table : tables.keySet()) {
 			if (first) {
 				first = false;
 				qbuff.append(" from ");
@@ -350,12 +350,15 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 		return qbuff.toString();
 	}
 
-	private void getColumns(Class<?> type, List<String> tables,
+	private void getColumns(Class<?> type, HashMap<String, String> tables,
 			List<String> columns) throws Exception {
 		// Get table name
 		Entity eann = (Entity) type.getAnnotation(Entity.class);
 		String table = eann.recordset();
-		tables.add(table);
+		if (tables.containsKey(table))
+			return;
+
+		tables.put(table, table);
 
 		// Get Columns
 		List<Field> fields = ReflectionUtils.get().getFields(type);
@@ -380,14 +383,18 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 				Class<?> rtype = Class.forName(ref.Reference.Class);
 				Entity reann = (Entity) rtype.getAnnotation(Entity.class);
 				String rtable = reann.recordset();
-				FilterCondition cond = new FilterCondition(rtable.concat(".")
-						.concat(ref.Reference.Field), EnumOperator.Equal, table
-						.concat(".").concat(ref.Column));
+				// FilterCondition cond = new FilterCondition(rtype, rtable
+				// .concat(".").concat(ref.Reference.Field),
+				// EnumOperator.Equal, table.concat(".")
+				// .concat(ref.Column));
+				FilterCondition jcond = new FilterCondition(type, ref.Column,
+						EnumOperator.Equal, rtype, ref.Reference.Field);
+
 				if (joinconditions == null)
 					joinconditions = new ArrayList<FilterCondition>();
 
-				joinconditions.add(cond);
-				if (!tables.contains(rtable))
+				joinconditions.add(jcond);
+				if (!tables.containsKey(rtable))
 					getColumns(rtype, tables, columns);
 			}
 		}
@@ -605,8 +612,24 @@ public class SimpleDbQuery extends SimpleFilterQuery {
 			for (AbstractEntity entity : entities) {
 				boolean select = true;
 				for (FilterCondition condition : postconditions) {
-					if (!matcher.match(entity, condition.getColumn(),
-							condition.getComparator(), condition.getValue())) {
+					AbstractConditionPredicate acp = condition.getLeft();
+					if (!(acp instanceof ColumnConditionPredicate))
+						throw new Exception(
+								"Invalid Filter Condition : Expecting type ["
+										+ ColumnConditionPredicate.class
+												.getCanonicalName() + "]");
+					ColumnConditionPredicate ccp = (ColumnConditionPredicate) acp;
+
+					acp = condition.getRight();
+					if (!(acp instanceof ValueConditionPredicate))
+						throw new Exception(
+								"Invalid Filter Condition : Expecting type ["
+										+ ValueConditionPredicate.class
+												.getCanonicalName() + "]");
+					ValueConditionPredicate vcp = (ValueConditionPredicate) acp;
+
+					if (!matcher.match(entity, ccp.getColumn(),
+							condition.getComparator(), vcp.getValue())) {
 						select = false;
 						break;
 					}

@@ -11,9 +11,13 @@ import com.wookler.core.persistence.Entity;
 import com.wookler.core.persistence.EnumPrimitives;
 import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.AbstractCondition;
+import com.wookler.core.persistence.query.AbstractConditionPredicate;
+import com.wookler.core.persistence.query.ColumnConditionPredicate;
 import com.wookler.core.persistence.query.ConditionTransformer;
+import com.wookler.core.persistence.query.EnumConditionType;
 import com.wookler.core.persistence.query.EnumOperator;
 import com.wookler.core.persistence.query.FilterCondition;
+import com.wookler.core.persistence.query.ValueConditionPredicate;
 import com.wookler.utils.DateUtils;
 import com.wookler.utils.KeyValuePair;
 
@@ -30,78 +34,158 @@ public class SqlConditionTransformer implements ConditionTransformer {
 	 * com.wookler.core.persistence.query.ConditionTransformer#transform(com
 	 * .wookler.core.persistence.query.AbstractCondition)
 	 */
-	public String transform(AbstractCondition condition, Class<?> type)
-			throws Exception {
+	public String transform(AbstractCondition condition) throws Exception {
+
 		if (condition instanceof FilterCondition) {
 			FilterCondition fc = (FilterCondition) condition;
-			String cleft = null;
-			if (type != null) {
-				if (fc.getColumn().indexOf('.') > 0) {
-					String[] refpath = fc.getColumn().split("\\.");
-					KeyValuePair<Class<?>> kvp = getJoinCondition(refpath, 0,
-							type);
-					cleft = kvp.getKey();
-					type = kvp.getValue();
+			AbstractConditionPredicate left = fc.getLeft();
+			AbstractConditionPredicate right = fc.getRight();
+			if (left instanceof ColumnConditionPredicate) {
+				ColumnConditionPredicate ccp = (ColumnConditionPredicate) left;
+				if (right instanceof ValueConditionPredicate) {
+					ValueConditionPredicate vcp = (ValueConditionPredicate) right;
+					return transformValueCondition(fc, ccp, fc.getComparator(),
+							vcp);
+				} else if (right instanceof ColumnConditionPredicate) {
+					ColumnConditionPredicate rcp = (ColumnConditionPredicate) right;
+					return transformJoinCondition(fc, ccp, fc.getComparator(),
+							rcp);
 				} else {
-					String table = null;
-
-					// Get table name
-					Entity eann = (Entity) type.getAnnotation(Entity.class);
-					table = eann.recordset();
-
-					cleft = table + "." + fc.getColumn();
+					throw new Exception("Unsupported Right Predicate : ["
+							+ right.getClass().getCanonicalName() + "]");
 				}
 			} else {
-				cleft = fc.getColumn();
+				throw new Exception(
+						"Invalid Filter Condition : Expecting type ["
+								+ ColumnConditionPredicate.class
+										.getCanonicalName() + "]");
 			}
-
-			StringBuffer buff = new StringBuffer(cleft);
-			switch (fc.getComparator()) {
-			case Equal:
-				buff.append(" = ");
-				break;
-			case NotEqual:
-				buff.append(" <> ");
-				break;
-			case GreaterThan:
-				buff.append(" > ");
-				break;
-			case GreaterThanEqual:
-				buff.append(" >= ");
-				break;
-			case LessThan:
-				buff.append(" < ");
-				break;
-			case LessThanEqual:
-				buff.append(" <= ");
-				break;
-			case Between:
-				buff.append(" between ");
-				break;
-			case In:
-				buff.append(" in ");
-				break;
-			case Like:
-				buff.append(" like ");
-				break;
-			case Contains:
-				buff.append(" like ");
-				fc.setValue("'%" + (String) fc.getValue() + "%'");
-				break;
-			default:
-				throw new Exception("Operator [" + fc.getComparator().name()
-						+ "] not supported");
-			}
-			if (type != null) {
-				String value = getValue(fc, type);
-				buff.append(value);
-			} else {
-				buff.append(fc.getValue());
-			}
-
-			return buff.toString();
 		}
 		return null;
+	}
+
+	private String transformJoinCondition(FilterCondition fc,
+			ColumnConditionPredicate lcp, EnumOperator compatator,
+			ColumnConditionPredicate rcp) throws Exception {
+		String cleft = getColumnReference(lcp);
+		String cright = getColumnReference(rcp);
+
+		StringBuffer buff = new StringBuffer(cleft);
+		switch (compatator) {
+		case Equal:
+			buff.append(" = ");
+			break;
+		case NotEqual:
+			buff.append(" <> ");
+			break;
+		case GreaterThan:
+			buff.append(" > ");
+			break;
+		case GreaterThanEqual:
+			buff.append(" >= ");
+			break;
+		case LessThan:
+			buff.append(" < ");
+			break;
+		case LessThanEqual:
+			buff.append(" <= ");
+			break;
+		case Between:
+			buff.append(" between ");
+			break;
+		case In:
+			buff.append(" in ");
+			break;
+		case Like:
+			buff.append(" like ");
+			break;
+		default:
+			throw new Exception("Operator [" + compatator.name()
+					+ "] not supported");
+		}
+		buff.append(cright);
+
+		return buff.toString();
+	}
+
+	private String getColumnReference(ColumnConditionPredicate ccp)
+			throws Exception {
+		Class<?> type = ccp.getType();
+
+		String column = null;
+		if (type != null) {
+			if (ccp.getColumn().indexOf('.') > 0) {
+				String[] refpath = ccp.getColumn().split("\\.");
+				KeyValuePair<Class<?>> kvp = getJoinCondition(refpath, 1, type);
+				column = kvp.getKey();
+				type = kvp.getValue();
+			} else {
+				String table = null;
+
+				// Get table name
+				Entity eann = (Entity) type.getAnnotation(Entity.class);
+				table = eann.recordset();
+
+				column = table + "." + ccp.getColumn();
+			}
+		} else {
+			column = ccp.getColumn();
+		}
+		return column;
+	}
+
+	private String transformValueCondition(FilterCondition fc,
+			ColumnConditionPredicate ccp, EnumOperator compatator,
+			ValueConditionPredicate vcp) throws Exception {
+		Class<?> type = ccp.getType();
+
+		String cleft = getColumnReference(ccp);
+
+		StringBuffer buff = new StringBuffer(cleft);
+		switch (compatator) {
+		case Equal:
+			buff.append(" = ");
+			break;
+		case NotEqual:
+			buff.append(" <> ");
+			break;
+		case GreaterThan:
+			buff.append(" > ");
+			break;
+		case GreaterThanEqual:
+			buff.append(" >= ");
+			break;
+		case LessThan:
+			buff.append(" < ");
+			break;
+		case LessThanEqual:
+			buff.append(" <= ");
+			break;
+		case Between:
+			buff.append(" between ");
+			break;
+		case In:
+			buff.append(" in ");
+			break;
+		case Like:
+			buff.append(" like ");
+			break;
+		case Contains:
+			buff.append(" like ");
+			vcp.setValue("'%" + (String) vcp.getValue() + "%'");
+			break;
+		default:
+			throw new Exception("Operator [" + compatator.name()
+					+ "] not supported");
+		}
+		if (type != null) {
+			String value = getValue(fc, type);
+			buff.append(value);
+		} else {
+			buff.append(vcp.getValue());
+		}
+
+		return buff.toString();
 	}
 
 	private KeyValuePair<Class<?>> getJoinCondition(String[] reference,
@@ -111,7 +195,7 @@ public class SqlConditionTransformer implements ConditionTransformer {
 				column);
 		if (attr == null)
 			throw new Exception("No attribute found for column [" + column
-					+ "]");
+					+ "] for type [" + type.getCanonicalName() + "]");
 		if (offset == reference.length - 1) {
 			Entity eann = (Entity) type.getAnnotation(Entity.class);
 			String table = eann.recordset();
@@ -130,18 +214,33 @@ public class SqlConditionTransformer implements ConditionTransformer {
 	}
 
 	private String getValue(FilterCondition fc, Class<?> type) throws Exception {
-		String column = fc.getColumn();
+		AbstractConditionPredicate acp = fc.getLeft();
+		if (!(acp instanceof ColumnConditionPredicate))
+			throw new Exception("Invalid Filter Condition : Expecting type ["
+					+ ColumnConditionPredicate.class.getCanonicalName() + "]");
+		ColumnConditionPredicate ccp = (ColumnConditionPredicate) acp;
+
+		acp = fc.getRight();
+		if (!(acp instanceof ValueConditionPredicate))
+			throw new Exception("Invalid Filter Condition : Expecting type ["
+					+ ValueConditionPredicate.class.getCanonicalName() + "]");
+		ValueConditionPredicate vcp = (ValueConditionPredicate) acp;
+
+		String column = ccp.getColumn();
 		if (column.indexOf('.') > 0) {
 			String[] parts = column.split("\\.");
 			column = parts[parts.length - 1];
 		}
 		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
 				column);
-		if (fc.getValue() instanceof String) {
-			String value = (String) fc.getValue();
-			return quoteValue(value, attr.Field);
-		} else if (fc.getValue().getClass().isArray()) {
-			String[] values = (String[]) fc.getValue();
+		if (vcp.getValue() instanceof String) {
+			String value = (String) vcp.getValue();
+			if (fc.getConditionType() == EnumConditionType.Value)
+				return quoteValue(value, attr.Field);
+			else
+				return value;
+		} else if (vcp.getValue().getClass().isArray()) {
+			String[] values = (String[]) vcp.getValue();
 			for (int ii = 0; ii < values.length; ii++) {
 				values[ii] = quoteValue(values[ii], attr.Field);
 			}

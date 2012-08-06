@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wookler.core.persistence.ReflectionUtils;
 import com.wookler.core.persistence.query.test.ReferenceRoot;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.Sequence;
@@ -52,10 +53,11 @@ public class Test_SimpleDbQuery {
 	@Test
 	public void testQuery() {
 		try {
+			ReflectionUtils.get().getEntityMetadata(ReferenceRoot.class);
 
 			String query = "STR=3;REF.STR='xxx';REF.REF.DT=12900123020";
 			SimpleDbQuery dbq = new SimpleDbQuery();
-			dbq.parse(query);
+			dbq.parse(new Class<?>[] { ReferenceRoot.class }, query);
 			String sql = dbq.getSelectQuery(ReferenceRoot.class);
 			log.info("SQL[" + sql + "]");
 
@@ -101,6 +103,8 @@ public class Test_SimpleDbQuery {
 	@Test
 	public void testPerfQuery() {
 		try {
+			ReflectionUtils.get().getEntityMetadata(ReferenceRoot.class);
+
 			while (true) {
 				long stime = new Date().getTime();
 				int count = 10;
@@ -108,7 +112,7 @@ public class Test_SimpleDbQuery {
 				for (int ii = 0; ii < count; ii++) {
 					String query = "STR=3;REF.STR='xxx';REF.REF.DT=12900123020";
 					SimpleDbQuery dbq = new SimpleDbQuery();
-					dbq.parse(query);
+					dbq.parse(new Class<?>[] { ReferenceRoot.class }, query);
 					String sql = dbq.getSelectQuery(ReferenceRoot.class);
 
 					/*

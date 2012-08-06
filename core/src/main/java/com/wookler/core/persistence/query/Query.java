@@ -24,7 +24,15 @@ public abstract class Query {
 	 *            - Query String
 	 * @throws Exception
 	 */
-	public abstract void parse(String query) throws Exception;
+	public abstract void parse(List<Class<?>> tables, String query)
+			throws Exception;
+
+	/**
+	 * @param tables
+	 * @param query
+	 * @throws Exception
+	 */
+	public abstract void parse(Class<?>[] tables, String query) throws Exception;
 
 	/**
 	 * Does the specified entity match the filter condition.

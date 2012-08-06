@@ -71,7 +71,11 @@ public abstract class AbstractDbPersister extends AbstractPersister {
 	private List<AbstractEntity> read(String query, Class<?> type,
 			Connection conn) throws Exception {
 		SimpleDbQuery parser = new SimpleDbQuery();
-		parser.parse(query);
+
+		// Make sure the type for the class is available.
+		ReflectionUtils.get().getEntityMetadata(type);
+
+		parser.parse(new Class<?>[] { type }, query);
 
 		String selectsql = parser.getSelectQuery(type);
 		Statement stmnt = conn.createStatement();
