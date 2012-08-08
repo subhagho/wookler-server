@@ -2,27 +2,33 @@
 <h2>
 	<db version="1.0">
 		<entities>
-			<entity>com.wookler.entities.users.Profile</entity>
-			<index name="INDX_PR_01" entity="com.wookler.entities.users.Profile"
+			<entity
+			class="com.wookler.entities.users.Profile">
+				<index name="INDX_PR_01"
 				columns="EMAIL" />
-			<entity>com.wookler.entities.users.Subscription</entity>
-			<index name="INDX_SU_01" entity="com.wookler.entities.users.Subscription"
+			</entity>
+			<entity class="com.wookler.entities.users.Subscription">
+				<index name="INDX_SU_01"
 				columns="PROFILE" />
-			<index name="INDX_SU_02" entity="com.wookler.entities.users.Subscription"
+				<index name="INDX_SU_02"
 				columns="TAXONOMY" />
-			<index name="INDX_SU_02" entity="com.wookler.entities.users.Subscription"
+				<index name="INDX_SU_03"
 				columns="VALUE" />
-			<entity>com.wookler.entities.users.Contribution</entity>
-			<index name="INDX_CON_01" entity="com.wookler.entities.users.Contribution"
+			</entity>
+			<entity class="com.wookler.entities.users.Contribution">
+				<index name="INDX_CON_01"
 				columns="PROFILE, CONTRIBSTATE" />
-			<entity>com.wookler.entities.users.Notification</entity>
-			<index name="INDX_NOT_01" entity="com.wookler.entities.users.Notification"
+			</entity>
+			<entity class="com.wookler.entities.users.Notification">
+				<index name="INDX_NOT_01"
 				columns="PROFILE, NOTIFYSTATE" />
-			<entity>com.wookler.entities.interactions.Activity</entity>
-			<index name="INDX_ACT_01" entity="com.wookler.entities.interactions.Activity"
+			</entity>
+			<entity class="com.wookler.entities.interactions.Activity">
+				<index name="INDX_ACT_01"
 				columns="PROFILEID,ACTIVITYTYPE" />
-			<index name="INDX_ACT_02" entity="com.wookler.entities.interactions.Activity"
+				<index name="INDX_ACT_02"
 				columns="PROFILEID,TX_TIMESTAMP" />
+			</entity>
 		</entities>
 	</db>
 </h2>

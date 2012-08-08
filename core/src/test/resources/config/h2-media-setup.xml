@@ -2,34 +2,40 @@
 <h2>
 	<db version="1.0">
 		<entities>
-			<entity>com.wookler.entities.media.Tag</entity>
-			<index name="INDX_TAG_01" entity="com.wookler.entities.media.Tag"
+			<entity class="com.wookler.entities.media.Tag">
+				<index name="INDX_TAG_01"
 				columns="MEDIAID,SEQID,NAME" />
-			<index name="INDX_TAG_02" entity="com.wookler.entities.media.Tag"
+				<index name="INDX_TAG_02"
 				columns="MEDIAID,NAME" />
-			<index name="INDX_TAG_03" entity="com.wookler.entities.media.Tag"
+				<index name="INDX_TAG_03"
 				columns="NAME" />
-			<index name="INDX_TAG_04" entity="com.wookler.entities.media.Tag"
+				<index name="INDX_TAG_04"
 				columns="VALUE,NAME" />
-			<entity>com.wookler.entities.media.Sequence</entity>
-			<index name="INDX_SEQ_01" entity="com.wookler.entities.media.Sequence"
+			</entity>
+			<entity class="com.wookler.entities.media.Sequence" >
+				<index name="INDX_SEQ_01"
 				columns="MEDIAID,SEQID" />
-			<index name="INDX_SEQ_02" entity="com.wookler.entities.media.Sequence"
+				<index name="INDX_SEQ_02"
 				columns="MEDIAID,STARTTIME" />
-			<entity>com.wookler.entities.media.Creative</entity>
-			<index name="INDX_CR_01" entity="com.wookler.entities.media.Creative"
+			</entity>
+			<entity class="com.wookler.entities.media.Creative">
+				<index name="INDX_CR_01"
 				columns="ID" />
-			<entity>com.wookler.entities.media.VideoMedia</entity>
-			<index name="INDX_VM_01" entity="com.wookler.entities.media.VideoMedia"
+			</entity>
+			<entity class="com.wookler.entities.media.VideoMedia">
+				<index name="INDX_VM_01"
 				columns="TYPE,ID" />
-			<index name="INDX_VM_02" entity="com.wookler.entities.media.VideoMedia"
+				<index name="INDX_VM_02"
 				columns="TYPE,NAME" />
-			<entity>com.wookler.entities.media.ProductHistory</entity>
-			<index name="INDX_PH_01" entity="com.wookler.entities.media.ProductHistory"
+			</entity>
+			<entity class="com.wookler.entities.media.ProductHistory">
+				<index name="INDX_PH_01"
 				columns="CREATIVE" />
-			<entity>com.wookler.entities.media.UserRating</entity>
-			<index name="INDX_RT_01" entity="com.wookler.entities.media.UserRating"
+			</entity>
+			<entity class="com.wookler.entities.media.UserRating">
+				<index name="INDX_RT_01"
 				columns="REFERENCEID,RATING" />
+			</entity>
 		</entities>
 	</db>
 </h2>
