@@ -8,5 +8,5 @@ package com.wookler.core.test;
  *
  */
 public class Config {
-	public static final String _CONFIG_FILENAME_ = "target/test-classes/wookler-server.xml";
+	public static final String _CONFIG_FILENAME_ = "target/classes/config/wookler-server.xml";
 }

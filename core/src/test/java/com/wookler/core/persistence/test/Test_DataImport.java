@@ -16,6 +16,7 @@ import com.sqewd.open.dal.api.utils.LogUtils;
 import com.sqewd.open.dal.api.utils.ValueParam;
 import com.sqewd.open.dal.core.Env;
 import com.sqewd.open.dal.core.persistence.DataImport;
+import com.sqewd.open.dal.core.persistence.DataManager;
 import com.sqewd.open.dal.core.persistence.csv.CSVPersister;
 import com.wookler.core.test.Config;
 import com.wookler.entities.users.Profile;
@@ -34,6 +35,7 @@ public class Test_DataImport {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		Env.create(Config._CONFIG_FILENAME_);
+		DataManager.create(Env.get().getConfig());
 		log.info("Environment initialzied...");
 	}
 

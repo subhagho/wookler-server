@@ -108,6 +108,9 @@
 			<resource>
 				<directory>src/test/resources/</directory>
 			</resource>
+			<resource>
+				<directory>src/main/java/config/</directory>
+			</resource>
 		</resources>
 	</build>
 </project>

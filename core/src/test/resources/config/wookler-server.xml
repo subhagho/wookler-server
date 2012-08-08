@@ -35,7 +35,7 @@
 						<param type="Value" name="user" value="wookler" />
 						<param type="Value" name="password" value="w00kler" />
 						<param type="Value" name="setup"
-						value="/var/wookler/config/h2/h2-media-setup.xml" />
+						value="target/classes/config/h2-media-setup.xml" />
 					</params>
 				</persister>
 				<classmap class="com.wookler.entities.media" persister="MEDIAPERSISTER" />
@@ -49,7 +49,7 @@
 						<param type="Value" name="user" value="wookler" />
 						<param type="Value" name="password" value="w00kler" />
 						<param type="Value" name="setup"
-						value="/var/wookler/config/h2/h2-users-setup.xml" />
+						value="target/classes/config/h2-users-setup.xml" />
 					</params>
 				</persister>
 				<classmap class="com.wookler.entities.users" persister="USERPERSISTER" />

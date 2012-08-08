@@ -37,6 +37,7 @@ public class Test_DataManager {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		Env.create(Config._CONFIG_FILENAME_);
+		DataManager.create(Env.get().getConfig());
 		log.info("Environment initialzied...");
 	}
 
