@@ -1,9 +1,0 @@
-{"state":"Loaded","timestamp":1343393452754,"type":"Video","id":"100","refid":"00000","tags":["Movie","Music"],"published":0,"viewcount":0,"name":"TestVideo-100","description":"This is a test Video","length":333445,"location":"http://www.youtube.com","source":"YouTube"}
-
-curl -i -H "Content-Type: application/json" -X POST -d '{"state":"Unknown","timestamp":0,"type":"Video","id":"100","refid":"00000","tags":["Movie","Music"],"published":0,"viewcount":0,"name":"TestVideo-100","description":"This is a test Video","length":333445,"location":"http://www.youtube.com","source":"YouTube"}' http://localhost:8090/rest/wookler/core/crud/save/video
-
-{"state":"Loaded","timestamp":0,"id":"400","html":"<div></div>","url":"http://wookler.com"}
-
-curl -i -H "Content-Type: application/json" -X POST -d '{"state":"Overwrite","timestamp":0,"id":"400","html":"<div></div>","url":"http://wookler.com"}' http://localhost:8090/rest/wookler/core/crud/save/creative
-
-curl -i -X POST http://localhost:8090/rest/import/process?entity=video -vF"file=@VIDEO.csv"
