@@ -7,9 +7,10 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.sqewd.open.dal.core.persistence.Entity;
-import com.sqewd.open.dal.core.persistence.Attribute;
-import com.sqewd.open.dal.core.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.Attribute;
+import com.sqewd.open.dal.api.persistence.Entity;
+
 
 /**
  * Base entity for a Media Object.

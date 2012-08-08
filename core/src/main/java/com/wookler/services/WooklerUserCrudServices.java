@@ -14,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.api.utils.LogUtils;
 import com.sqewd.open.dal.core.persistence.DataManager;
-import com.sqewd.open.dal.utils.LogUtils;
 import com.sun.jersey.api.JResponse;
 import com.wookler.entities.users.Contribution;
 import com.wookler.entities.users.Notification;

@@ -11,12 +11,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.api.utils.ListParam;
+import com.sqewd.open.dal.api.utils.LogUtils;
+import com.sqewd.open.dal.api.utils.ValueParam;
 import com.sqewd.open.dal.core.Env;
 import com.sqewd.open.dal.core.persistence.DataImport;
 import com.sqewd.open.dal.core.persistence.csv.CSVPersister;
-import com.sqewd.open.dal.utils.ListParam;
-import com.sqewd.open.dal.utils.LogUtils;
-import com.sqewd.open.dal.utils.ValueParam;
 import com.wookler.core.test.Config;
 import com.wookler.entities.users.Profile;
 

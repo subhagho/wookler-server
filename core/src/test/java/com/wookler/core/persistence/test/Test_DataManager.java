@@ -14,11 +14,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.EnumEntityState;
+import com.sqewd.open.dal.api.utils.LogUtils;
 import com.sqewd.open.dal.core.Env;
-import com.sqewd.open.dal.core.persistence.AbstractEntity;
 import com.sqewd.open.dal.core.persistence.DataManager;
-import com.sqewd.open.dal.core.persistence.EnumEntityState;
-import com.sqewd.open.dal.utils.LogUtils;
 import com.wookler.core.test.Config;
 import com.wookler.entities.media.EnumVideoSource;
 import com.wookler.entities.media.VideoMedia;

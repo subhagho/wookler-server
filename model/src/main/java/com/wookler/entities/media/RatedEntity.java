@@ -5,8 +5,9 @@ package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.sqewd.open.dal.core.persistence.Attribute;
-import com.sqewd.open.dal.core.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.Attribute;
+
 
 /**
  * @author subhagho

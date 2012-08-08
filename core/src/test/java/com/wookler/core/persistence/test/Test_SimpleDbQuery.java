@@ -15,9 +15,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.api.utils.KeyValuePair;
+import com.sqewd.open.dal.api.utils.LogUtils;
 import com.sqewd.open.dal.core.persistence.query.SimpleDbQuery;
-import com.sqewd.open.dal.utils.KeyValuePair;
-import com.sqewd.open.dal.utils.LogUtils;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.VideoMedia;
