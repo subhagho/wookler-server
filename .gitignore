@@ -10,7 +10,5 @@
 .classpath
 .project
 .settings
-target/
+target
 core/runserver.local.sh
-
-web/target/maven-archiver/pom.properties
