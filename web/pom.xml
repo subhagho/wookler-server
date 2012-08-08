@@ -35,11 +35,6 @@
 			<version>1.0.6</version>
 		</dependency>
 		<dependency>
-			<groupId>com.wookler</groupId>
-			<artifactId>common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.struts</groupId>
 			<artifactId>struts2-core</artifactId>
 			<version>2.3.4</version>
@@ -58,6 +53,11 @@
 			<groupId>com.jgeppert.struts2.jquery</groupId>
 			<artifactId>struts2-jquery-plugin</artifactId>
 			<version>3.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.wookler</groupId>
+			<artifactId>model</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
