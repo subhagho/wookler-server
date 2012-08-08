@@ -13,10 +13,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.wookler.core.persistence.AbstractPersister;
-import com.wookler.core.persistence.DataManager;
-import com.wookler.core.persistence.Entity;
-import com.wookler.core.persistence.ReflectionUtils;
+import com.sqewd.open.dal.core.persistence.AbstractPersister;
+import com.sqewd.open.dal.core.persistence.DataManager;
+import com.sqewd.open.dal.core.persistence.Entity;
+import com.sqewd.open.dal.core.persistence.ReflectionUtils;
+
 
 /**
  * @author subhagho

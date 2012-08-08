@@ -14,13 +14,13 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.core.persistence.DataManager;
+import com.sqewd.open.dal.utils.LogUtils;
 import com.sun.jersey.api.JResponse;
-import com.wookler.core.persistence.DataManager;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
-import com.wookler.utils.LogUtils;
 
 /**
  * @author subhagho

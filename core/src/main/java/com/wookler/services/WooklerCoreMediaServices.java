@@ -19,17 +19,17 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sqewd.open.dal.core.persistence.AbstractEntity;
+import com.sqewd.open.dal.core.persistence.DataManager;
+import com.sqewd.open.dal.core.persistence.query.Query;
+import com.sqewd.open.dal.server.ServerConfig;
+import com.sqewd.open.dal.utils.LogUtils;
 import com.sun.jersey.api.JResponse;
-import com.wookler.core.persistence.AbstractEntity;
-import com.wookler.core.persistence.DataManager;
-import com.wookler.core.persistence.query.Query;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.ProductHistory;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
-import com.wookler.server.ServerConfig;
-import com.wookler.utils.LogUtils;
 
 /**
  * Core services for fetching Entity data. (CRUD services are part of a separate

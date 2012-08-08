@@ -6,8 +6,8 @@ package com.wookler.server;
 import java.util.HashMap;
 import java.util.List;
 
-import com.wookler.core.persistence.AbstractEntity;
-import com.wookler.core.persistence.DataManager;
+import com.sqewd.open.dal.core.persistence.AbstractEntity;
+import com.sqewd.open.dal.core.persistence.DataManager;
 import com.wookler.entities.users.Profile;
 
 /**

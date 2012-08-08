@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wookler>
+<configuration>
 	<env>
 		<work directory="/tmp/wookler/work/" />
 		<temp directory="/tmp/wookler/temp/" />
@@ -10,50 +10,52 @@
 				<app context="/home" war="web.war" />
 			</webapps>
 		</web>
+		<services package="com.wookler.services" />
 	</server>
 	<core>
 		<datamanager>
+			<packages>
+				<jar name="" package="com.wookler.entities" />
+			</packages>
 			<persistence>
 				<persister name="CSVPERSISTER"
-					class="com.wookler.core.persistence.csv.CSVPersister">
+				class="com.sqewd.open.dal.core.persistence.csv.CSVPersister">
 					<params>
 						<param type="Value" name="key" value="CSVPERSISTER" />
 						<param type="Value" name="datadir" value="/var/wookler/data/" />
 					</params>
 				</persister>
-
 				<persister name="MEDIAPERSISTER"
-					class="com.wookler.core.persistence.db.H2DbPersister">
+				class="com.sqewd.open.dal.core.persistence.db.H2DbPersister">
 					<params>
 						<param type="Value" name="key" value="MEDIAPERSISTER" />
 						<param type="Value" name="url"
-							value="jdbc:h2:/var/wookler/data/h2/wookler/media" />
+						value="jdbc:h2:/var/wookler/data/h2/wookler/media" />
 						<param type="Value" name="poolsize" value="10" />
 						<param type="Value" name="user" value="wookler" />
 						<param type="Value" name="password" value="w00kler" />
 						<param type="Value" name="setup"
-							value="/var/wookler/config/h2/h2-media-setup.xml" />
+						value="/var/wookler/config/h2/h2-media-setup.xml" />
 					</params>
 				</persister>
 				<classmap class="com.wookler.entities.media" persister="MEDIAPERSISTER" />
-
 				<persister name="USERPERSISTER"
-					class="com.wookler.core.persistence.db.H2DbPersister">
+				class="com.sqewd.open.dal.core.persistence.db.H2DbPersister">
 					<params>
 						<param type="Value" name="key" value="USERPERSISTER" />
 						<param type="Value" name="url"
-							value="jdbc:h2:/var/wookler/data/h2/wookler/users" />
+						value="jdbc:h2:/var/wookler/data/h2/wookler/users" />
 						<param type="Value" name="poolsize" value="10" />
 						<param type="Value" name="user" value="wookler" />
 						<param type="Value" name="password" value="w00kler" />
 						<param type="Value" name="setup"
-							value="/var/wookler/config/h2/h2-users-setup.xml" />
+						value="/var/wookler/config/h2/h2-users-setup.xml" />
 					</params>
 				</persister>
 				<classmap class="com.wookler.entities.users" persister="USERPERSISTER" />
 				<classmap class="com.wookler.entities.interactions"
-					persister="USERPERSISTER" />
+				persister="USERPERSISTER" />
 			</persistence>
 		</datamanager>
 	</core>
-</wookler>
+</configuration>

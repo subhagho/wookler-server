@@ -8,8 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.wookler.core.persistence.AttributeReflection;
-import com.wookler.core.persistence.ReflectionUtils;
+import com.sqewd.open.dal.core.persistence.AttributeReflection;
+import com.sqewd.open.dal.core.persistence.ReflectionUtils;
+
 
 /**
  * @author subhagho
