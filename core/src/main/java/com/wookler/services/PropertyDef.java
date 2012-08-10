@@ -8,10 +8,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AttributeReflection;
 import com.sqewd.open.dal.api.persistence.ReflectionUtils;
-
-
+import com.sqewd.open.dal.api.persistence.StructAttributeReflect;
 
 /**
  * @author subhagho
@@ -110,7 +108,7 @@ public class PropertyDef {
 
 	public static PropertyDef load(Class<?> type, String field)
 			throws Exception {
-		AttributeReflection attr = ReflectionUtils.get().getAttribute(type,
+		StructAttributeReflect attr = ReflectionUtils.get().getAttribute(type,
 				field);
 		if (attr == null)
 			return null;
