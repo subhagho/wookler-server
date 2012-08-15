@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.sqewd.open.dal.api.persistence.AbstractPersister;
 import com.sqewd.open.dal.api.persistence.Entity;
 import com.sqewd.open.dal.api.persistence.ReflectionUtils;
+import com.sqewd.open.dal.api.persistence.StructAttributeReflect;
+import com.sqewd.open.dal.api.persistence.StructEntityReflect;
 import com.sqewd.open.dal.core.persistence.DataManager;
-
-
 
 /**
  * @author subhagho
@@ -104,18 +104,18 @@ public class EntityDef {
 					+ "] has not been annotated as an Entity.");
 
 		EntityDef entity = new EntityDef();
-		Entity eann = type.getAnnotation(Entity.class);
+		StructEntityReflect enref = ReflectionUtils.get().getEntityMetadata(
+				type);
 
-		entity.name = eann.recordset();
+		entity.name = enref.Entity;
 		AbstractPersister pers = DataManager.get().getPersister(type);
 		entity.persister = pers.getClass().getCanonicalName();
 		entity.classname = type.getCanonicalName();
 
-		List<Field> fields = ReflectionUtils.get().getFields(type);
 		entity.properties = new ArrayList<PropertyDef>();
 
-		for (Field field : fields) {
-			PropertyDef pdef = PropertyDef.load(type, field.getName());
+		for (StructAttributeReflect attr : enref.Attributes) {
+			PropertyDef pdef = PropertyDef.load(type, attr.Field.getName());
 			if (pdef != null)
 				entity.properties.add(pdef);
 		}

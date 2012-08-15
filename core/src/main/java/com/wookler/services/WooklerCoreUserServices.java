@@ -92,7 +92,7 @@ public class WooklerCoreUserServices {
 	public JResponse<WooklerResponse> profile(@Context HttpServletRequest req,
 			@PathParam("userid") String id) throws Exception {
 		try {
-			String query = "ID=" + id;
+			String query = "PROFILE.ID=" + id;
 			String path = "/users?q=" + query;
 
 			log.debug("QUERY [" + query + "]");
@@ -127,7 +127,7 @@ public class WooklerCoreUserServices {
 			@Context HttpServletRequest req, @PathParam("emailid") String email)
 			throws Exception {
 		try {
-			String query = "EMAIL=" + email;
+			String query = "PROFILE.EMAIL=" + email;
 			String path = "/users?q=" + query;
 
 			log.debug("QUERY [" + query + "]");
@@ -226,7 +226,7 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "PROFILE.ID=" + userid + ";LIMIT " + count;
+			String querystr = "CONTRIBUTION.PROFILE.ID=" + userid + ";LIMIT " + count;
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 				querystr = "ID=" + id + ";" + querystr;
@@ -289,7 +289,7 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "PROFILE.ID=" + userid + ";LIMIT " + count
+			String querystr = "NOTIFICATION.PROFILE.ID=" + userid + ";LIMIT " + count
 					+ ";SORT TX_TIMESTAMP DSC";
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
@@ -353,7 +353,7 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "PROFILE.ID=" + userid + ";LIMIT " + count;
+			String querystr = "SUBSCRIPTION.PROFILE.ID=" + userid + ";LIMIT " + count;
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 				querystr = "ID=" + id + ";" + querystr;

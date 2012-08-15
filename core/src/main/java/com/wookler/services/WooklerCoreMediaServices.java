@@ -282,9 +282,9 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
-			StringBuffer squery = new StringBuffer("MEDIAID=" + videoid);
+			StringBuffer squery = new StringBuffer("TAG.MEDIAID=" + videoid);
 			if (seqid.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
-				squery.append(Query._QUERY_CONDITION_AND_).append("SEQID=")
+				squery.append(Query._QUERY_CONDITION_AND_).append("TAG.SEQID=")
 						.append(seqid);
 			}
 			if (query != null && !query.isEmpty()
@@ -435,7 +435,7 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
-			StringBuffer squery = new StringBuffer("MEDIAID=" + videoid);
+			StringBuffer squery = new StringBuffer("SEQUENCE.MEDIAID=" + videoid);
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
@@ -494,7 +494,7 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("CREATIVE-ID:" + id);
-			StringBuffer squery = new StringBuffer("CREATIVE.ID=" + id);
+			StringBuffer squery = new StringBuffer("SEQUENCE.CREATIVE.ID=" + id);
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(

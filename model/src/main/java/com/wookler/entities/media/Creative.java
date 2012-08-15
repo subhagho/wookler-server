@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 
-
 /**
  * Creative is the product/product display creative that is rendered.
  * 
@@ -25,6 +24,14 @@ public class Creative extends RatedEntity {
 	@Attribute(name = "ID", keyattribute = true, size = 256, autoincr = true)
 	@XmlElement(name = "creativeid")
 	private String id;
+
+	@Attribute(name = "TITLE", size = 1024)
+	@XmlElement(name = "title")
+	private String title;
+
+	@Attribute(name = "DESCRIPTION", size = 10 * 1024)
+	@XmlElement(name = "description")
+	private String description;
 
 	// Max HTML size 10K
 	@Attribute(name = "HTML", size = 10 * 1024)
@@ -95,6 +102,36 @@ public class Creative extends RatedEntity {
 		buff.append(", [HTML:").append(getHtml()).append("]");
 		buff.append(", [URL:").append(getUrl()).append("]");
 		return buff.toString();
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title
+	 *            the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

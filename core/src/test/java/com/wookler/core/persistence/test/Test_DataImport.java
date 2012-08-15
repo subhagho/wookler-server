@@ -78,7 +78,7 @@ public class Test_DataImport {
 			 * Sequence.class.getCanonicalName(), Tag.class.getCanonicalName(),
 			 * ProductHistory.class.getCanonicalName() });
 			 */
-			importer.load(new String[] { Profile.class.getCanonicalName() });
+			importer.load(new String[] { "com.wookler.entities.users.Profile" });
 		} catch (Exception e) {
 			LogUtils.stacktrace(log, e);
 			fail(e.getLocalizedMessage());
