@@ -92,12 +92,12 @@ public class WooklerCoreUserServices {
 	public JResponse<WooklerResponse> profile(@Context HttpServletRequest req,
 			@PathParam("userid") String id) throws Exception {
 		try {
-			String query = "PROFILE.ID=" + id;
+			String query = "PROFILE.ID='" + id + "'";
 			String path = "/users?q=" + query;
 
 			log.debug("QUERY [" + query + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(query, Profile.class);
+			List<AbstractEntity> data = dm.read(query, Profile.class, 1);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -127,12 +127,12 @@ public class WooklerCoreUserServices {
 			@Context HttpServletRequest req, @PathParam("emailid") String email)
 			throws Exception {
 		try {
-			String query = "PROFILE.EMAIL=" + email;
+			String query = "PROFILE.EMAIL='" + email + "'";
 			String path = "/users?q=" + query;
 
 			log.debug("QUERY [" + query + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(query, Profile.class);
+			List<AbstractEntity> data = dm.read(query, Profile.class, -1);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -167,10 +167,10 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "LIMIT " + count + ";SORT EMAIL DSC";
+			String querystr = "ORDER BY EMAIL DESC";
 
 			if (query != null && !query.isEmpty()) {
-				querystr = query + ";" + querystr;
+				querystr = query + " " + querystr;
 			}
 
 			String path = "/users/"
@@ -178,7 +178,7 @@ public class WooklerCoreUserServices {
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, Profile.class);
+			List<AbstractEntity> data = dm.read(querystr, Profile.class, count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -226,7 +226,7 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "CONTRIBUTION.PROFILE.ID=" + userid + ";LIMIT " + count;
+			String querystr = "CONTRIBUTION.PROFILE.ID='" + userid + "'";
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 				querystr = "ID=" + id + ";" + querystr;
@@ -241,7 +241,8 @@ public class WooklerCoreUserServices {
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, Contribution.class);
+			List<AbstractEntity> data = dm.read(querystr, Contribution.class,
+					count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -289,23 +290,25 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "NOTIFICATION.PROFILE.ID=" + userid + ";LIMIT " + count
-					+ ";SORT TX_TIMESTAMP DSC";
+			String querystr = "NOTIFICATION.PROFILE.ID='" + userid + "'";
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
-				querystr = "ID=" + id + ";" + querystr;
+				querystr = "ID='" + id + "';" + querystr;
 			}
 
 			if (query != null && !query.isEmpty()) {
 				querystr = query + ";" + querystr;
 			}
 
+			querystr = querystr + " ORDER BY TX_TIMESTAMP DESC";
+
 			String path = "/notification/"
 					+ (querystr != null ? "?q=" + querystr : "");
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, Notification.class);
+			List<AbstractEntity> data = dm.read(querystr, Notification.class,
+					count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -353,10 +356,10 @@ public class WooklerCoreUserServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "SUBSCRIPTION.PROFILE.ID=" + userid + ";LIMIT " + count;
+			String querystr = "SUBSCRIPTION.PROFILE.ID='" + userid + "'";
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
-				querystr = "ID=" + id + ";" + querystr;
+				querystr = "ID='" + id + "';" + querystr;
 			}
 
 			if (query != null && !query.isEmpty()) {
@@ -368,7 +371,8 @@ public class WooklerCoreUserServices {
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, Subscription.class);
+			List<AbstractEntity> data = dm.read(querystr, Subscription.class,
+					count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);

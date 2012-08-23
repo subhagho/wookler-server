@@ -46,7 +46,7 @@ public class SessionCache {
 
 	public Profile add(String sessionid, String id) throws Exception {
 		List<AbstractEntity> entities = DataManager.get().read("ID=" + id,
-				Profile.class);
+				Profile.class, 1);
 		if (entities == null || entities.size() <= 0)
 			throw new Exception("No profiles found for ID [" + id + "]");
 

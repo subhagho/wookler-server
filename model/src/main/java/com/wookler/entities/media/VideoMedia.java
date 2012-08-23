@@ -25,7 +25,7 @@ public class VideoMedia extends Media {
 	@XmlElement(name = "name")
 	private String name;
 
-	@Attribute(name = "DESC", size = 1024)
+	@Attribute(name = "DESCRIPTION", size = 1024)
 	@XmlElement(name = "description")
 	private String description;
 

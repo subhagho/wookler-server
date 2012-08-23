@@ -27,6 +27,7 @@ import com.sqewd.open.dal.server.ServerConfig;
 import com.sun.jersey.api.JResponse;
 import com.wookler.entities.media.Creative;
 import com.wookler.entities.media.ProductHistory;
+import com.wookler.entities.media.ProductView;
 import com.wookler.entities.media.Sequence;
 import com.wookler.entities.media.Tag;
 import com.wookler.entities.media.VideoMedia;
@@ -137,14 +138,13 @@ public class WooklerCoreMediaServices {
 				if (!querystr.isEmpty())
 					querystr = querystr + ";";
 
-				querystr = querystr + "LIMIT " + count;
-
 				log.debug("QUERY [" + querystr + "]");
 				log.debug("VEDIO-ID [" + videoid + "]");
 
 				DataManager dm = DataManager.get();
 
-				List<AbstractEntity> data = dm.read(querystr, VideoMedia.class);
+				List<AbstractEntity> data = dm.read(querystr, VideoMedia.class,
+						count);
 				WooklerResponse response = new WooklerResponse();
 				String path = "/videos" + (query != null ? "?q=" + query : "");
 				response.setRequest(path);
@@ -220,14 +220,15 @@ public class WooklerCoreMediaServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "LIMIT " + count + ";SORT " + column + " DSC";
+			String querystr = "ORDER BY " + column + " DESC";
 
 			String path = "/videos"
 					+ (querystr != null ? "?q=" + querystr : "");
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, VideoMedia.class);
+			List<AbstractEntity> data = dm.read(querystr, VideoMedia.class,
+					count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);
@@ -282,10 +283,11 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
-			StringBuffer squery = new StringBuffer("TAG.MEDIAID=" + videoid);
+			StringBuffer squery = new StringBuffer("TAG.MEDIAID='" + videoid)
+					.append("'");
 			if (seqid.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
-				squery.append(Query._QUERY_CONDITION_AND_).append("TAG.SEQID=")
-						.append(seqid);
+				squery.append(Query._QUERY_CONDITION_AND_)
+						.append("TAG.SEQID='").append(seqid).append("'");
 			}
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
@@ -294,13 +296,12 @@ public class WooklerCoreMediaServices {
 			int pagec = Integer.parseInt(page);
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
-			squery = squery.append(Query._QUERY_CONDITION_AND_)
-					.append("LIMIT ").append(count);
 
 			log.debug("QUERY [" + squery + "]");
 
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(squery.toString(), Tag.class);
+			List<AbstractEntity> data = dm.read(squery.toString(), Tag.class,
+					count);
 			WooklerResponse response = new WooklerResponse();
 			String path = "/videos/" + videoid + "?q=" + squery.toString();
 			response.setRequest(path);
@@ -366,8 +367,8 @@ public class WooklerCoreMediaServices {
 			}
 
 			log.debug("PERIOD:" + periodtype);
-			StringBuffer squery = new StringBuffer("SORT " + periodtype
-					+ " DSC");
+			StringBuffer squery = new StringBuffer("ORDER BY " + periodtype
+					+ " DESC");
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
@@ -375,14 +376,12 @@ public class WooklerCoreMediaServices {
 			int pagec = Integer.parseInt(page);
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
-			squery = squery.append(Query._QUERY_CONDITION_AND_)
-					.append("LIMIT ").append(count);
 
 			log.debug("QUERY [" + squery + "]");
 
 			DataManager dm = DataManager.get();
 			List<AbstractEntity> data = dm.read(squery.toString(),
-					ProductHistory.class);
+					ProductHistory.class, count);
 			WooklerResponse response = new WooklerResponse();
 			String path = "/products/" + period + "?q=" + squery.toString();
 			response.setRequest(path);
@@ -435,7 +434,8 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("VIDEO-ID:" + videoid);
-			StringBuffer squery = new StringBuffer("SEQUENCE.MEDIAID=" + videoid);
+			StringBuffer squery = new StringBuffer("SEQUENCE.MEDIAID='"
+					+ videoid).append("'");
 			if (query != null && !query.isEmpty()
 					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
 				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
@@ -443,14 +443,12 @@ public class WooklerCoreMediaServices {
 			int pagec = Integer.parseInt(page);
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
-			squery = squery.append(Query._QUERY_CONDITION_AND_)
-					.append("LIMIT ").append(count);
 
 			log.debug("QUERY [" + squery + "]");
 
 			DataManager dm = DataManager.get();
 			List<AbstractEntity> data = dm.read(squery.toString(),
-					Sequence.class);
+					Sequence.class, count);
 			WooklerResponse response = new WooklerResponse();
 			String path = "/videos/" + videoid + "?q=" + squery.toString();
 			response.setRequest(path);
@@ -494,25 +492,57 @@ public class WooklerCoreMediaServices {
 			@DefaultValue("20") @QueryParam("s") String size) throws Exception {
 		try {
 			log.debug("CREATIVE-ID:" + id);
-			StringBuffer squery = new StringBuffer("SEQUENCE.CREATIVE.ID=" + id);
-			if (query != null && !query.isEmpty()
-					&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
-				squery = squery.append(Query._QUERY_CONDITION_AND_).append(
-						query);
 			int pagec = Integer.parseInt(page);
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
-			if (type.compareToIgnoreCase("seqeunce") == 0)
-				squery = squery.append(Query._QUERY_CONDITION_AND_)
-						.append("LIMIT ").append(count);
 
-			log.debug("QUERY [" + squery + "]");
-
-			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(squery.toString(),
-					Sequence.class);
 			WooklerResponse response = new WooklerResponse();
 			if (type.compareToIgnoreCase("seqeunce") == 0) {
+
+				StringBuffer squery = new StringBuffer("SEQUENCE.CREATIVE.ID='"
+						+ id).append("'");
+				if (query != null
+						&& !query.isEmpty()
+						&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
+					squery = squery.append(Query._QUERY_CONDITION_AND_).append(
+							query);
+
+				log.debug("QUERY [" + squery + "]");
+
+				DataManager dm = DataManager.get();
+				List<AbstractEntity> data = dm.read(squery.toString(),
+						Sequence.class, count);
+				String path = "/videos/" + type + "?q=" + squery.toString();
+				response.setRequest(path);
+				if (data == null || data.size() <= 0) {
+					response.setState(EnumResponseState.NoData);
+				} else {
+					response.setState(EnumResponseState.Success);
+					int stindex = limit * (pagec - 1);
+					if (stindex > 0) {
+						if (stindex > data.size()) {
+							response.setState(EnumResponseState.NoData);
+						} else {
+							List<AbstractEntity> subdata = data.subList(
+									stindex, data.size());
+							response.setData(subdata);
+						}
+					} else
+						response.setData(data);
+				}
+			} else if (type.compareToIgnoreCase("video") == 0) {
+				StringBuffer squery = new StringBuffer("PRODUCT.ID='" + id)
+						.append("'");
+				if (query != null
+						&& !query.isEmpty()
+						&& query.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0)
+					squery = squery.append(Query._QUERY_CONDITION_AND_).append(
+							query);
+				log.debug("QUERY [" + squery + "]");
+
+				DataManager dm = DataManager.get();
+				List<AbstractEntity> data = dm.read(squery.toString(),
+						ProductView.class, count);
 				String path = "/videos/" + type + "?q=" + squery.toString();
 				response.setRequest(path);
 				if (data == null || data.size() <= 0) {
@@ -532,7 +562,8 @@ public class WooklerCoreMediaServices {
 						response.setData(data);
 				}
 			} else {
-				
+				throw new Exception("Unsupported type [" + type
+						+ "], valid values [sequence,video]");
 			}
 			return JResponse.ok(response).build();
 		} catch (Exception e) {

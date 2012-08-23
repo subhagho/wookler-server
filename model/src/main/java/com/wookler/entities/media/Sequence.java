@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 import com.sqewd.open.dal.api.persistence.Reference;
@@ -21,7 +21,7 @@ import com.sqewd.open.dal.api.persistence.Reference;
 @Entity(recordset = "SEQUENCE")
 @XmlRootElement(name = "sequence")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Sequence extends AbstractEntity {
+public class Sequence extends AbstractPersistedEntity {
 	@Attribute(name = "MEDIAID", keyattribute = true, size = 256)
 	@XmlElement(name = "mediaid")
 	private String mediaid;

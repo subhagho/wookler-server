@@ -7,7 +7,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 
@@ -19,7 +19,7 @@ import com.sqewd.open.dal.api.persistence.Entity;
  * 
  */
 @Entity(recordset = "MEDIA")
-public abstract class Media extends AbstractEntity {
+public abstract class Media extends AbstractPersistedEntity {
 	@Attribute(name = "TYPE")
 	@XmlElement(name = "type")
 	protected EnumMediaType type;
@@ -29,7 +29,7 @@ public abstract class Media extends AbstractEntity {
 	private String id;
 
 	@Attribute(name = "REFID", size = 256)
-	@XmlElement(name = "id")
+	@XmlElement(name = "refid")
 	private String refid;
 
 	@Attribute(name = "TAGS", handler = "com.sqewd.open.dal.core.persistence.handlers.StringArrayConvertor", size = 2048)

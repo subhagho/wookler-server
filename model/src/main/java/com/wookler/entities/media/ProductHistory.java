@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 import com.sqewd.open.dal.api.persistence.Reference;
@@ -21,7 +21,7 @@ import com.sqewd.open.dal.api.persistence.Reference;
 @Entity(recordset = "PRODUCTHISTORY")
 @XmlRootElement(name = "producthistory")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ProductHistory extends AbstractEntity {
+public class ProductHistory extends AbstractPersistedEntity {
 	@Attribute(name = "CREATIVE", keyattribute = true, size = 256)
 	@Reference(target = "com.wookler.entities.media.Creative", attribute = "ID")
 	@XmlElement(name = "creativeid")

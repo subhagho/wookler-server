@@ -73,8 +73,8 @@ public class Test_DataManager {
 
 			manager.save(vm);
 
-			List<AbstractEntity> vmf = manager.read("NAME=TEST-MEDIA-VIDEO",
-					VideoMedia.class);
+			List<AbstractEntity> vmf = manager.read("NAME='TEST-MEDIA-VIDEO'",
+					VideoMedia.class, -1);
 			vm = (VideoMedia) vmf.get(0);
 			String id = vm.getId();
 
@@ -84,7 +84,7 @@ public class Test_DataManager {
 
 			manager.save(vm);
 
-			vmf = manager.read("ID=" + id, VideoMedia.class);
+			vmf = manager.read("ID='" + id + "'", VideoMedia.class, 1);
 
 			assertEquals(0, vmf.size());
 		} catch (Exception e) {

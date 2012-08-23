@@ -8,10 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
-
 
 /**
  * @author subhagho
@@ -20,7 +19,7 @@ import com.sqewd.open.dal.api.persistence.Entity;
 @Entity(recordset = "USERRATING")
 @XmlRootElement(name = "userrating")
 @XmlAccessorType(XmlAccessType.NONE)
-public class UserRating extends AbstractEntity {
+public class UserRating extends AbstractPersistedEntity {
 	@Attribute(name = "PROFILEID", keyattribute = true)
 	@XmlElement(name = "profileid")
 	private long profileid;

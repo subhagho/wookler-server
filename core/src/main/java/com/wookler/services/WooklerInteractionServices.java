@@ -88,8 +88,7 @@ public class WooklerInteractionServices {
 			int limit = Integer.parseInt(size);
 			int count = pagec * limit;
 
-			String querystr = "PROFILEID=" + userid + ";LIMIT " + count
-					+ ";SORT TX_TIMESTAMP DSC";
+			String querystr = "PROFILEID=" + userid + " ORDER BY TX_TIMESTAMP DESC";
 
 			if (id.compareTo(ServerConfig._EMPTY_PATH_ELEMENT_) != 0) {
 				querystr = "ID=" + id + ";" + querystr;
@@ -104,7 +103,7 @@ public class WooklerInteractionServices {
 
 			log.debug("QUERY [" + querystr + "]");
 			DataManager dm = DataManager.get();
-			List<AbstractEntity> data = dm.read(querystr, Activity.class);
+			List<AbstractEntity> data = dm.read(querystr, Activity.class, count);
 			WooklerResponse response = new WooklerResponse();
 
 			response.setRequest(path);

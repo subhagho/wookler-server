@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 import com.sqewd.open.dal.api.persistence.Reference;
@@ -21,7 +21,7 @@ import com.sqewd.open.dal.api.persistence.Reference;
 @Entity(recordset = "SUBSCRIPTION")
 @XmlRootElement(name = "subscription")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Subscription extends AbstractEntity {
+public class Subscription extends AbstractPersistedEntity {
 	public static final String _SUBSCRIBE_ALL_ = "ALL";
 
 	@Attribute(name = "ID", size = 256, autoincr = true)

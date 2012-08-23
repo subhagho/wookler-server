@@ -5,7 +5,7 @@ package com.wookler.entities.media;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 
 
@@ -13,7 +13,7 @@ import com.sqewd.open.dal.api.persistence.Attribute;
  * @author subhagho
  * 
  */
-public class RatedEntity extends AbstractEntity {
+public class RatedEntity extends AbstractPersistedEntity {
 	@Attribute(name = "RATING")
 	@XmlElement(name = "rating")
 	private double rating = 0.0;

@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqewd.open.dal.api.persistence.AbstractEntity;
+import com.sqewd.open.dal.api.persistence.AbstractPersistedEntity;
 import com.sqewd.open.dal.api.persistence.Attribute;
 import com.sqewd.open.dal.api.persistence.Entity;
 import com.wookler.entities.media.EnumEntityType;
@@ -20,7 +20,7 @@ import com.wookler.entities.media.EnumEntityType;
 @Entity(recordset = "ACTIVITY")
 @XmlRootElement(name = "activity")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Activity extends AbstractEntity {
+public class Activity extends AbstractPersistedEntity {
 	@Attribute(name = "PROFILEID")
 	@XmlElement(name = "profileid")
 	private long profileid;
